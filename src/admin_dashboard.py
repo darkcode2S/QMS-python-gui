@@ -365,21 +365,20 @@ def add_record():
 #Database query for add students
 def insert_student_data(school_id, fullname, course, year, connection, cursor, add_window):
     try:
+        school_id_pattern = r'^\d{2}-\d{4}$'
               # Input validation
         if not school_id or not fullname or not course or not year:
             messagebox.showerror("Add Record", "All fields are required.")
-            return
-        
-        if course == 'Select Course' or year == 'Select Year & level':
+            return      
+        elif course == 'Select Course' or year == 'Select Year & level':
            messagebox.showerror("Add Record", "All fields are required.")
            return
               
         # Validate school_id format
-        school_id_pattern = r'^\d{2}-\d{4}$'
-
-        if not re.match(school_id_pattern, school_id):
+        elif not re.match(school_id_pattern, school_id):
             messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
-            return  # Exit the function if validation fails    
+            return  # Exit the function if validation fails  
+          
 
         query = "INSERT INTO student (school_id, full_name, course, year_level) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (school_id, fullname, course, year))
@@ -387,11 +386,11 @@ def insert_student_data(school_id, fullname, course, year, connection, cursor, a
         print("Record added successfully")
         update_table("Students")
         add_window.destroy()  # Close the add window
-    except Error as err:  # Catch MySQL specific errors
-        print(f"Error: {err}")  # Handle MySQL errors as warnings
-    finally:
         cursor.close()
         connection.close()
+    except Error as err:  # Catch MySQL specific errors
+        print(f"Error: {err}")  # Handle MySQL errors as warnings
+        
 
     # elif dropdown_var.get() == "Queue":
     #     queue_window = ctk.CTkToplevel(admin)
