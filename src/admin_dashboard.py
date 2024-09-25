@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import ttk
 from tkinter import messagebox
+import re
 from db import create_connection
 from mysql.connector import Error
 from admin_tables import queue_table,  password_table
@@ -158,7 +159,7 @@ def add_unique_data_to_table(tree, data):
         if record not in existing_data:  # Check if the record is already present
             tree.insert("", "end", values=record)  # Insert only if not present
 
-
+#display data in each tables of students by course from database
 def fetch_students_by_course(course_name):
     connection = create_connection()  # Create the database connection
     if connection is None:
@@ -300,11 +301,9 @@ def add_record():
         input_fullname = ctk.CTkEntry(input_frame, width=250, placeholder_text='Full name')
         input_fullname.pack(padx=10, pady=10)
 
-        # input_course = ctk.CTkEntry(input_frame, width=250, placeholder_text='Course')
-        # input_course.pack(padx=10, pady=10)
         dropdown_course = ctk.StringVar(value="Select Course")
         dropdown_layout = ctk.CTkOptionMenu(input_frame, variable=dropdown_course, width=250,
-                              values=['Select Course',
+                              values=[
                                       "BSCS", 
                                       'BS-CRIM', 
                                       "BSSW", 
@@ -323,12 +322,11 @@ def add_record():
                               button_color="orange",
                               dropdown_hover_color="orange",
                               button_hover_color="#de9420")
-        # dropdown_layout.pack(padx=(0, 110))
         dropdown_layout.pack(padx=10, pady=10)
 
         dropdown_year = ctk.StringVar(value="Select Year & level")
         dropdown_level = ctk.CTkOptionMenu(input_frame, variable=dropdown_year, width=250,
-                              values=['Select Year & level',
+                              values=[
                                       "1st Year", 
                                       '2nd Year', 
                                       "3rd Year", 
@@ -345,17 +343,12 @@ def add_record():
                               button_color="orange",
                               dropdown_hover_color="orange",
                               button_hover_color="#de9420")
-        # dropdown_layout.pack(padx=(0, 110))
         dropdown_level.pack(padx=10, pady=10)
-
-        # input_year = ctk.CTkEntry(input_frame, width=250, placeholder_text='Year & level')
-        # input_year.pack(padx=10, pady=10)
 
         # Button to add the student record
         add_button = ctk.CTkButton(input_frame, text="Add", command=lambda: insert_student_data(
             input_schoolid.get(),
             input_fullname.get(),
-            # input_course.get(),
             dropdown_course.get(),
             dropdown_year.get(),
             connection,
@@ -364,8 +357,30 @@ def add_record():
         ))
         add_button.pack(padx=10, pady=10)
 
+
+        
+    # elif not dropdown_var.get() == "Students":
+    #     messagebox.showerror("Add Failed", "Only Students, Members and Passwords table can Add Record.")
+        
+#Database query for add students
 def insert_student_data(school_id, fullname, course, year, connection, cursor, add_window):
     try:
+              # Input validation
+        if not school_id or not fullname or not course or not year:
+            messagebox.showerror("Add Record", "All fields are required.")
+            return
+        
+        if course == 'Select Course' or year == 'Select Year & level':
+           messagebox.showerror("Add Record", "All fields are required.")
+           return
+              
+        # Validate school_id format
+        school_id_pattern = r'^\d{2}-\d{4}$'
+
+        if not re.match(school_id_pattern, school_id):
+            messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            return  # Exit the function if validation fails    
+
         query = "INSERT INTO student (school_id, full_name, course, year_level) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (school_id, fullname, course, year))
         connection.commit()  # Commit the changes to the database
@@ -411,9 +426,6 @@ def insert_student_data(school_id, fullname, course, year, connection, cursor, a
 
     # cursor.close()
     # connection.close()
-
-
-
 
 
 def remove_record():
