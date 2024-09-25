@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from tkinter import ttk
 from tkinter import messagebox
-
+from db import create_connection
+from mysql.connector import Error
 from admin_tables import queue_table,  password_table
 
 # Initialize the main application window
@@ -157,6 +158,23 @@ def add_unique_data_to_table(tree, data):
         if record not in existing_data:  # Check if the record is already present
             tree.insert("", "end", values=record)  # Insert only if not present
 
+
+def fetch_students_by_course(course_name):
+    connection = create_connection()  # Create the database connection
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+
+    cursor = connection.cursor()
+    query = "SELECT school_id, full_name, course, year_level FROM student WHERE course = %s"  # Query to fetch students by course
+    cursor.execute(query, (course_name,))  # Execute the query with the course name
+
+    students = cursor.fetchall()  # Fetch all results
+    cursor.close()
+    connection.close()
+    return students  # Return the list of students
+
+
 # Update table based on selection
 def update_table(choice):
     # Clear current table data
@@ -203,15 +221,25 @@ def update_table(choice):
             table.insert("", "end", values=password)
             
     elif choice == "Students":
-        table.pack_forget()  # Hide the treeview
-        tab_view.pack(fill="both", expand=True)  # Show the tab view for students
+            table.pack_forget()
+            tab_view.pack(fill="both", expand=True)  # Show the tab view for students
+            
+            # Clear previous data in each student tab
+            for tab_name in tab_list:
+                tables[tab_name].delete(*tables[tab_name].get_children())
 
-        # Add sample data to each tab's table
-        bscs_data = [('21-3434', "Roselyn Basan", 'BSCS', '4th year', '098473834')]
-        add_unique_data_to_table(tables["BSCS"], bscs_data)
+            # Fetch students from the database for each course and insert into the relevant table
+            for course_name in tab_list:
+                students_data = fetch_students_by_course(course_name)  # Fetch data for each course
+                
+                if students_data:
+                    for student in students_data:
+                        # Insert each student record into the corresponding Treeview
+                        tables[course_name].insert("", "end", values=student)
+                else:
+                    print(f"No students found for the course: {course_name}")
 
-        crim_data = [('21-3434', "John Doe", 'BS-CRIM', '3rd year', '0912345678')]
-        add_unique_data_to_table(tables["BS-CRIM"], crim_data)
+
 
     elif choice == "Select Option":
         # Clear current table data
@@ -230,9 +258,163 @@ def define_queue_columns():
 def define_password_columns():
     password_table(table)
 
+
+#ACTION FROM DATABASE++++++++++++++++++
 # Placeholder functions for the buttons
 def add_record():
-    print("Add record")
+    # Function to add a record to the database based on the current selected table
+    connection = create_connection()
+    if connection is None:
+        print("Failed to connect to the database.")
+        return
+
+    cursor = connection.cursor()
+
+    # Get the main window's geometry
+    x = admin.winfo_x()
+    y = admin.winfo_y()
+    width = 300  # Desired width of the pop-up window
+    height = 350  # Desired height of the pop-up window
+    # Calculate the center position
+    x_position = x + (admin.winfo_width() // 2) - (width // 2)
+    y_position = y + (admin.winfo_height() // 2) - (height // 2)
+
+    if dropdown_var.get() == "Students":
+        add_window = ctk.CTkToplevel(admin)
+        add_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
+        add_window.title("Add Student")
+        add_window.iconbitmap("old-logo.ico")
+        add_window.grab_set()  # Make the window modal
+
+        add_window.resizable(False, False)
+        # Create a frame for the input fields
+        input_frame = ctk.CTkFrame(add_window, fg_color='transparent')
+        input_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
+
+        add_label = ctk.CTkLabel(input_frame, text='Add Record', font=ctk.CTkFont(size=20, weight="bold"))
+        add_label.pack(padx=10, pady=10)
+
+        # Create input fields for adding a student
+        input_schoolid = ctk.CTkEntry(input_frame, width=250, placeholder_text='School ID')
+        input_schoolid.pack(padx=10, pady=10)
+        input_fullname = ctk.CTkEntry(input_frame, width=250, placeholder_text='Full name')
+        input_fullname.pack(padx=10, pady=10)
+
+        # input_course = ctk.CTkEntry(input_frame, width=250, placeholder_text='Course')
+        # input_course.pack(padx=10, pady=10)
+        dropdown_course = ctk.StringVar(value="Select Course")
+        dropdown_layout = ctk.CTkOptionMenu(input_frame, variable=dropdown_course, width=250,
+                              values=['Select Course',
+                                      "BSCS", 
+                                      'BS-CRIM', 
+                                      "BSSW", 
+                                      "BSEE",
+                                      'BSMT',
+                                      'BSM',
+                                      'BEED',
+                                      'BSED',
+                                      'BSBA',
+                                      'BSHM',
+                                      'BSA',
+                                      'BAPS'], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        # dropdown_layout.pack(padx=(0, 110))
+        dropdown_layout.pack(padx=10, pady=10)
+
+        dropdown_year = ctk.StringVar(value="Select Year & level")
+        dropdown_level = ctk.CTkOptionMenu(input_frame, variable=dropdown_year, width=250,
+                              values=['Select Year & level',
+                                      "1st Year", 
+                                      '2nd Year', 
+                                      "3rd Year", 
+                                      "4rth Year",
+                                      '5th Year',
+                                      '6th Year',
+                                      '7th Year',
+                                      '8th Year',
+                                      '9th Year',
+                                      '10th Year'], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        # dropdown_layout.pack(padx=(0, 110))
+        dropdown_level.pack(padx=10, pady=10)
+
+        # input_year = ctk.CTkEntry(input_frame, width=250, placeholder_text='Year & level')
+        # input_year.pack(padx=10, pady=10)
+
+        # Button to add the student record
+        add_button = ctk.CTkButton(input_frame, text="Add", command=lambda: insert_student_data(
+            input_schoolid.get(),
+            input_fullname.get(),
+            # input_course.get(),
+            dropdown_course.get(),
+            dropdown_year.get(),
+            connection,
+            cursor,
+            add_window  # Pass the add window to close it later
+        ))
+        add_button.pack(padx=10, pady=10)
+
+def insert_student_data(school_id, fullname, course, year, connection, cursor, add_window):
+    try:
+        query = "INSERT INTO student (school_id, full_name, course, year_level) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query, (school_id, fullname, course, year))
+        connection.commit()  # Commit the changes to the database
+        print("Record added successfully")
+        update_table("Students")
+        add_window.destroy()  # Close the add window
+    except Error as err:  # Catch MySQL specific errors
+        print(f"Error: {err}")  # Handle MySQL errors as warnings
+    finally:
+        cursor.close()
+        connection.close()
+
+    # elif dropdown_var.get() == "Queue":
+    #     queue_window = ctk.CTkToplevel(admin)
+    #     queue_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
+    #     queue_window.title("Add Queue")
+    #     queue_window.iconbitmap("old-logo.ico")
+    #     queue_window.grab_set()  # Make the window modal
+
+    #     # Create a frame for the input fields
+    #     input_frame = ctk.CTkFrame(queue_window)
+    #     input_frame.pack(expand=True)  # Center the frame in the window
+
+    #     # Create input fields for adding a queue
+    #     input_queue_number = ctk.CTkEntry(input_frame)
+    #     input_queue_number.pack(padx=10, pady=10)  # Centering
+    #     input_queue_name = ctk.CTkEntry(input_frame)
+    #     input_queue_name.pack(padx=10, pady=10)  # Centering
+    #     input_details = ctk.CTkEntry(input_frame)
+    #     input_details.pack(padx=10, pady=10)  # Centering
+    #     input_affiliation = ctk.CTkEntry(input_frame)
+    #     input_affiliation.pack(padx=10, pady=10)  # Centering
+    #     input_ticket_number = ctk.CTkEntry(input_frame)
+    #     input_ticket_number.pack(padx=10, pady=10)  # Centering
+    #     input_time = ctk.CTkEntry(input_frame)
+    #     input_time.pack(padx=10, pady=10)  # Centering
+    #     input_completed = ctk.CTkEntry(input_frame)
+    #     input_completed.pack(padx=10, pady=10)  # Centering
+
+    #     # Button to add the queue record
+    #     add_button = ctk.CTkButton(input_frame, text="Add Queue")
+    #     add_button.pack(padx=10, pady=10)  # Centering
+
+    # cursor.close()
+    # connection.close()
+
+
+
+
 
 def remove_record():
     print("Remove record")
