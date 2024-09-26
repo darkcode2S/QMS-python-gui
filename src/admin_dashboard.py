@@ -378,6 +378,8 @@ def add_record():
             add_window  # Pass the add window to close it later
         ))
         add_button.pack(padx=10, pady=10)
+    else:
+        messagebox.showerror("Add Failed", "Only Students, Members and Passwords table can Add Record.")
        
     # elif not dropdown_var.get() == "Students":
     #     messagebox.showerror("Add Failed", "Only Students, Members and Passwords table can Add Record.")
@@ -448,11 +450,6 @@ def insert_student_data(school_id, fullname, course, year, connection, cursor, a
 
 
 def update_record():
-    global selected_item_values  # Access the selected item values
-    if selected_item_values is None:
-        print("No item selected for update.")
-        return  # Exit if no item is selected
-
     connection = create_connection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -463,12 +460,16 @@ def update_record():
     x = admin.winfo_x()
     y = admin.winfo_y()
     width = 320  # Desired width of the pop-up window
-    height = 350  # Desired height of the pop-up window
+    height = 380  # Desired height of the pop-up window
     # Calculate the center position
     x_position = x + (admin.winfo_width() // 2) - (width // 2)
     y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
     if dropdown_var.get() == "Students":
+        global selected_item_values  # Access the selected item values
+        if selected_item_values is None:
+            messagebox.showwarning("Warning","No item selected for update.")
+            return  # Exit if no item is selected
         # Create a modal update window
         update_window = ctk.CTkToplevel(admin)
         update_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
@@ -485,20 +486,29 @@ def update_record():
         update_label.pack(padx=10, pady=10)
 
         # Create input fields for updating a student and set their initial values
-        update_schoolid = ctk.CTkEntry(update_frame, width=250, placeholder_text='School ID')
-        update_schoolid.pack(padx=10, pady=10)
+        schoolid_text = ctk.CTkLabel(update_frame, text='School ID', width=250, text_color='#979490')
+        schoolid_text.pack(padx=(0,190))
+        update_schoolid = ctk.CTkEntry(update_frame, width=250, placeholder_text='School ID', fg_color='lightgray')
+        update_schoolid.pack(padx=10)
         update_schoolid.insert(0, selected_item_values[0])  # Set the School ID
+        update_schoolid.configure(state="disabled")
 
+        fullname_text = ctk.CTkLabel(update_frame, text='Full name', width=250, text_color='#979490')
+        fullname_text.pack(padx=(0,190))
         update_fullname = ctk.CTkEntry(update_frame, width=250, placeholder_text='Full name')
-        update_fullname.pack(padx=10, pady=10)
+        update_fullname.pack(padx=10)
         update_fullname.insert(0, selected_item_values[1])  # Set the Full name
 
+        course_text = ctk.CTkLabel(update_frame, text='Course', width=250, text_color='#979490')
+        course_text.pack(padx=(0,200))
         update_course = ctk.CTkEntry(update_frame, width=250, placeholder_text='Course')
-        update_course.pack(padx=10, pady=10)
+        update_course.pack(padx=10)
         update_course.insert(0, selected_item_values[2])  # Set the Course
 
+        year_text = ctk.CTkLabel(update_frame, text='Year level', width=250, text_color='#979490')
+        year_text.pack(padx=(0,190))
         update_year = ctk.CTkEntry(update_frame, width=250, placeholder_text='Year & level')
-        update_year.pack(padx=10, pady=10)
+        update_year.pack(padx=10)
         update_year.insert(0, selected_item_values[3])  # Set the Year & Level
 
         # Update button with functionality
@@ -517,23 +527,34 @@ def update_record():
             )
         )
         update_button.pack(padx=10, pady=20)
+    else:
+        messagebox.showerror("Update Failed", "Only Students, Members and Passwords table can Update record.")
 
 def save_changes_to_database(school_id, fullname, course, year, conn, cursor, update):
     try:
-        # school_id_pattern = r'^\d{2}-\d{4}$'
-        #       # Input validation
-        # if not school_id or not fullname or not course or not year:
-        #     messagebox.showerror("Add Record", "All fields are required.")
-        #     return      
-        # elif course == 'Select Course' or year == 'Select Year & level':
-        #    messagebox.showerror("Add Record", "All fields are required.")
-        #    return
-              
-        # # Validate school_id format
-        # elif not re.match(school_id_pattern, school_id):
-        #     messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
-        #     return  # Exit the function if validation fails  
-        #          
+
+        year_format = [
+                '1st Year', 
+                '2nd Year', 
+                '3rd Year',
+                '4rth Year', 
+                '5th Year', 
+                '6th Year', 
+                '7th Year', 
+                '8th Year', 
+                '9th Year',
+                '10th Year'
+                ]
+         # Input validation
+        if not school_id or not fullname or not course or not year:
+            messagebox.showerror("Update record", "All fields are required.")
+            return      
+        elif course not in tab_list:
+           messagebox.showerror("Update record", "Please input valid Course")
+           return
+        elif year not in year_format:
+           messagebox.showerror("Update record", "Please input valid Year level")
+           return                             
 
         query = "UPDATE student SET school_id = %s, full_name = %s, course =%s, year_level =%s WHERE school_id = %s"
         cursor.execute(query, (school_id, fullname, course, year, school_id))
@@ -549,11 +570,6 @@ def save_changes_to_database(school_id, fullname, course, year, conn, cursor, up
 
 
 def remove_record():
-    global selected_item_values  # Access the selected item values
-    if selected_item_values is None:
-        print("No item selected for update.")
-        return  # Exit if no item is selected
-
     connection = create_connection()
     if connection is None:
         print("Failed to connect to the database.")
@@ -564,12 +580,16 @@ def remove_record():
     x = admin.winfo_x()
     y = admin.winfo_y()
     width = 320  # Desired width of the pop-up window
-    height = 350  # Desired height of the pop-up window
+    height = 380  # Desired height of the pop-up window
     # Calculate the center position
     x_position = x + (admin.winfo_width() // 2) - (width // 2)
     y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
     if dropdown_var.get() == "Students":
+        global selected_item_values  # Access the selected item values
+        if selected_item_values is None:
+           messagebox.showwarning("Warning","No item selected for remove.")
+           return  # Exit if no item is selected
         # Create a modal update window
         remove_window = ctk.CTkToplevel(admin)
         remove_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
@@ -586,24 +606,36 @@ def remove_record():
         remove_label.pack(padx=10, pady=10)
 
         # Create input fields for updating a student and set their initial values
-        remove_schoolid = ctk.CTkEntry(remove_frame, width=250, placeholder_text='School ID')
-        remove_schoolid.pack(padx=10, pady=10)
+        remove_text = ctk.CTkLabel(remove_frame, text='School ID', width=250, text_color='#979490')
+        remove_text.pack(padx=(0,190))
+        remove_schoolid = ctk.CTkEntry(remove_frame, width=250, placeholder_text='School ID', border_width=0, fg_color='transparent')
+        remove_schoolid.pack(padx=10)
         remove_schoolid.insert(0, selected_item_values[0])  # Set the School ID
+        remove_schoolid.configure(state="disabled")
 
-        remove_fullname = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Full name')
-        remove_fullname.pack(padx=10, pady=10)
+        remove_text = ctk.CTkLabel(remove_frame, text='Full name', width=250, text_color='#979490')
+        remove_text.pack(padx=(0,190))
+        remove_fullname = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Full name', border_width=0, fg_color='transparent')
+        remove_fullname.pack(padx=10)
         remove_fullname.insert(0, selected_item_values[1])  # Set the Full name
+        remove_fullname.configure(state="disabled")
 
-        remove_course = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Course')
-        remove_course.pack(padx=10, pady=10)
+        remove_text = ctk.CTkLabel(remove_frame, text='Course', width=250, text_color='#979490')
+        remove_text.pack(padx=(0,200))
+        remove_course = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Course', border_width=0, fg_color='transparent')
+        remove_course.pack(padx=10)
         remove_course.insert(0, selected_item_values[2])  # Set the Course
+        remove_course.configure(state="disabled")      
 
-        remove_year = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Year & level')
-        remove_year.pack(padx=10, pady=10)
+        remove_text = ctk.CTkLabel(remove_frame, text='Year level', width=250, text_color='#979490')
+        remove_text.pack(padx=(0,190))
+        remove_year = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Year level', border_width=0, fg_color='transparent')
+        remove_year.pack(padx=10)
         remove_year.insert(0, selected_item_values[3])  # Set the Year & Level
+        remove_year.configure(state="disabled")
 
         # Update button with functionality
-        update_button = ctk.CTkButton(
+        remove_button = ctk.CTkButton(
             remove_frame,
             width=250,
             text='Remove record',
@@ -611,39 +643,34 @@ def remove_record():
                 remove_schoolid.get(),
                 connection,
                 cursor,
-                remove_window  # Pass the update window to close it later
+                remove_window  # Pass the remove window to close it later
             )
         )
-        update_button.pack(padx=10, pady=20)
+        remove_button.pack(padx=10, pady=20)
+    else:
+        messagebox.showerror("Remove Failed", "Only Students, Members and Passwords table can Remove Record.")
 
 
 def remove_data_from_database(school_id, conn, cursor, remove):
-    try:
-        # # Input validation
-        # if not school_id:
-        #     messagebox.showerror("Remove Record", "School ID is required.")
-        #     return
+    remove_res = messagebox.askyesno("Confirm", "Are you sure to delete this record")
+    if remove_res:
+        try:
+            # Prepare and execute the DELETE query
+            query = "DELETE FROM `student` WHERE school_id = %s"
+            cursor.execute(query, (school_id,))  # Use a tuple with only the school_id
+            conn.commit()  # Commit the changes to the database
 
-        # # Validate school_id format (uncomment if necessary)
-        # school_id_pattern = r'^\d{2}-\d{4}$'
-        # if not re.match(school_id_pattern, school_id):
-        #     messagebox.showerror("Remove Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
-        #     return  # Exit the function if validation fails  
-
-        # Prepare and execute the DELETE query
-        query = "DELETE FROM `student` WHERE school_id = %s"
-        cursor.execute(query, (school_id,))  # Use a tuple with only the school_id
-        conn.commit()  # Commit the changes to the database
-
-        print("Record removed successfully")
-        update_table("Students")  # Update the displayed table (assuming this is defined elsewhere)
-        
-        remove.destroy()  # Close the remove window
-    except Error as err:  # Catch MySQL specific errors
-        print(f"Error: {err}")  # Handle MySQL errors as warnings
-    finally:
-        cursor.close()  # Close the cursor
-        conn.close()    # Close the connection
+            print("Record removed successfully")
+            update_table("Students")  # Update the displayed table (assuming this is defined elsewhere)
+            
+            remove.destroy()  # Close the remove window
+        except Error as err:  # Catch MySQL specific errors
+            print(f"Error: {err}")  # Handle MySQL errors as warnings
+        finally:
+            cursor.close()  # Close the cursor
+            conn.close()    # Close the connection
+    else:
+        print("Remove canceled.")
 
     
 def confirm_logout():
