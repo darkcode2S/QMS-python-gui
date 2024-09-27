@@ -506,3 +506,42 @@ admin.mainloop()
 
 # # Start the main loop
 # admin.mainloop()
+
+
+tab_member = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw")
+tab_member.add("School Staff")  # Add the BSCS tab
+tab_member.add("School Faculty")  # Add the CRIM tab
+tab_member.pack_forget()  # Initially hide the tab view
+
+# Create Treeview tables inside each Tab
+# Create Treeview tables inside each Tab
+school_staff = ttk.Treeview(tab_member.tab("School Staff"), show="headings") 
+school_staff['columns'] = ('School ID', 'Full name', 'Office', 'Role')    
+school_staff.column("#0", width=0, stretch="no")
+school_staff.column("School ID", anchor="s", width=80)
+school_staff.column("Full name", anchor="w", width=80)
+school_staff.column("Office", anchor="w", width=80)
+school_staff.column("Role", anchor="w", width=80)
+
+school_staff.heading("#0", text="", anchor="center")
+school_staff.heading("School ID", text="School ID", anchor="center")
+school_staff.heading("Full name", text="Full name")
+school_staff.heading("Office", text="Office")
+school_staff.heading("Role", text="Role")
+school_staff.pack(fill="both", expand=True, pady=(0, 20))
+# Disable column dragging
+
+school_faculty = ttk.Treeview(tab_member.tab("School Faculty"), show="headings") 
+school_faculty['columns'] = ('School ID', 'Full name', 'Department', 'Role')    
+school_faculty.column("#0", width=0, stretch="no")
+school_faculty.column("School ID", anchor="s", width=80)
+school_faculty.column("Full name", anchor="w", width=80)
+school_faculty.column("Department", anchor="w", width=80)
+school_faculty.column("Role", anchor="w", width=80)
+
+school_faculty.heading("#0", text="", anchor="center")
+school_faculty.heading("School ID", text="School ID", anchor="center")
+school_faculty.heading("Full name", text="Full name")
+school_faculty.heading("Department", text="Department")
+school_faculty.heading("Role", text="Role")
+school_faculty.pack(fill="both", expand=True, pady=(0, 20))

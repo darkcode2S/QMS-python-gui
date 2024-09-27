@@ -14,8 +14,8 @@ def open_login_window(root):
     # Disable maximize button
     log_in_window.resizable(False, False)  # Disable resizing
 
-    window_width = 400
-    window_height = 300
+    window_width = 300
+    window_height = 320
 
     screen_width = log_in_window.winfo_screenwidth()
     screen_height = log_in_window.winfo_screenheight()
@@ -27,31 +27,34 @@ def open_login_window(root):
 
     photo = ctk.CTkImage(light_image=Image.open("old-logo.png"),
                                   dark_image=Image.open("old-logo.png"),
-                                  size=(50, 50))
-    image_label = ctk.CTkLabel(log_in_window, image=photo, text="")  # Empty text to display only the image
-    image_label.pack(pady=(20, 10))
+                                  size=(80, 80))
+
 
     # Center the username entry, password entry, and button
-    frame = ctk.CTkFrame(log_in_window, width=400, height=300, fg_color="transparent")
-    frame.pack(expand=True)
+    frame = ctk.CTkFrame(log_in_window, fg_color="transparent")
+    frame.pack(expand=True, fill='x')
 
-    # Center elements vertically in the frame
-    frame.grid_rowconfigure((0, 1, 2, 3), weight=1)
-    frame.grid_columnconfigure(0, weight=1)
 
+    image_label = ctk.CTkLabel(frame, image=photo, text="")  # Empty text to display only the image
+    image_label.pack(pady=10)
+
+    username_label = ctk.CTkLabel(frame, text='Username')
+    username_label.pack(padx=(0,150))
     username_entry = ctk.CTkEntry(frame, width=220, placeholder_text='Username')
-    username_entry.grid(row=1, column=0, pady=12)
+    username_entry.pack(pady=(0,10), padx=20)
 
+    password_label = ctk.CTkLabel(frame, text='Password')
+    password_label.pack(padx=(0,150))
     password_entry = ctk.CTkEntry(frame, width=220, show="*", placeholder_text='Password')
-    password_entry.grid(row=2, column=0, pady=12)
+    password_entry.pack(pady=(0,10), padx=20)
 
     # Create custom button with orange background color
-    button = ctk.CTkButton(frame, width=100, text="Log in", 
+    button = ctk.CTkButton(frame, width=220, text="Log in",
                            corner_radius=6, 
                            fg_color='orange', 
                            hover_color="#de9420",
                            command=lambda: log_in(username_entry.get(), password_entry.get(), log_in_window, root))
-    button.grid(row=3, column=0, pady=15)
+    button.pack(pady=15, padx=20)
 
     def on_enter(event):
         button.invoke()  # Simulate button click
