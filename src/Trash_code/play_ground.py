@@ -100,87 +100,132 @@ import customtkinter
 
 # root.mainloop()
 
+# import tkinter as tk
+# from tkinter import ttk
+
+# # Create the main window
+# root = tk.Tk()
+# root.title("Multiple Tables Example")
+
+# # Create a list to store the Treeview widgets (tables)
+# tables = []
+
+# # Column headers
+# columns = ("School ID", "Full Name", "Course", "Year Level")
+
+# # Sample data for the tables
+# data = [
+#     [("12-2323", "John Doe", "Computer Science", "3rd Year"),
+#      ("13-1122", "Jane Smith", "Business Management", "2nd Year")],
+#     [("14-5544", "Mike Johnson", "Engineering", "1st Year"),
+#      ("15-9988", "Linda Lee", "Architecture", "4th Year")],
+#     [("16-6633", "Chris White", "Computer Science", "3rd Year"),
+#      ("17-4455", "Sara Brown", "Law", "2nd Year")],
+#     [("18-7788", "James Green", "Medicine", "4th Year"),
+#      ("19-2299", "Emily Black", "Nursing", "1st Year")]
+# ]
+
+# # Create 4 tables
+# import tkinter as tk
+# from tkinter import ttk
+
+# # Create the main window
+# root = tk.Tk()
+# root.title("Treeview to Entry Example")
+
+# # Create Entry widgets for ID, Name, and Age
+# entry_id = tk.Entry(root, width=20)
+# entry_name = tk.Entry(root, width=20)
+# entry_age = tk.Entry(root, width=20)
+
+# entry_id.grid(row=0, column=1, padx=10, pady=10)
+# entry_name.grid(row=1, column=1, padx=10, pady=10)
+# entry_age.grid(row=2, column=1, padx=10, pady=10)
+
+# # Create labels
+# tk.Label(root, text="ID").grid(row=0, column=0, padx=10, pady=10)
+# tk.Label(root, text="Name").grid(row=1, column=0, padx=10, pady=10)
+# tk.Label(root, text="Age").grid(row=2, column=0, padx=10, pady=10)
+
+# # Create Treeview
+# tree = ttk.Treeview(root, columns=("ID", "Name", "Age"), show="headings")
+# tree.heading("ID", text="ID")
+# tree.heading("Name", text="Name")
+# tree.heading("Age", text="Age")
+
+# # Add some example data to the Treeview
+# data = [("1", "John Doe", "25"),
+#         ("2", "Jane Smith", "30"),
+#         ("3", "Mike Lee", "22")]
+
+# for item in data:
+#     tree.insert("", "end", values=item)
+
+# tree.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
+
+# # Function to get the selected item and populate the Entry fields
+# def on_tree_select(event):
+#     selected_item = tree.selection()[0]  # Get selected item
+#     values = tree.item(selected_item, "values")  # Get values of the selected row
+    
+#     # Populate the Entry fields
+#     entry_id.delete(0, tk.END)
+#     entry_id.insert(0, values[0])
+    
+#     entry_name.delete(0, tk.END)
+#     entry_name.insert(0, values[1])
+    
+#     entry_age.delete(0, tk.END)
+#     entry_age.insert(0, values[2])
+
+# # Bind the treeview selection event to the on_tree_select function
+# tree.bind("<<TreeviewSelect>>", on_tree_select)
+
+# # Run the main loop
+# root.mainloop()
+
 import tkinter as tk
 from tkinter import ttk
 
-# Create the main window
-root = tk.Tk()
-root.title("Multiple Tables Example")
+def on_select(event):
+    # Capture the selected item from the table
+    global selected_item
+    selected_item = table.focus()  # Get the ID of the selected item
+    selected_values = table.item(selected_item, 'values')  # Get the actual value
+    print(f"Selected: {selected_values}")  # Debugging
 
-# Create a list to store the Treeview widgets (tables)
-tables = []
-
-# Column headers
-columns = ("School ID", "Full Name", "Course", "Year Level")
-
-# Sample data for the tables
-data = [
-    [("12-2323", "John Doe", "Computer Science", "3rd Year"),
-     ("13-1122", "Jane Smith", "Business Management", "2nd Year")],
-    [("14-5544", "Mike Johnson", "Engineering", "1st Year"),
-     ("15-9988", "Linda Lee", "Architecture", "4th Year")],
-    [("16-6633", "Chris White", "Computer Science", "3rd Year"),
-     ("17-4455", "Sara Brown", "Law", "2nd Year")],
-    [("18-7788", "James Green", "Medicine", "4th Year"),
-     ("19-2299", "Emily Black", "Nursing", "1st Year")]
-]
-
-# Create 4 tables
-import tkinter as tk
-from tkinter import ttk
+def reset_selection():
+    # Reset the selected value
+    table.selection_remove(table.selection())  # Deselect the item in the table
+    global selected_item
+    selected_item = None  # Clear the stored value
+    print("Selection reset")
 
 # Create the main window
 root = tk.Tk()
-root.title("Treeview to Entry Example")
+root.geometry("400x300")
 
-# Create Entry widgets for ID, Name, and Age
-entry_id = tk.Entry(root, width=20)
-entry_name = tk.Entry(root, width=20)
-entry_age = tk.Entry(root, width=20)
+# Create a table using Treeview
+columns = ('#1', '#2', '#3')
+table = ttk.Treeview(root, columns=columns, show='headings')
+table.heading('#1', text='ID')
+table.heading('#2', text='Name')
+table.heading('#3', text='Value')
 
-entry_id.grid(row=0, column=1, padx=10, pady=10)
-entry_name.grid(row=1, column=1, padx=10, pady=10)
-entry_age.grid(row=2, column=1, padx=10, pady=10)
+# Insert sample data into the table
+table.insert('', tk.END, values=('1', 'Item A', '100'))
+table.insert('', tk.END, values=('2', 'Item B', '200'))
+table.insert('', tk.END, values=('3', 'Item C', '300'))
 
-# Create labels
-tk.Label(root, text="ID").grid(row=0, column=0, padx=10, pady=10)
-tk.Label(root, text="Name").grid(row=1, column=0, padx=10, pady=10)
-tk.Label(root, text="Age").grid(row=2, column=0, padx=10, pady=10)
+table.pack(pady=20)
 
-# Create Treeview
-tree = ttk.Treeview(root, columns=("ID", "Name", "Age"), show="headings")
-tree.heading("ID", text="ID")
-tree.heading("Name", text="Name")
-tree.heading("Age", text="Age")
+# Bind the select event
+table.bind('<<TreeviewSelect>>', on_select)
 
-# Add some example data to the Treeview
-data = [("1", "John Doe", "25"),
-        ("2", "Jane Smith", "30"),
-        ("3", "Mike Lee", "22")]
+# Create Cancel Button
+cancel_button = tk.Button(root, text="Cancel", command=reset_selection)
+cancel_button.pack()
 
-for item in data:
-    tree.insert("", "end", values=item)
+selected_item = None  # Variable to store the selected item
 
-tree.grid(row=3, column=0, columnspan=2, padx=10, pady=10)
-
-# Function to get the selected item and populate the Entry fields
-def on_tree_select(event):
-    selected_item = tree.selection()[0]  # Get selected item
-    values = tree.item(selected_item, "values")  # Get values of the selected row
-    
-    # Populate the Entry fields
-    entry_id.delete(0, tk.END)
-    entry_id.insert(0, values[0])
-    
-    entry_name.delete(0, tk.END)
-    entry_name.insert(0, values[1])
-    
-    entry_age.delete(0, tk.END)
-    entry_age.insert(0, values[2])
-
-# Bind the treeview selection event to the on_tree_select function
-tree.bind("<<TreeviewSelect>>", on_tree_select)
-
-# Run the main loop
 root.mainloop()
-

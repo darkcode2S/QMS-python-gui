@@ -52,7 +52,7 @@ table_label.pack(anchor="w", padx=(8, 0), pady=(10, 0))
 dropdown_var = ctk.StringVar(value="Select Option")
 dropdown = ctk.CTkOptionMenu(sidebar_frame, variable=dropdown_var, 
                               values=['Select Option', "Queue", 'Students', 
-                                      "Members", "Passwords"], 
+                                      "Members", "Operators"], 
                               fg_color="#fff",
                               text_color="#000",
                               dropdown_fg_color="#fff",
@@ -72,15 +72,18 @@ update_button.pack(pady=10)
 remove_button = ctk.CTkButton(sidebar_frame, text="Remove Record", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: remove_record())
 remove_button.pack(pady=10)
 
+settings_button = ctk.CTkButton(sidebar_frame, text="Settings", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: settings_for_admin())
+settings_button.pack(pady=10)
+
 logout_button = ctk.CTkButton(sidebar_frame, text="Log out", text_color="#000", fg_color="lightblue", hover_color="#de9420", command=lambda: confirm_logout())
 logout_button.pack(side="bottom", pady='30')
 
-# Table Frame
-table_frame = ctk.CTkFrame(main_frame, width=500, height=300)
-table_frame.pack(side="right", fill="both", expand=True, padx=(0, 20))
+# Table Frame to handle all table
+table_frame = ctk.CTkFrame(main_frame, width=500, height=300, fg_color='lightgray')
+table_frame.pack(side="right", fill="both", expand=True)
 
-# TabView for students
-tab_view = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw")
+# TabView for students , padx=(0, 20)
+tab_view = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw", fg_color='lightgray')
 tab_view.pack_forget()  # Initially hide the tab view
 
 # Dictionary to store table references for each tab
@@ -120,9 +123,9 @@ for tab_name in tab_list:
     table_student.heading("Course", text="Course")
     table_student.heading("Year&level", text="Year & Level")
     
-    table_student.pack(fill="both", expand=True, pady=(0, 20))
+    table_student.pack(fill="both", expand=True, padx=20)
     
-    # Bind the selection event to the table
+    # Bind the selection event to the table , pady=(0, 20)
     table_student.bind("<<TreeviewSelect>>", lambda event, tab_name=tab_name: on_item_selected(event, tab_name))
     
     tables[tab_name] = table_student  # Store the table reference for each tab
@@ -131,12 +134,12 @@ for tab_name in tab_list:
  # Create tabs and tables dynamically
 
 table = ttk.Treeview(table_frame)
-table.pack(fill="both", expand=True, pady=20)
+table.pack(fill="both", expand=True, pady=20, padx=20)
 
 
 # Create Treeview tables inside each Tab
 # TabView for Members
-tab_member = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw")
+tab_member = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw" , fg_color='lightgray')
 tab_member.pack_forget()  # Initially hide the tab view
 
 # Dictionary to store table references for each tab
@@ -178,9 +181,9 @@ for member_name in member_list:
     table_member.heading("Role", text="Role")
     table_member.heading("Office", text="Office")
     
-    table_member.pack(fill="both", expand=True, pady=(0, 20))
+    table_member.pack(fill="both", expand=True, padx=20)
     
-    # Bind the selection event to the table
+    # Bind the selection event to the table , pady=(0, 20) 
     table_member.bind("<<TreeviewSelect>>", lambda event, member_name=member_name: member_selected(event, member_name))
     
     member_tables[member_name] = table_member  # Store the table reference for each tab
@@ -237,12 +240,12 @@ def update_table(choice):
     # Hide the tab views initially
     tab_view.pack_forget()
     tab_member.pack_forget()
-    table.pack(fill="both", expand=True, pady=20)
+    table.pack(fill="both", expand=True, pady=20, padx=20)
 
-    # Configure the appropriate columns for the selected table
+    # Configure the appropriate columns for the selected table , pady=20
     if choice == "Members":
         table.pack_forget()
-        tab_member.pack(fill="both", expand=True)  # Show the tab view for students
+        tab_member.pack(fill="both", expand=True, pady=20)  # Show the tab view for students
             
         # Clear previous data in each student tab
         for member_name in member_list:
@@ -267,13 +270,13 @@ def update_table(choice):
         for queue in queue_data:
             table.insert("", "end", values=queue)
 
-    elif choice == "Passwords":
+    elif choice == "Operators":
         # tab_member.pack_forget()
         define_password_columns()
             
     elif choice == "Students":
             table.pack_forget()
-            tab_view.pack(fill="both", expand=True)  # Show the tab view for students
+            tab_view.pack(fill="both", expand=True, pady=20)  # Show the tab view for students
             
             # Clear previous data in each student tab
             for tab_name in tab_list:
@@ -289,8 +292,6 @@ def update_table(choice):
                         tables[course_name].insert("", "end", values=student)
                 else:
                     messagebox.showinfo('Show info',f"No students found for the course: {course_name}")
-
-
 
     elif choice == "Select Option":
         # Clear current table data
@@ -314,7 +315,7 @@ def fetch_data():
     cursor.close()
     connection.close()
     return rows
-
+# Operator table
 def define_password_columns():
     table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password', 'Role')
     table.column("#0", width=0, stretch="no")  # Hide the first column
@@ -341,15 +342,40 @@ def define_password_columns():
     for row in data:
         table.insert("", "end", values=row)
 
+item_values = None
+
 def on_item_selected_password(event):
-    selected_item = table.selection()[0]  # Get selected item
-    item_values = table.item(selected_item, 'values')  # Get the values of the selected item
-    print(f"Selected values: {item_values}")  # Do something with the values
-    
+    global item_values
+    selected_item = table.selection()  # Get the selected items (returns a tuple)
+
+    if selected_item:  # Check if any item is selected
+        item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
+        print(f"Selected values: {item_values}")  # Do something with the values
+    else:
+        print("No item selected")  # Handle the case where no item is selected
 
 table.bind("<<TreeviewSelect>>", on_item_selected_password)
 
-#ACTION FROM DATABASE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#Action for close window to cancel seleted values for every tables
+def close_window_add_student(add_window):
+    """Function to handle window close and reset selected item values."""
+    global selected_item_values
+    selected_item_values = None  # Reset the selected item values
+    add_window.destroy()  # Close the window
+
+def close_window_add_member(add_window):
+    """Function to handle window close and reset selected item values."""
+    global select_member_value
+    select_member_value = None
+    add_window.destroy()  # Close the window
+
+def close_window_add_operator(add_window):
+    """Function to handle window close and reset selected item values."""
+    global item_values
+    item_values = None
+    add_window.destroy()  # Close the window
+
+#ACTION FROM DATABASE add records++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Placeholder functions for the buttons
 def add_record():
     # Function to add a record to the database based on the current selected table
@@ -377,8 +403,11 @@ def add_record():
         add_window.grab_set()  # Make the window modal
 
         add_window.resizable(False, False)
+
+        add_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_student(add_window))
+
         # Create a frame for the input fields
-        input_frame = ctk.CTkFrame(add_window, fg_color='transparent')
+        input_frame = ctk.CTkFrame(add_window)
         input_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
 
         add_label = ctk.CTkLabel(input_frame, text='Add Record', font=ctk.CTkFont(size=20, weight="bold"))
@@ -460,6 +489,8 @@ def add_record():
 
         member_window.resizable(False, False)
 
+        member_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_member(member_window))
+
         # Create a frame for the input fields
         member_frame = ctk.CTkFrame(member_window, width=250)
         member_frame.pack(expand=True, fill='x')  # Center the frame in the window
@@ -503,28 +534,34 @@ def add_record():
                                     ))  # Centering
         add_member.pack(padx=10, pady=10)
 
-    elif dropdown_var.get() == "Passwords":
+    elif dropdown_var.get() == "Operators":
         x = admin.winfo_x()
         y = admin.winfo_y()
         width = 320  # Desired width of the pop-up window
-        height = 500  # Desired height of the pop-up window
-        # Calculate the center position
+        height = 450  # Desired height of the pop-up window
+
+        # Calculate the center position for both x and y
         x_position = x + (admin.winfo_width() // 2) - (width // 2)
+        y_position = y + (admin.winfo_height() // 2) - (height // 2)
+
         password_window = ctk.CTkToplevel(admin)
         password_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
-        password_window.title("Add password")
+        password_window.title("Add oprators")
         password_window.iconbitmap("old-logo.ico")
         password_window.grab_set()  # Make the window modal
 
+
         password_window.resizable(False, False)
+
+        password_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_operator(password_window))
 
         # Create a frame for the input fields
         password_frame = ctk.CTkFrame(password_window, width=250)
-        password_frame.pack(expand=True, fill='x')  # Center the frame in the window
+        password_frame.pack(expand=True, fill='both')  # Center the frame in the window
 
         # Create input fields for adding a member
-        password_heading = ctk.CTkLabel(password_frame, text='Add password record')
-        password_heading.pack(padx=10)
+        password_heading = ctk.CTkLabel(password_frame, text='Add operators record')
+        password_heading.pack(padx=10, pady=(20, 0))
 
         password_id = ctk.CTkEntry(password_frame, width=250, placeholder_text='School ID')
         password_id.pack(padx=10, pady=10)  # Centering
@@ -542,7 +579,7 @@ def add_record():
         password_role.pack(padx=10, pady=10)  # Centering
 
         # Button to add the queue record
-        add_password = ctk.CTkButton(password_frame, text="Add passwords",width=250,
+        add_password = ctk.CTkButton(password_frame, text="Add operators",width=250,
                                    command=lambda: insert_password_data(
                                         password_id.get(),
                                         password_name.get(),
@@ -556,8 +593,11 @@ def add_record():
                                         password_window  # Pass the add window to close it later
                                     ))  # Centering
         add_password.pack(padx=10, pady=10)
+    else:
+         messagebox.showwarning("Warning", "Only Students, Members and Operators table can activate the button records.")
+
         
-#Database query for add students
+#Database action query for add students
 def insert_student_data(school_id, fullname, course, year, connection, cursor, add_window):
     try:
         school_id_pattern = r'^\d{2}-\d{4}$'
@@ -581,6 +621,11 @@ def insert_student_data(school_id, fullname, course, year, connection, cursor, a
         update_table("Students")
         add_window.destroy()  # Close the add window
         messagebox.showinfo('Success',"Record added successfully")
+
+        # Reset the selected item values
+        global selected_item_values
+        selected_item_values = None
+
         cursor.close()
         connection.close()
     except Error as err:  # Catch MySQL specific errors
@@ -609,6 +654,11 @@ def insert_member_data(school_id, fullname, affiliation, role, office, connectio
         update_table("Members")
         member_window.destroy()  # Close the add window
         messagebox.showinfo('Success',"Record member added successfully")
+
+        # Reset the selected item values
+        global select_member_value
+        select_member_value = None
+
         cursor.close()
         connection.close()
     except Error as err:  # Catch MySQL specific errors
@@ -619,29 +669,27 @@ def insert_password_data(school_id, fullname, operate_area, phone_num, username,
         school_id_pattern = r'^\d{2}-\d{4}$'
               # Input validation
         if not school_id or not fullname or not operate_area or not phone_num or not username or not role:
-            messagebox.showerror("Add passwrd record", "All fields are required.")
+            messagebox.showerror("Add operator record", "All fields are required.")
             return      
         
         # Validate school_id format
         elif not re.match(school_id_pattern, school_id):
-            messagebox.showerror("Add password record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            messagebox.showerror("Add operator record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
             return  # Exit the function if validation fails  
           
 
         query = "INSERT INTO operator (school_id, full_name, operate_area, phone_number, username, password, role) VALUES (%s, %s, %s, %s,%s,%s,%s)"
         cursor.execute(query, (school_id, fullname, operate_area, phone_num, username, password, role))
         connection.commit()  # Commit the changes to the database
-        update_table("Passwords")
+        update_table("Operators")
         password_window.destroy()  # Close the add window
-        messagebox.showinfo('Success',"Record password added successfully")
+        messagebox.showinfo('Success',"Record operator added successfully")
         cursor.close()
         connection.close()
     except Error as err:  # Catch MySQL specific errors
         print(f"Error: {err}")  # Handle MySQL errors as warning def insert_password_data():
     
-    
-
-        
+           
 
 #update record
 def update_record():
@@ -665,6 +713,7 @@ def update_record():
         if selected_item_values is None:
             messagebox.showwarning("Warning","No item selected for update.")
             return  # Exit if no item is selected
+
         # Create a modal update window
         update_window = ctk.CTkToplevel(admin)
         update_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
@@ -672,6 +721,8 @@ def update_record():
         update_window.iconbitmap("old-logo.ico")
         update_window.grab_set()  # Make the window modal
         update_window.resizable(False, False)
+
+        update_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_student(update_window))
 
         # Create a frame for the input fields
         update_member_frame = ctk.CTkFrame(update_window, fg_color='transparent')
@@ -745,6 +796,8 @@ def update_record():
         update_member.grab_set()  # Make the window modal
         update_member.resizable(False, False)
 
+        update_member.protocol("WM_DELETE_WINDOW", lambda: close_window_add_member(update_member))
+
         # Create a frame for the input fields
         update_member_frame = ctk.CTkFrame(update_member, fg_color='transparent')
         update_member_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
@@ -802,6 +855,87 @@ def update_record():
         )
         update_button.pack(padx=10, pady=20)
 
+    elif dropdown_var.get() == "Operators":
+        global item_values  # Access the selected item values
+        if item_values is None:
+            messagebox.showwarning("Warning","No item selected for update.")
+            return  # Exit if no item is selected
+        
+        x = admin.winfo_x()
+        y = admin.winfo_y()
+        width = 320  # Desired width of the pop-up window
+        height = 450  # Desired height of the pop-up window
+
+        # Calculate the center position for both x and y
+        x_position = x + (admin.winfo_width() // 2) - (width // 2)
+        y_position = y + (admin.winfo_height() // 2) - (height // 2)
+
+        password_update = ctk.CTkToplevel(admin)
+        password_update.geometry(f"{width}x{height}+{x_position}+{y_position}")
+        password_update.title("Update oprators")
+        password_update.iconbitmap("old-logo.ico")
+        password_update.grab_set()  # Make the window modal
+
+        password_update.resizable(False, False)
+
+        password_update.protocol("WM_DELETE_WINDOW", lambda: close_window_add_operator(password_update))
+
+        # Create a frame for the input fields
+        password_operator = ctk.CTkFrame(password_update, width=250)
+        password_operator.pack(expand=True, fill='both')  # Center the frame in the window
+
+        # Create input fields for adding a member
+        password_heading = ctk.CTkLabel(password_operator, text='Update operators record')
+        password_heading.pack(padx=10, pady=(20, 0))
+
+        password_id = ctk.CTkEntry(password_operator, width=250, placeholder_text='School ID', fg_color='lightgray')
+        password_id.pack(padx=10, pady=10)  # Centering
+        password_id.insert(0, item_values[0])
+        password_id.configure(state="disabled")
+
+        password_name = ctk.CTkEntry(password_operator, width=250, placeholder_text='Full name')
+        password_name.pack(padx=10, pady=10)  # Centering
+        password_name.insert(0, item_values[1])
+
+        pasword_operate = ctk.CTkEntry(password_operator, width=250, placeholder_text='Operate area')
+        pasword_operate.pack(padx=10, pady=10)  # Centering
+        pasword_operate.insert(0, item_values[2])
+
+        password_num = ctk.CTkEntry(password_operator, width=250, placeholder_text='Phone')
+        password_num.pack(padx=10, pady=10)  # Centering
+        password_num.insert(0, item_values[3])
+
+        password_username = ctk.CTkEntry(password_operator, width=250, placeholder_text='Username')
+        password_username.pack(padx=10, pady=10)  # Centering
+        password_username.insert(0, item_values[4])
+
+        password_password = ctk.CTkEntry(password_operator, width=250, placeholder_text='Password')
+        password_password.pack(padx=10, pady=10)  # Centering
+        password_password.insert(0, item_values[5])
+
+        password_role = ctk.CTkEntry(password_operator, width=250, placeholder_text='Role')
+        password_role.pack(padx=10, pady=10)  # Centering
+        password_role.insert(0, item_values[6])
+
+        # Button to add the queue record
+        update_opearator = ctk.CTkButton(password_operator, text="Update operators",width=250,
+                                                        command=lambda: update_password_data(
+                                                            password_id.get(),
+                                                            password_name.get(),
+                                                            pasword_operate.get(),
+                                                            password_num.get(),
+                                                            password_username.get(),
+                                                            password_password.get(),
+                                                            password_role.get(),
+                                                            connection,
+                                                            cursor,
+                                                            password_update  # Pass the add window to close it later
+                                                        ))  # Centering
+        update_opearator.pack(padx=10, pady=10)
+    else:
+        messagebox.showwarning("Warning", "Only Students, Members and Operators table can activate the button records.")
+
+
 #Action of update in databse
 def save_changes_to_database(school_id, fullname, course, year, conn, cursor, update):
     try:
@@ -835,6 +969,16 @@ def save_changes_to_database(school_id, fullname, course, year, conn, cursor, up
         update_table("Students")
         update.destroy()  # Close the add window
         messagebox.showinfo('Success',"Record update successfully")
+
+        # Reset the table selection
+        if tab_view:
+            selected_table = tables[course]  # Get the table for the updated course
+            selected_table.selection_remove(selected_table.selection())  # Deselect any selected items
+
+        # Reset the selected item values
+        global selected_item_values
+        selected_item_values = None
+
         cursor.close()
         conn.close()
     except Error as err:  # Catch MySQL specific errors
@@ -862,13 +1006,64 @@ def save_changes_member(school_id, fullname, affiliation, role, office, conn, cu
         update_table("Members")
         update.destroy()  # Close the add window
         messagebox.showinfo('Success',"Record update successfully")
+
+
+        # Reset the table selection
+        if tab_member:
+            selected_table = member_tables[office]  # Get the table for the updated course
+            selected_table.selection_remove(selected_table.selection())  # Deselect any selected items
+
+        # Reset the selected item values
+        global select_member_value
+        select_member_value = None
+
+
         cursor.close()
         conn.close()
     except Error as err:  # Catch MySQL specific errors
-        print(f"Error: {err}")  # Handle MySQL errors as warnings
+        print(f"Error: {err}")  # Handle MySQL errors as warnings update_password_data
+
+def update_password_data(school_id, fullname, operate, phone, username, password, role, conn, cursor, update):
+    try:
+
+        # office_format = [
+        #         'School staff', 
+        #         'School faculty'
+        #         ]
+         # Input validation
+        if not school_id or not fullname or not operate or not phone or not username or not password or not role:
+            messagebox.showerror("Update record member", "All fields are required.")
+            return      
+        
+        # elif office not in office_format:
+        #    messagebox.showerror("Update record member", "Please input valid office")
+        #    return                             
+
+        query = "UPDATE operator SET school_id = %s, full_name = %s, operate_area =%s, phone_number =%s, username =%s, password =%s, role =%s WHERE school_id = %s"
+        cursor.execute(query, (school_id, fullname, operate, phone, username, password, role, school_id))
+        conn.commit()  # Commit the changes to the database       
+        update_table("Operators")
+        update.destroy()  # Close the add window
+        messagebox.showinfo('Success',"Record update successfully")
 
 
+        # # Reset the table selection
+        # if tab_member:
+        #     selected_table = member_tables[office]  # Get the table for the updated course
+        #     selected_table.selection_remove(selected_table.selection())  # Deselect any selected items
 
+        # Reset the selected item values
+        global item_values
+        item_values = None
+
+
+        cursor.close()
+        conn.close()
+    except Error as err:  # Catch MySQL specific errors
+        print(f"Error: {err}")  # Handle MySQL errors as warnings update_password_data
+
+
+#Remove record 
 def remove_record():
     connection = create_connection()
     if connection is None:
@@ -877,159 +1072,47 @@ def remove_record():
 
     cursor = connection.cursor()
 
-    x = admin.winfo_x()
-    y = admin.winfo_y()
-    width = 320  # Desired width of the pop-up window
-    height = 380  # Desired height of the pop-up window
-    # Calculate the center position
-    x_position = x + (admin.winfo_width() // 2) - (width // 2)
-    y_position = y + (admin.winfo_height() // 2) - (height // 2)
-
     if dropdown_var.get() == "Students":
         global selected_item_values  # Access the selected item values
         if selected_item_values is None:
            messagebox.showwarning("Warning","No item selected for remove.")
            return  # Exit if no item is selected
-        # Create a modal update window
-        remove_window = ctk.CTkToplevel(admin)
-        remove_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
-        remove_window.title("Remove Student")
-        remove_window.iconbitmap("old-logo.ico")
-        remove_window.grab_set()  # Make the window modal
-        remove_window.resizable(False, False)
+        
+        global student_id
+        student_id = selected_item_values[0]
 
-        # Create a frame for the input fields
-        remove_frame = ctk.CTkFrame(remove_window, fg_color='transparent')
-        remove_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
+        remove_data_from_database(student_id, connection, cursor)
 
-        remove_label = ctk.CTkLabel(remove_frame, text='Remove record', font=ctk.CTkFont(size=20, weight="bold"))
-        remove_label.pack(padx=10, pady=10)
-
-        # Create input fields for updating a student and set their initial values
-        remove_text = ctk.CTkLabel(remove_frame, text='School ID', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_schoolid = ctk.CTkEntry(remove_frame, width=250, placeholder_text='School ID', border_width=0, fg_color='transparent')
-        remove_schoolid.pack(padx=10)
-        remove_schoolid.insert(0, selected_item_values[0])  # Set the School ID
-        remove_schoolid.configure(state="disabled")
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Full name', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_fullname = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Full name', border_width=0, fg_color='transparent')
-        remove_fullname.pack(padx=10)
-        remove_fullname.insert(0, selected_item_values[1])  # Set the Full name
-        remove_fullname.configure(state="disabled")
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Course', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,200))
-        remove_course = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Course', border_width=0, fg_color='transparent')
-        remove_course.pack(padx=10)
-        remove_course.insert(0, selected_item_values[2])  # Set the Course
-        remove_course.configure(state="disabled")      
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Year level', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_year = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Year level', border_width=0, fg_color='transparent')
-        remove_year.pack(padx=10)
-        remove_year.insert(0, selected_item_values[3])  # Set the Year & Level
-        remove_year.configure(state="disabled")
-
-        # Update button with functionality
-        remove_button = ctk.CTkButton(
-            remove_frame,
-            width=250,
-            text='Remove record',
-            command=lambda: remove_data_from_database(
-                remove_schoolid.get(),
-                connection,
-                cursor,
-                remove_window  # Pass the remove window to close it later
-            )
-        )
-        remove_button.pack(padx=10, pady=20)
     # else:
     #     messagebox.showerror("Remove Failed", "Only Students, Members and Passwords table can Remove Record.")
-    elif dropdown_var.get() == "Members":
-        x = admin.winfo_x()
-        y = admin.winfo_y()
-        width = 320  # Desired width of the pop-up window
-        height = 400  # Desired height of the pop-up window
-        # Calculate the center position
-        x_position = x + (admin.winfo_width() // 2) - (width // 2)
-        y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
+    elif dropdown_var.get() == "Members":
         global select_member_value  # Access the selected item values
         if select_member_value is None:
            messagebox.showwarning("Warning","No item selected for remove.")
            return  # Exit if no item is selected
-        # Create a modal update window
-        remove_window = ctk.CTkToplevel(admin)
-        remove_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
-        remove_window.title("Remove Student")
-        remove_window.iconbitmap("old-logo.ico")
-        remove_window.grab_set()  # Make the window modal
-        remove_window.resizable(False, False)
+        
+        global member_id
+        member_id = select_member_value[0]
+        remove_member_data(member_id, connection, cursor)
 
-        # Create a frame for the input fields
-        remove_frame = ctk.CTkFrame(remove_window, fg_color='transparent')
-        remove_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
+    elif dropdown_var.get() == "Operators":
+        global item_values  # Access the selected item values
+        if item_values is None:
+           messagebox.showwarning("Warning","No item selected for remove.")
+           return  # Exit if no item is selected
+        
+        global operator_id
+        operator_id = item_values[0]
+        remove_operator_data(operator_id, connection, cursor)
 
-        remove_label = ctk.CTkLabel(remove_frame, text='Remove record', font=ctk.CTkFont(size=20, weight="bold"))
-        remove_label.pack()
-
-        # Create input fields for updating a student and set their initial values
-        remove_text = ctk.CTkLabel(remove_frame, text='School ID', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_schoolid = ctk.CTkEntry(remove_frame, width=250, placeholder_text='School ID', border_width=0, fg_color='transparent')
-        remove_schoolid.pack(padx=10)
-        remove_schoolid.insert(0, select_member_value[0])  # Set the School ID
-        remove_schoolid.configure(state="disabled")
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Full name', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_fullname = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Full name', border_width=0, fg_color='transparent')
-        remove_fullname.pack(padx=10)
-        remove_fullname.insert(0, select_member_value[1])  # Set the Full name
-        remove_fullname.configure(state="disabled")
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Affiliation', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,200))
-        remove_course = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Course', border_width=0, fg_color='transparent')
-        remove_course.pack(padx=10)
-        remove_course.insert(0, select_member_value[2])  # Set the Course
-        remove_course.configure(state="disabled")      
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Role', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_year = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Year level', border_width=0, fg_color='transparent')
-        remove_year.pack(padx=10)
-        remove_year.insert(0, select_member_value[3])  # Set the Year & Level
-        remove_year.configure(state="disabled")
-
-        remove_text = ctk.CTkLabel(remove_frame, text='Office', width=250, text_color='#979490')
-        remove_text.pack(padx=(0,190))
-        remove_year = ctk.CTkEntry(remove_frame, width=250, placeholder_text='Year level', border_width=0, fg_color='transparent')
-        remove_year.pack(padx=10)
-        remove_year.insert(0, select_member_value[4])  # Set the Year & Level
-        remove_year.configure(state="disabled")
-
-        # Update button with functionality
-        remove_button = ctk.CTkButton(
-            remove_frame,
-            width=250,
-            text='Remove record',
-            command=lambda: remove_member_data(
-                remove_schoolid.get(),
-                connection,
-                cursor,
-                remove_window  # Pass the remove window to close it later
-            )
-        )
-        remove_button.pack(padx=10, pady=20)
+    else:
+        messagebox.showwarning("Warning", "Only Students, Members and Operators table can activate the button records.")
 
 
-def remove_data_from_database(school_id, conn, cursor, remove):
-    remove_res = messagebox.askyesno("Confirm", "Are you sure to delete this record")
+#action query from database to remove records     
+def remove_data_from_database(school_id, conn, cursor):
+    remove_res = messagebox.askyesno("Confirm", f"Are you sure to remove this record {student_id}")
     if remove_res:
         try:
             # Prepare and execute the DELETE query
@@ -1040,7 +1123,9 @@ def remove_data_from_database(school_id, conn, cursor, remove):
             print("Record removed successfully")
             update_table("Students")  # Update the displayed table (assuming this is defined elsewhere)
             
-            remove.destroy()  # Close the remove window
+            global selected_item_values
+            selected_item_values = None  # Clear the selected item after deletion
+
         except Error as err:  # Catch MySQL specific errors
             print(f"Error: {err}")  # Handle MySQL errors as warnings
         finally:
@@ -1049,8 +1134,8 @@ def remove_data_from_database(school_id, conn, cursor, remove):
     else:
         print("Remove canceled.")
 
-def remove_member_data(school_id, conn, cursor, remove):
-    remove_res = messagebox.askyesno("Confirm", "Are you sure to delete this record")
+def remove_member_data(school_id, conn, cursor):
+    remove_res = messagebox.askyesno("Confirm", f"Are you sure to remove this record {member_id}")
     if remove_res:
         try:
             # Prepare and execute the DELETE query
@@ -1059,19 +1144,49 @@ def remove_member_data(school_id, conn, cursor, remove):
             conn.commit()  # Commit the changes to the database
 
             print("Record removed successfully")
-            update_table("Members")  # Update the displayed table (assuming this is defined elsewhere)         
-            remove.destroy()  # Close the remove window
+            update_table("Members")  # Update the displayed table (assuming this is defined elsewhere)     
+
+            # Reset the selected item values
+            global select_member_value
+            select_member_value = None
+
         except Error as err:  # Catch MySQL specific errors
             print(f"Error: {err}")  # Handle MySQL errors as warnings
         finally:
             cursor.close()  # Close the cursor
-            conn.close()    # Close the connection
-        remove.destroy()
+            conn.close()    # Close the connection 
     else:
-        remove.destroy()
         print("Remove canceled.")
 
+def remove_operator_data(school_id, conn, cursor):
+    remove_res = messagebox.askyesno("Confirm", f"Are you sure to remove this record {operator_id}")
+    if remove_res:
+        try:
+            # Prepare and execute the DELETE query
+            query = "DELETE FROM `operator` WHERE school_id = %s"
+            cursor.execute(query, (school_id,))  # Use a tuple with only the school_id
+            conn.commit()  # Commit the changes to the database
+
+            print("Record removed successfully")
+            update_table("Operators")  # Update the displayed table (assuming this is defined elsewhere)     
+
+            # Reset the selected item values
+            global item_values
+            item_values = None
+
+        except Error as err:  # Catch MySQL specific errors
+            print(f"Error: {err}")  # Handle MySQL errors as warnings
+        finally:
+            cursor.close()  # Close the cursor
+            conn.close()    # Close the connection remove_operator_data
+    else:
+        print("Remove canceled.")
+
+# admin settings
+def settings_for_admin():
+    print("Admin Settings")
     
+#logout confirmation   
 def confirm_logout():
     response = messagebox.askyesno("Log out", "Are you sure you want to log out?")
     if response:
