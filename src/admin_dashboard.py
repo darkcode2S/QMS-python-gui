@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import tkinter as tk
 from tkinter import END, Event, StringVar, ttk
 from tkinter import messagebox
 import re
@@ -101,7 +102,7 @@ def on_item_selected(event, tab_name):
         print(f"Selected Item from {tab_name}: {selected_item_values}")  # Process or display the selected values
 
 
-# Function to dynamically create tabs and tables
+# Function to dynamically create tabs and tables for students
 for tab_name in tab_list:
     tab_view.add(tab_name)  # Add the tab
     table_student = ttk.Treeview(tab_view.tab(tab_name), show="headings")
@@ -183,6 +184,8 @@ for member_name in member_list:
     table_member.bind("<<TreeviewSelect>>", lambda event, member_name=member_name: member_selected(event, member_name))
     
     member_tables[member_name] = table_member  # Store the table reference for each tab
+
+#table for passwords
 
 # Function to add unique data to a table
 def add_unique_data_to_table(tree, data):
@@ -267,10 +270,6 @@ def update_table(choice):
     elif choice == "Passwords":
         # tab_member.pack_forget()
         define_password_columns()
-        passwords_data = [(1, "User1", "Password1"),
-                          (2, "User2", "Password2")]
-        for password in passwords_data:
-            table.insert("", "end", values=password)
             
     elif choice == "Students":
             table.pack_forget()
@@ -307,9 +306,48 @@ def define_queue_columns():
     queue_table(table)
 
 # Function to define columns for the password table
-def define_password_columns():
-    password_table(table)
+def fetch_data():
+    connection = create_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT school_id, full_name, operate_area, phone_number, username, password, role FROM operator")
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return rows
 
+def define_password_columns():
+    table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password', 'Role')
+    table.column("#0", width=0, stretch="no")  # Hide the first column
+    table.column("School ID", anchor="center", width=80)
+    table.column("Full name", anchor="center", width=80)
+    table.column("Operate area", anchor="center", width=80)
+    table.column("Phone", anchor="center", width=80)
+    table.column("Username", anchor="center", width=80)
+    table.column("Password", anchor="center", width=80)
+    table.column("Role", anchor="center", width=80)
+
+    table.heading("#0", text="", anchor="center")
+    table.heading("School ID", text="School ID")
+    table.heading("Full name", text="Full name")
+    table.heading("Operate area", text="Operate area")
+    table.heading("Phone", text="Phone")
+    table.heading("Username", text="Username")
+    table.heading("Password", text="Password")
+    table.heading("Role", text="Role")
+
+
+    # Fetch and display data
+    data = fetch_data()
+    for row in data:
+        table.insert("", "end", values=row)
+
+def on_item_selected_password(event):
+    selected_item = table.selection()[0]  # Get selected item
+    item_values = table.item(selected_item, 'values')  # Get the values of the selected item
+    print(f"Selected values: {item_values}")  # Do something with the values
+    
+
+table.bind("<<TreeviewSelect>>", on_item_selected_password)
 
 #ACTION FROM DATABASE++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Placeholder functions for the buttons
@@ -348,6 +386,7 @@ def add_record():
 
         # Create input fields for adding a student
         input_schoolid = ctk.CTkEntry(input_frame, width=250, placeholder_text='School ID')
+
         input_schoolid.pack(padx=10, pady=10)
         input_fullname = ctk.CTkEntry(input_frame, width=250, placeholder_text='Full name')
         input_fullname.pack(padx=10, pady=10)
@@ -463,6 +502,60 @@ def add_record():
                                         member_window  # Pass the add window to close it later
                                     ))  # Centering
         add_member.pack(padx=10, pady=10)
+
+    elif dropdown_var.get() == "Passwords":
+        x = admin.winfo_x()
+        y = admin.winfo_y()
+        width = 320  # Desired width of the pop-up window
+        height = 500  # Desired height of the pop-up window
+        # Calculate the center position
+        x_position = x + (admin.winfo_width() // 2) - (width // 2)
+        password_window = ctk.CTkToplevel(admin)
+        password_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
+        password_window.title("Add password")
+        password_window.iconbitmap("old-logo.ico")
+        password_window.grab_set()  # Make the window modal
+
+        password_window.resizable(False, False)
+
+        # Create a frame for the input fields
+        password_frame = ctk.CTkFrame(password_window, width=250)
+        password_frame.pack(expand=True, fill='x')  # Center the frame in the window
+
+        # Create input fields for adding a member
+        password_heading = ctk.CTkLabel(password_frame, text='Add password record')
+        password_heading.pack(padx=10)
+
+        password_id = ctk.CTkEntry(password_frame, width=250, placeholder_text='School ID')
+        password_id.pack(padx=10, pady=10)  # Centering
+        password_name = ctk.CTkEntry(password_frame, width=250, placeholder_text='Full name')
+        password_name.pack(padx=10, pady=10)  # Centering
+        pasword_operate = ctk.CTkEntry(password_frame, width=250, placeholder_text='Operate area')
+        pasword_operate.pack(padx=10, pady=10)  # Centering
+        password_num = ctk.CTkEntry(password_frame, width=250, placeholder_text='Phone')
+        password_num.pack(padx=10, pady=10)  # Centering
+        password_username = ctk.CTkEntry(password_frame, width=250, placeholder_text='Username')
+        password_username.pack(padx=10, pady=10)  # Centering
+        password_password = ctk.CTkEntry(password_frame, width=250, placeholder_text='Password')
+        password_password.pack(padx=10, pady=10)  # Centering
+        password_role = ctk.CTkEntry(password_frame, width=250, placeholder_text='Role')
+        password_role.pack(padx=10, pady=10)  # Centering
+
+        # Button to add the queue record
+        add_password = ctk.CTkButton(password_frame, text="Add passwords",width=250,
+                                   command=lambda: insert_password_data(
+                                        password_id.get(),
+                                        password_name.get(),
+                                        pasword_operate.get(),
+                                        password_num.get(),
+                                        password_username.get(),
+                                        password_password.get(),
+                                        password_role.get(),
+                                        connection,
+                                        cursor,
+                                        password_window  # Pass the add window to close it later
+                                    ))  # Centering
+        add_password.pack(padx=10, pady=10)
         
 #Database query for add students
 def insert_student_data(school_id, fullname, course, year, connection, cursor, add_window):
@@ -519,7 +612,35 @@ def insert_member_data(school_id, fullname, affiliation, role, office, connectio
         cursor.close()
         connection.close()
     except Error as err:  # Catch MySQL specific errors
-        print(f"Error: {err}")  # Handle MySQL errors as warning
+        print(f"Error: {err}")  # Handle MySQL errors as warning def insert_password_data():
+
+def insert_password_data(school_id, fullname, operate_area, phone_num, username, password, role, connection, cursor, password_window):
+    try:
+        school_id_pattern = r'^\d{2}-\d{4}$'
+              # Input validation
+        if not school_id or not fullname or not operate_area or not phone_num or not username or not role:
+            messagebox.showerror("Add passwrd record", "All fields are required.")
+            return      
+        
+        # Validate school_id format
+        elif not re.match(school_id_pattern, school_id):
+            messagebox.showerror("Add password record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            return  # Exit the function if validation fails  
+          
+
+        query = "INSERT INTO operator (school_id, full_name, operate_area, phone_number, username, password, role) VALUES (%s, %s, %s, %s,%s,%s,%s)"
+        cursor.execute(query, (school_id, fullname, operate_area, phone_num, username, password, role))
+        connection.commit()  # Commit the changes to the database
+        update_table("Passwords")
+        password_window.destroy()  # Close the add window
+        messagebox.showinfo('Success',"Record password added successfully")
+        cursor.close()
+        connection.close()
+    except Error as err:  # Catch MySQL specific errors
+        print(f"Error: {err}")  # Handle MySQL errors as warning def insert_password_data():
+    
+    
+
         
 
 #update record
