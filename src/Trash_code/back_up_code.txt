@@ -545,3 +545,114 @@ school_faculty.heading("Full name", text="Full name")
 school_faculty.heading("Department", text="Department")
 school_faculty.heading("Role", text="Role")
 school_faculty.pack(fill="both", expand=True, pady=(0, 20))
+
+
+#search function
+def search():
+    global cancel_clicked
+
+    connection = create_connection()  # Create the database connection
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+
+    cursor = connection.cursor()
+
+    search_value = search_bar.get().strip()  # Get the input and remove leading/trailing spaces
+
+    school_id_pattern = r'^\d{2}-\d{4}$'
+
+    if not search_value:  # Check if the search bar is empty
+        messagebox.showinfo("Input Error", "Please enter a value to search")  # Show a message if it's empty
+        return  # Exit the function if there's no input
+            
+    elif not re.match(school_id_pattern, search_value):
+        messagebox.showerror("Search field", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+        return  # Exit the function if validation fails  
+    
+    search_value = "%" + search_value + "%"  # Add wildcards for the LIKE clause
+
+    if dropdown_var.get() == "Students":        
+
+        # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+        # Use a parameterized query to prevent SQL injection
+        query = "SELECT school_id, full_name, course, year_level FROM student WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear existing entries in each table
+        for tab_name, table_student in tables.items():
+            table_student.delete(*table_student.get_children())  # Clear existing entries
+
+            # Check if results are empty
+            if not results:
+                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            else:
+                # Insert the new search results into the current tab's table_student
+                for row in results:
+                    table_student.insert("", "end", values=row)
+
+    elif dropdown_var.get() == "Members":
+                # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+
+        # Use a parameterized query to prevent SQL injection
+        query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear existing entries in each table
+        for tab_name, table_member in member_tables.items():
+            table_member.delete(*table_member.get_children())  # Clear existing entries
+
+            # Check if results are empty
+            if not results:
+                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            else:
+                # Insert the new search results into the current tab's table_member
+                for row in results:
+                    table_member.insert("", "end", values=row)
+
+    elif dropdown_var.get() == "Operators":
+
+                # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+        
+        connection = create_connection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return []
+
+        cursor = connection.cursor()
+
+        search_value = search_bar.get().strip()  # Get and strip the search input
+
+        if not search_value:  # Check if the search input is empty
+            messagebox.showinfo("Input Error", "Please enter a value to search")
+            return
+
+        search_value = "%" + search_value + "%"  # Add wildcards for LIKE clause
+
+        # Execute the search query for Operators
+        query = "SELECT school_id, full_name, operate_area, phone_number, username, password FROM operator WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear and update the Operator table with search results
+        update_operator_table(results)
+
+        # Show a message if no results were found
+        if not results:
+            messagebox.showinfo("Search Result", "User does not exist")
+                    
+    search_bar.delete(0, tk.END)  # Clear the search bar after the search is performed
+
+    cursor.close()  # Close the cursor
+    connection.close()  # Close the connection 

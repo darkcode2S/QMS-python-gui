@@ -104,7 +104,7 @@ search_button.pack(side='right',pady=20, padx=(5,0))
 search_bar = ctk.CTkEntry(nav_frame, width=250, placeholder_text='Search ID...')
 search_bar.pack(side='right',pady=20, padx=(20,0))
 
-#Hide wedgit
+#Hide wedgit from navbar
 cancel_search.pack_forget()
 search_button.pack_forget()
 search_bar.pack_forget()
@@ -280,8 +280,7 @@ def update_table(choice):
         cancel_search.pack(side='right',pady=20, padx=(5,20))
         search_button.pack(side='right',pady=20, padx=(5,0))
         search_bar.pack(side='right',pady=20, padx=(20,0))
-        
-        
+           
             
         # Clear previous data in each student tab
         for member_name in member_list:
@@ -367,6 +366,8 @@ def update_table(choice):
 # Function to define columns for the queue table
 def define_queue_columns():
     queue_table(table)
+
+    
 #Cancel the search of operator
 def update_operator_table(data=None):
     # Clear existing entries in the table
@@ -382,8 +383,10 @@ def update_operator_table(data=None):
 
 cancel_clicked = False
 
-#search function
+#search functionality
 def search():
+    global cancel_clicked
+
     connection = create_connection()  # Create the database connection
     if connection is None:
         print("Failed to connect to the database.")
@@ -393,17 +396,23 @@ def search():
 
     search_value = search_bar.get().strip()  # Get the input and remove leading/trailing spaces
 
+    school_id_pattern = r'^\d{2}-\d{4}$'
+
     if not search_value:  # Check if the search bar is empty
         messagebox.showinfo("Input Error", "Please enter a value to search")  # Show a message if it's empty
         return  # Exit the function if there's no input
-
+            
+    elif not re.match(school_id_pattern, search_value):
+        messagebox.showerror("Search field", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+        search_bar.delete(0, tk.END)
+        return  # Exit the function if validation fails  
+    
     search_value = "%" + search_value + "%"  # Add wildcards for the LIKE clause
 
-    if dropdown_var.get() == "Students":
+    # A flag to check if any results were found
+    results_found = False
 
-        global cancel_clicked
-
-        # Perform search operations here
+    if dropdown_var.get() == "Students":        
 
         # After a search, re-enable the cancel button
         cancel_search.configure(state="normal")
@@ -418,15 +427,23 @@ def search():
         for tab_name, table_student in tables.items():
             table_student.delete(*table_student.get_children())  # Clear existing entries
 
-            # Check if results are empty
-            if not results:
-                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
-            else:
-                # Insert the new search results into the current tab's table_student
+            # # Check if results are empty
+            # if not results:
+            #     messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            # else:
+            #     # Insert the new search results into the current tab's table_student
+            #     for row in results:
+            #         table_student.insert("", "end", values=row)
+            if results:
+                results_found = True  # Mark that we found results
                 for row in results:
                     table_student.insert("", "end", values=row)
 
     elif dropdown_var.get() == "Members":
+                # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+
         # Use a parameterized query to prevent SQL injection
         query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id LIKE %s"
         
@@ -437,15 +454,24 @@ def search():
         for tab_name, table_member in member_tables.items():
             table_member.delete(*table_member.get_children())  # Clear existing entries
 
-            # Check if results are empty
-            if not results:
-                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
-            else:
-                # Insert the new search results into the current tab's table_member
+            # # Check if results are empty
+            # if not results:
+            #     messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            # else:
+            #     # Insert the new search results into the current tab's table_member
+            #     for row in results:
+            #         table_member.insert("", "end", values=row)
+            if results:
+                results_found = True  # Mark that we found results
                 for row in results:
                     table_member.insert("", "end", values=row)
 
     elif dropdown_var.get() == "Operators":
+
+                # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+        
         connection = create_connection()
         if connection is None:
             print("Failed to connect to the database.")
@@ -470,16 +496,23 @@ def search():
         # Clear and update the Operator table with search results
         update_operator_table(results)
 
-        # Show a message if no results were found
-        if not results:
-            messagebox.showinfo("Search Result", "User does not exist")
+        # # Show a message if no results were found
+        # if not results:
+        #     messagebox.showinfo("Search Result", "User does not exist")
+
+        if results:
+            results_found = True  # Mark that we found results
+    
+       # Show a message if no results were found across all categories
+    if not results_found:
+        messagebox.showinfo("Search Result", "User does not exist")  # Show a message box indicating no results found
                     
     search_bar.delete(0, tk.END)  # Clear the search bar after the search is performed
 
     cursor.close()  # Close the cursor
     connection.close()  # Close the connection 
   
-# Function to define columns for the password table
+# Function to define columns for the Operator table
 def fetch_data():
     connection = create_connection()
     cursor = connection.cursor()
@@ -489,6 +522,7 @@ def fetch_data():
     connection.close()
     return rows
 
+# Remove all existing rows from the TreeView table
 def clear_table(table):
     # Remove all existing rows from the TreeView table
     for row in table.get_children():
@@ -496,17 +530,20 @@ def clear_table(table):
 
 # Function to cancel search and reload all data
 def cancel_search_action():
+    global cancel_clicked  # Declare the variable as global at the beginning
 
     if dropdown_var.get() == "Operators":
+        if cancel_clicked:
+            return  # If already clicked once, do nothing
+        
         data = fetch_data()  # Fetch all data from the operator table
         update_operator_table(data)  # Refresh the table with all data
         search_bar.delete(0, tk.END)  # Clear the search bar
-        # messagebox.showinfo("Cancel Search", "All data has been restored.")
+        # Disable the cancel button after one use
+        cancel_search.configure(state="disabled")
+        cancel_clicked = True  # Set the flag to prevent further clicks
 
     elif dropdown_var.get() == "Students":
-
-        global cancel_clicked
-
         if cancel_clicked:
             return  # If already clicked once, do nothing
 
@@ -542,9 +579,44 @@ def cancel_search_action():
 
         return students  # Return the list of students
 
+    elif dropdown_var.get() == "Members":
+        if cancel_clicked:
+            return  # If already clicked once, do nothing
+            
+        connection = create_connection()  # Create the database connection
+        if connection is None:
+            print("Failed to connect to the database.")
+            return []
+        
+        # Clear previous data in each member tab
+        for member_name in member_list:
+            clear_table(member_tables[member_name]) 
+            # Fetch members from the database for each member and insert into the relevant table
+            member_data = fetch_members_data(member_name)  # Fetch data for each member
+            
+            if member_data:
+                for member in member_data:
+                    # Insert each member record into the corresponding Treeview
+                    member_tables[member_name].insert("", "end", values=member)
+            else:
+                messagebox.showinfo('Show info', f"No members found for: {member_name}")
+
+        cursor = connection.cursor()
+        query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE office = %s"  # Query to fetch members by office
+        cursor.execute(query, (member_name,))  # Execute the query with the office name
+
+        members = cursor.fetchall()  # Fetch all results
+
+        # Disable the cancel button after one use
+        cancel_search.configure(state="disabled")
+        cancel_clicked = True  # Set the flag to prevent further clicks
+
+        cursor.close()
+        connection.close()
+        return members  # Return the list of members
 
 
-    
+   
 # Operator table
 def define_password_columns():
     table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
@@ -573,6 +645,7 @@ def define_password_columns():
 
 item_values = None
 
+#get value wehn selected operator table
 def on_item_selected_password(event):
     global item_values
     selected_item = table.selection()  # Get the selected items (returns a tuple)
@@ -978,7 +1051,6 @@ def insert_password_data(school_id, fullname, operate_area, phone_num, username,
         print(f"Error: {err}")  # Handle MySQL errors as warning
     
            
-
 #update record
 def update_record():
     connection = create_connection()
@@ -1338,7 +1410,8 @@ def update_password_data(school_id, fullname, operate, phone, username, password
         
         if len(password) < 4:
             messagebox.showerror("Add operator record", "Error: Password must be at least 4 characters long.")
-            return      
+            return   
+           
         # Check if the username already exists in the database
         cursor.execute("SELECT username FROM operator WHERE username = %s", (username,))
         existing_user = cursor.fetchone()
@@ -1346,10 +1419,12 @@ def update_password_data(school_id, fullname, operate, phone, username, password
         if existing_user:
             messagebox.showerror("Add operator record", "Error: Username already exists. Please choose a different username.")
             return
-
+        
+        # Hash the password before storing it
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         query = "UPDATE operator SET school_id = %s, full_name = %s, operate_area =%s, phone_number =%s, username =%s, password =%s WHERE school_id = %s"
-        cursor.execute(query, (school_id, fullname, operate, phone, username, password, school_id))
+        cursor.execute(query, (school_id, fullname, operate, phone, username, hashed_password, school_id))
         conn.commit()  # Commit the changes to the database       
         update_table("Operators")
         update.destroy()  # Close the add window
@@ -1488,6 +1563,8 @@ def remove_operator_data(school_id, conn, cursor):
     else:
         print("Remove canceled.")
 
+admin_frame = ctk.CTkFrame(table_frame, width=500, height=300, fg_color='lightgray')
+admin_frame.pack(side="right", fill="both", expand=True)
 # admin settings
 def settings_for_admin():
     print("Admin Settings")
