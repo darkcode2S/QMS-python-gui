@@ -1563,12 +1563,62 @@ def remove_operator_data(school_id, conn, cursor):
     else:
         print("Remove canceled.")
 
-admin_frame = ctk.CTkFrame(table_frame, width=500, height=300, fg_color='lightgray')
-admin_frame.pack(side="right", fill="both", expand=True)
 # admin settings
+# Global variable to track if admin_frame is open
+is_admin_frame_open = False
+admin_frame = None  # Declare admin_frame globally
+
 def settings_for_admin():
-    print("Admin Settings")
+    global is_admin_frame_open, admin_frame  # Access the global variable
+
+    # If the admin frame is already open, do nothing
+    if is_admin_frame_open:
+        return  # Exit the function if admin_frame is already open
+
+    # Hide the previous table_frame
+    table_frame.pack_forget()
+
+    # Create and pack the admin frame
+    admin_frame = ctk.CTkFrame(main_frame, fg_color='lightblue')
+    admin_frame.pack(side="right", fill="both", expand=True)
+
+    #navbar frame
+    admin_navbar_frame = ctk.CTkFrame(admin_frame, width=800, height=60, fg_color='#d68b26')
+    admin_navbar_frame.pack(side='top', fill='x')
+
+    admin_navbar_label = ctk.CTkLabel(admin_navbar_frame,
+                            text='Admin settings',
+                            anchor='w', 
+                            text_color='#fff',
+                            font=ctk.CTkFont(size=15, weight="bold"))
+    admin_navbar_label.pack(side='left',pady=20, padx=20)
+
+    #Hero frame
+    admin_hero_frame = ctk.CTkFrame(admin_frame, width=800, height=60, fg_color='#fff')
+    admin_hero_frame.pack(expand=True, fill='both', pady=10, padx=10)
+
+    # Create and pack the label in the admin frame
+    admin_label = ctk.CTkLabel(admin_hero_frame, text="Admin Settings")
+    admin_label.pack(pady=20, padx=20)
+
+    # Add a button to close the admin_frame
+    close_button = ctk.CTkButton(admin_hero_frame, text="Close", command=close_admin_frame)
+    close_button.pack(pady=10, anchor='w')
+
+    # Set the flag to indicate that the admin frame is now open
+    is_admin_frame_open = True
+
+#to close admin frame
+def close_admin_frame():
+    global is_admin_frame_open, admin_frame
+
+    # Use pack_forget to hide the admin_frame
+    if admin_frame is not None:
+        admin_frame.pack_forget()  # Hide the admin frame
     
+    is_admin_frame_open = False  # Reset the flag to allow reopening
+    table_frame.pack(side="right", fill="both", expand=True)
+      
 #logout confirmation   
 def confirm_logout():
     response = messagebox.askyesno("Log out", "Are you sure you want to log out?")
