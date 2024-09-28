@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import bcrypt
 from PIL import Image, ImageTk
 from db import create_connection
 
@@ -106,12 +107,13 @@ def log_in(username, password, log_in_window, root):
                     messagebox.showerror("Login Failed", "Incorrect password.")
             # Check if user is found in operator table
             elif operator_user:
-                if operator_user[6] == password:  # Assuming password is the sixth field
+                stored_password = operator_user[6]  # Assuming password is the sixth field
+                if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field
                     messagebox.showinfo("Success", f"Logged in successfully as {role.capitalize()}!")
                     log_in_window.destroy()
                     root.destroy()
-                    import operator_dashboard  # Redirect to operator dashboard              
+                    import operator_dashboard  # Redirect to operator dashboard            
                 else:
                     messagebox.showerror("Login Failed", "Incorrect password.")
             else:

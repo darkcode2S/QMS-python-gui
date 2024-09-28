@@ -3,9 +3,10 @@ import tkinter as tk
 from tkinter import END, Event, StringVar, ttk
 from tkinter import messagebox
 import re
+import bcrypt
 from db import create_connection
 from mysql.connector import Error
-from admin_tables import queue_table,  password_table
+from admin_tables import queue_table
 
 
 # Initialize the main application window
@@ -721,7 +722,11 @@ def insert_password_data(school_id, fullname, operate_area, phone_num, username,
         
         if len(password) < 4:
             messagebox.showerror("Add operator record", "Error: Password must be at least 4 characters long.")
-            return      
+            return
+
+        # Hash the password before storing it
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+              
         # Check if the username already exists in the database
         cursor.execute("SELECT username FROM operator WHERE username = %s", (username,))
         existing_user = cursor.fetchone()
