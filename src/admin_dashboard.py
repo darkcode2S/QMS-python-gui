@@ -83,9 +83,31 @@ logout_button.pack(side="bottom", pady='30')
 table_frame = ctk.CTkFrame(main_frame, width=500, height=300, fg_color='lightgray')
 table_frame.pack(side="right", fill="both", expand=True)
 
-#exmple
+#Navbar frame
 nav_frame = ctk.CTkFrame(table_frame, width=800, height=60, fg_color='#d68b26')
 nav_frame.pack(side='top', fill='x')
+
+title_label = ctk.CTkLabel(nav_frame,
+                            text='Dashboard',
+                            anchor='w', 
+                            text_color='#fff',
+                            font=ctk.CTkFont(size=15, weight="bold"))
+title_label.pack(side='left',pady=20, padx=20)
+
+cancel_search = ctk.CTkButton(nav_frame, text='Cancel', width=50, command=lambda: cancel_search_action())
+cancel_search.pack(side='right',pady=20, padx=(5,20))
+cancel_search.configure(state="disabled")
+
+search_button = ctk.CTkButton(nav_frame, text='Search', width=50, command=lambda: search())
+search_button.pack(side='right',pady=20, padx=(5,0))
+
+search_bar = ctk.CTkEntry(nav_frame, width=250, placeholder_text='Search ID...')
+search_bar.pack(side='right',pady=20, padx=(20,0))
+
+#Hide wedgit
+cancel_search.pack_forget()
+search_button.pack_forget()
+search_bar.pack_forget()
 
 # TabView for students , padx=(0, 20)
 tab_view = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw", fg_color='lightgray')
@@ -194,7 +216,7 @@ for member_name in member_list:
     member_tables[member_name] = table_member  # Store the table reference for each tab
 
 #table for passwords
-
+global course_name
 # Function to add unique data to a table
 def add_unique_data_to_table(tree, data):
     existing_data = [tree.item(item, 'values') for item in tree.get_children()]
@@ -251,6 +273,15 @@ def update_table(choice):
     if choice == "Members":
         table.pack_forget()
         tab_member.pack(fill="both", expand=True, pady=(0,20))  # Show the tab view for students
+
+        title_label.configure(text="Members table")
+  
+        #Unhide this wedgit
+        cancel_search.pack(side='right',pady=20, padx=(5,20))
+        search_button.pack(side='right',pady=20, padx=(5,0))
+        search_bar.pack(side='right',pady=20, padx=(20,0))
+        
+        
             
         # Clear previous data in each student tab
         for member_name in member_list:
@@ -269,6 +300,13 @@ def update_table(choice):
 
     elif choice == "Queue":
         tab_member.pack_forget()
+
+        title_label.configure(text="Queue table")
+        #Unhide this wedgit
+        cancel_search.pack(side='right',pady=20, padx=(5,20))
+        search_button.pack(side='right',pady=20, padx=(5,0))
+        search_bar.pack(side='right',pady=20, padx=(20,0))
+
         define_queue_columns()
         queue_data = [(1, "Queue 1", "Details 1", "Affiliation 1fdgfdgdgf", 100, "10:30", "No"),
                       (2, "Queue 2", "Details 2", "Affiliation 2", 101, "11:00", "Yes")]
@@ -278,11 +316,24 @@ def update_table(choice):
     elif choice == "Operators":
         # tab_member.pack_forget()
         define_password_columns()
+        title_label.configure(text="Oprators table")
+
+        #Unhide this wedgit
+        cancel_search.pack(side='right',pady=20, padx=(5,20))
+        search_button.pack(side='right',pady=20, padx=(5,0))
+        search_bar.pack(side='right',pady=20, padx=(20,0))
             
     elif choice == "Students":
             table.pack_forget()
             tab_view.pack(fill="both", expand=True, pady=(0,20))  # Show the tab view for students
-            
+
+            title_label.configure(text="Students table")
+
+            #Unhide this wedgit
+            cancel_search.pack(side='right',pady=20, padx=(5,20))
+            search_button.pack(side='right',pady=20, padx=(5,0))
+            search_bar.pack(side='right',pady=20, padx=(20,0))
+                
             # Clear previous data in each student tab
             for tab_name in tab_list:
                 tables[tab_name].delete(*tables[tab_name].get_children())
@@ -290,7 +341,6 @@ def update_table(choice):
             # Fetch students from the database for each course and insert into the relevant table
             for course_name in tab_list:
                 students_data = fetch_students_by_course(course_name)  # Fetch data for each course
-                
                 if students_data:
                     for student in students_data:
                         # Insert each student record into the corresponding Treeview
@@ -302,6 +352,13 @@ def update_table(choice):
         # Clear current table data
         for item in table.get_children():
             table.delete(item)
+
+        title_label.configure(text="Dashboard")
+
+        cancel_search.pack_forget()
+        search_button.pack_forget()
+        search_bar.pack_forget()
+
          # Clear the headings
         table["columns"] = ()
         table.heading("#0", text="")  # Hide the default column header
@@ -310,7 +367,118 @@ def update_table(choice):
 # Function to define columns for the queue table
 def define_queue_columns():
     queue_table(table)
+#Cancel the search of operator
+def update_operator_table(data=None):
+    # Clear existing entries in the table
+    table.delete(*table.get_children())
+    
+    # Fetch data if not provided (used for initial loading)
+    if data is None:
+        data = fetch_data()
+    
+    # Insert the fetched data into the table
+    for row in data:
+        table.insert("", "end", values=row)
 
+cancel_clicked = False
+
+#search function
+def search():
+    connection = create_connection()  # Create the database connection
+    if connection is None:
+        print("Failed to connect to the database.")
+        return []
+
+    cursor = connection.cursor()
+
+    search_value = search_bar.get().strip()  # Get the input and remove leading/trailing spaces
+
+    if not search_value:  # Check if the search bar is empty
+        messagebox.showinfo("Input Error", "Please enter a value to search")  # Show a message if it's empty
+        return  # Exit the function if there's no input
+
+    search_value = "%" + search_value + "%"  # Add wildcards for the LIKE clause
+
+    if dropdown_var.get() == "Students":
+
+        global cancel_clicked
+
+        # Perform search operations here
+
+        # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+        # Use a parameterized query to prevent SQL injection
+        query = "SELECT school_id, full_name, course, year_level FROM student WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear existing entries in each table
+        for tab_name, table_student in tables.items():
+            table_student.delete(*table_student.get_children())  # Clear existing entries
+
+            # Check if results are empty
+            if not results:
+                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            else:
+                # Insert the new search results into the current tab's table_student
+                for row in results:
+                    table_student.insert("", "end", values=row)
+
+    elif dropdown_var.get() == "Members":
+        # Use a parameterized query to prevent SQL injection
+        query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear existing entries in each table
+        for tab_name, table_member in member_tables.items():
+            table_member.delete(*table_member.get_children())  # Clear existing entries
+
+            # Check if results are empty
+            if not results:
+                messagebox.showinfo("Search Result", "User does not exist")  # Show popup message
+            else:
+                # Insert the new search results into the current tab's table_member
+                for row in results:
+                    table_member.insert("", "end", values=row)
+
+    elif dropdown_var.get() == "Operators":
+        connection = create_connection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return []
+
+        cursor = connection.cursor()
+
+        search_value = search_bar.get().strip()  # Get and strip the search input
+
+        if not search_value:  # Check if the search input is empty
+            messagebox.showinfo("Input Error", "Please enter a value to search")
+            return
+
+        search_value = "%" + search_value + "%"  # Add wildcards for LIKE clause
+
+        # Execute the search query for Operators
+        query = "SELECT school_id, full_name, operate_area, phone_number, username, password FROM operator WHERE school_id LIKE %s"
+        
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear and update the Operator table with search results
+        update_operator_table(results)
+
+        # Show a message if no results were found
+        if not results:
+            messagebox.showinfo("Search Result", "User does not exist")
+                    
+    search_bar.delete(0, tk.END)  # Clear the search bar after the search is performed
+
+    cursor.close()  # Close the cursor
+    connection.close()  # Close the connection 
+  
 # Function to define columns for the password table
 def fetch_data():
     connection = create_connection()
@@ -320,6 +488,63 @@ def fetch_data():
     cursor.close()
     connection.close()
     return rows
+
+def clear_table(table):
+    # Remove all existing rows from the TreeView table
+    for row in table.get_children():
+        table.delete(row)
+
+# Function to cancel search and reload all data
+def cancel_search_action():
+
+    if dropdown_var.get() == "Operators":
+        data = fetch_data()  # Fetch all data from the operator table
+        update_operator_table(data)  # Refresh the table with all data
+        search_bar.delete(0, tk.END)  # Clear the search bar
+        # messagebox.showinfo("Cancel Search", "All data has been restored.")
+
+    elif dropdown_var.get() == "Students":
+
+        global cancel_clicked
+
+        if cancel_clicked:
+            return  # If already clicked once, do nothing
+
+        connection = create_connection()  # Create the database connection
+        if connection is None:
+            print("Failed to connect to the database.")
+            return []
+
+        # Clear all student tables to prevent duplication
+        for course_name in tab_list:
+            clear_table(tables[course_name])  # Clear the TreeView for the course
+            students_data = fetch_students_by_course(course_name)  # Fetch data for each course
+            if students_data:
+                for student in students_data:
+                    # Insert each student record into the corresponding TreeView
+                    tables[course_name].insert("", "end", values=student)
+            else:
+                messagebox.showinfo('Show info', f"No students found for the course: {course_name}")
+
+        cursor = connection.cursor()
+
+        # Fetch all student data for each course (you can adjust the query as needed)
+        query = "SELECT school_id, full_name, course, year_level FROM student WHERE course = %s"
+        cursor.execute(query, (course_name,))
+        students = cursor.fetchall()
+
+        # Disable the cancel button after one use
+        cancel_search.configure(state="disabled")
+        cancel_clicked = True  # Set the flag to prevent further clicks
+
+        cursor.close()
+        connection.close()
+
+        return students  # Return the list of students
+
+
+
+    
 # Operator table
 def define_password_columns():
     table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
@@ -740,7 +965,7 @@ def insert_password_data(school_id, fullname, operate_area, phone_num, username,
         INSERT INTO operator (school_id, full_name, operate_area, phone_number, username, password, role)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (school_id, fullname, operate_area, phone_num, username, password, 'operator'))
+        cursor.execute(query, (school_id, fullname, operate_area, phone_num, username, hashed_password, 'operator'))
         connection.commit()  # Commit the changes to the database
         update_table("Operators")  # Assuming update_table refreshes the data
         password_window.destroy()  # Close the password window
