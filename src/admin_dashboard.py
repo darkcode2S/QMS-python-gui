@@ -42,7 +42,7 @@ style.configure("Treeview",
                 fieldbackground="#f0f0f0")
 style.configure("Treeview.Heading", 
                 background="#4CAF50",  # Green background for headings
-                foreground="white",
+                foreground="#000",
                 font=("Arial", 10, "bold"))  # Bold font for headings
 style.map("Treeview", 
           background=[('selected', '#0078D7')])  # Highlight selected row
