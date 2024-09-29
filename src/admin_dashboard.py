@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import END, Event, StringVar, ttk
+from tkinter import END, Event, PhotoImage, StringVar, ttk
+from PIL import Image 
 from tkinter import messagebox
 import re
 import bcrypt
@@ -30,6 +31,25 @@ admin.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
 # Show the sensitive data warning message
 messagebox.showinfo("Info", "Please be aware that you are accessing sensitive data.")
+
+
+# Configure the style
+style = ttk.Style()
+style.configure("Treeview", 
+                background="#f0f0f0",
+                foreground="black",
+                rowheight=25,
+                fieldbackground="#f0f0f0")
+style.configure("Treeview.Heading", 
+                background="#4CAF50",  # Green background for headings
+                foreground="white",
+                font=("Arial", 10, "bold"))  # Bold font for headings
+style.map("Treeview", 
+          background=[('selected', '#0078D7')])  # Highlight selected row
+
+# Define alternating row colors
+style.configure("evenrow", background="white")
+style.configure("oddrow", background="#D3D3D3")  # Light gray background for odd rows
 
 
 # Create the main frame for content
@@ -63,20 +83,37 @@ dropdown = ctk.CTkOptionMenu(sidebar_frame, variable=dropdown_var,
                               command=lambda choice: update_table(choice))
 dropdown.pack(pady=(0, 10))
 
+#button icon 
+add_icon = ctk.CTkImage(light_image=Image.open("add-button.png"),
+                     dark_image=Image.open("add-button.png"),
+                     size=(24, 24))  # Resize to 24x24 pixels
+update_icon = ctk.CTkImage(light_image=Image.open("update.png"),
+                     dark_image=Image.open("update.png"),
+                     size=(24, 24))  # Resize to 24x24 pixels
+remove_icon = ctk.CTkImage(light_image=Image.open("trash-can.png"),
+                     dark_image=Image.open("trash-can.png"),
+                     size=(24, 24))  # Resize to 24x24 pixels
+settings_icon = ctk.CTkImage(light_image=Image.open("settings.png"),
+                     dark_image=Image.open("settings.png"),
+                     size=(24, 24))  # Resize to 24x24 pixels
+logout_icon = ctk.CTkImage(light_image=Image.open("log-out.png"),
+                     dark_image=Image.open("log-out.png"),
+                     size=(24, 24))  # Resize to 24x24 pixels
+
 # Create buttons for adding, deleting, and updating records
-add_button = ctk.CTkButton(sidebar_frame, text="Add Record", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: add_record())
+add_button = ctk.CTkButton(sidebar_frame, text="  Add Record  ", anchor='w', image=add_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: add_record())
 add_button.pack(pady=10)
 
-update_button = ctk.CTkButton(sidebar_frame, text="Update Record", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: update_record())
+update_button = ctk.CTkButton(sidebar_frame, text="Update Record", anchor='w', image=update_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: update_record())
 update_button.pack(pady=10)
 
-remove_button = ctk.CTkButton(sidebar_frame, text="Remove Record", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: remove_record())
+remove_button = ctk.CTkButton(sidebar_frame, text="Remove Record", anchor='w',image=remove_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: remove_record())
 remove_button.pack(pady=10)
 
-settings_button = ctk.CTkButton(sidebar_frame, text="Settings", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: settings_for_admin())
+settings_button = ctk.CTkButton(sidebar_frame, text="  Settings  ",anchor='w', image=settings_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: settings_for_admin())
 settings_button.pack(pady=10)
 
-logout_button = ctk.CTkButton(sidebar_frame, text="Log out", text_color="#fff", fg_color="#1768ff", hover_color="#de9420", command=lambda: confirm_logout())
+logout_button = ctk.CTkButton(sidebar_frame, text="  Log out  ",anchor='w', image=logout_icon, compound="left", text_color="#fff", fg_color="#1768ff", hover_color="#de9420", command=lambda: confirm_logout())
 logout_button.pack(side="bottom", pady='30')
 
 # Table Frame to handle all table
@@ -84,12 +121,17 @@ table_frame = ctk.CTkFrame(main_frame, width=500, height=300, fg_color='lightgra
 table_frame.pack(side="right", fill="both", expand=True)
 
 #Navbar frame
+search_icon = ctk.CTkImage(light_image=Image.open("search.png"),#seach ison
+                     dark_image=Image.open("search.png"),
+                     size=(20, 20))  # Resize to 24x24 pixels
+
 nav_frame = ctk.CTkFrame(table_frame, width=800, height=60, fg_color='#d68b26')
 nav_frame.pack(side='top', fill='x')
 
 title_label = ctk.CTkLabel(nav_frame,
                             text='Dashboard',
-                            anchor='w', 
+                            anchor='w',
+                            compound='left', 
                             text_color='#fff',
                             font=ctk.CTkFont(size=15, weight="bold"))
 title_label.pack(side='left',pady=20, padx=20)
@@ -98,7 +140,12 @@ cancel_search = ctk.CTkButton(nav_frame, text='Cancel', width=50, command=lambda
 cancel_search.pack(side='right',pady=20, padx=(5,20))
 cancel_search.configure(state="disabled")
 
-search_button = ctk.CTkButton(nav_frame, text='Search', width=50, command=lambda: search())
+search_button = ctk.CTkButton(nav_frame, 
+                              text='Search  ',
+                              image=search_icon,
+                              anchor='w', 
+                              width=50, 
+                              command=lambda: search())
 search_button.pack(side='right',pady=20, padx=(5,0))
 
 search_bar = ctk.CTkEntry(nav_frame, width=250, placeholder_text='Search ID...')
@@ -149,8 +196,16 @@ for tab_name in tab_list:
     table_student.heading("Full name", text="Full name")
     table_student.heading("Course", text="Course")
     table_student.heading("Year&level", text="Year & Level")
+
+        # Create a vertical scrollbar
+    scrollbar = ttk.Scrollbar(tab_view.tab(tab_name), orient="vertical", command=table_student.yview)
+    table_student.configure(yscroll=scrollbar.set)
+
+    # Pack the Treeview and scrollbar
+    table_student.pack(fill="both", expand=True, side="left", padx=(20, 0))
+    scrollbar.pack(fill="y", side="right")
     
-    table_student.pack(fill="both", expand=True, padx=20)
+    # table_student.pack(fill="both", expand=True, padx=20)
     
     # Bind the selection event to the table , pady=(0, 20)
     table_student.bind("<<TreeviewSelect>>", lambda event, tab_name=tab_name: on_item_selected(event, tab_name))
@@ -412,7 +467,7 @@ def search():
     # A flag to check if any results were found
     results_found = False
 
-    if dropdown_var.get() == "Students":        
+    if dropdown_var.get() == "Students":
 
         # After a search, re-enable the cancel button
         cancel_search.configure(state="normal")
@@ -709,7 +764,7 @@ def add_record():
         add_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_student(add_window))
 
         # Create a frame for the input fields
-        input_frame = ctk.CTkFrame(add_window)
+        input_frame = ctk.CTkFrame(add_window, fg_color='transparent')
         input_frame.pack(expand=True, fill='y', pady=(10, 0))  # Center the frame in the window
 
         add_label = ctk.CTkLabel(input_frame, text='Add Record', font=ctk.CTkFont(size=20, weight="bold"))
@@ -794,7 +849,7 @@ def add_record():
         member_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_member(member_window))
 
         # Create a frame for the input fields
-        member_frame = ctk.CTkFrame(member_window, width=250)
+        member_frame = ctk.CTkFrame(member_window, width=250, fg_color='transparent')
         member_frame.pack(expand=True, fill='x')  # Center the frame in the window
 
         # Create input fields for adding a member
@@ -871,7 +926,7 @@ def add_record():
         password_window.protocol("WM_DELETE_WINDOW", lambda: close_window_add_operator(password_window))
 
         # Create a frame for the input fields
-        password_frame = ctk.CTkFrame(password_window, width=250)
+        password_frame = ctk.CTkFrame(password_window, width=250, fg_color='transparent')
         password_frame.pack(expand=True, fill='both')  # Center the frame in the window
 
         # Create input fields for adding a member
@@ -1241,7 +1296,7 @@ def update_record():
         password_update.protocol("WM_DELETE_WINDOW", lambda: close_window_add_operator(password_update))
 
         # Create a frame for the input fields
-        password_operator = ctk.CTkFrame(password_update, width=250)
+        password_operator = ctk.CTkFrame(password_update, width=250, fg_color='transparent')
         password_operator.pack(expand=True, fill='both')  # Center the frame in the window
 
         # Create input fields for adding a member
@@ -1579,7 +1634,7 @@ def settings_for_admin():
     table_frame.pack_forget()
 
     # Create and pack the admin frame
-    admin_frame = ctk.CTkFrame(main_frame, fg_color='lightblue')
+    admin_frame = ctk.CTkFrame(main_frame, fg_color='lightgray')
     admin_frame.pack(side="right", fill="both", expand=True)
 
     #navbar frame
@@ -1595,7 +1650,7 @@ def settings_for_admin():
 
     #Hero frame
     admin_hero_frame = ctk.CTkFrame(admin_frame, width=800, height=60, fg_color='#fff')
-    admin_hero_frame.pack(expand=True, fill='both', pady=10, padx=10)
+    admin_hero_frame.pack(expand=True, fill='both', pady=20, padx=20)
 
     # Create and pack the label in the admin frame
     admin_label = ctk.CTkLabel(admin_hero_frame, text="Admin Settings")
