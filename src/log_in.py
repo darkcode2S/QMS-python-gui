@@ -42,7 +42,7 @@ def open_login_window(root):
     username_label = ctk.CTkLabel(frame, text='Username')
     username_label.pack(padx=(0,150))
     username_entry = ctk.CTkEntry(frame, width=220, placeholder_text='Username')
-    username_entry.pack(pady=(0,10), padx=20)
+    username_entry.pack(padx=20)
 
     password_label = ctk.CTkLabel(frame, text='Password')
     password_label.pack(padx=(0,150))

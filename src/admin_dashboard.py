@@ -41,7 +41,7 @@ style.configure("Treeview",
                 rowheight=25,
                 fieldbackground="#f0f0f0")
 style.configure("Treeview.Heading", 
-                background="#4CAF50",  # Green background for headings
+                background="lightblue",  # Green background for headings
                 foreground="#000",
                 font=("Arial", 10, "bold"))  # Bold font for headings
 style.map("Treeview", 
@@ -59,6 +59,13 @@ main_frame.pack(side="left", expand=True, fill="both")
 # Sidebar frame
 sidebar_frame = ctk.CTkFrame(main_frame, width=200, height=300, fg_color="transparent")
 sidebar_frame.pack(side="left", fill="both", padx="20")
+
+logo_icon = ctk.CTkImage(light_image=Image.open("old-logo.png"),
+                     dark_image=Image.open("old-logo.png"),
+                     size=(60, 60))  # Resize to 24x24 pixels
+
+logo_ncmc = ctk.CTkLabel(sidebar_frame, image=logo_icon, text="")
+logo_ncmc.pack(pady=(20,5))
 
 table_label = ctk.CTkLabel(
     sidebar_frame,
@@ -80,40 +87,41 @@ dropdown = ctk.CTkOptionMenu(sidebar_frame, variable=dropdown_var,
                               button_color="orange",
                               dropdown_hover_color="orange",
                               button_hover_color="#de9420",
+                              anchor="s",
                               command=lambda choice: update_table(choice))
 dropdown.pack(pady=(0, 10))
 
-#button icon 
-add_icon = ctk.CTkImage(light_image=Image.open("add-button.png"),
-                     dark_image=Image.open("add-button.png"),
-                     size=(24, 24))  # Resize to 24x24 pixels
-update_icon = ctk.CTkImage(light_image=Image.open("update.png"),
-                     dark_image=Image.open("update.png"),
-                     size=(24, 24))  # Resize to 24x24 pixels
-remove_icon = ctk.CTkImage(light_image=Image.open("trash-can.png"),
-                     dark_image=Image.open("trash-can.png"),
-                     size=(24, 24))  # Resize to 24x24 pixels
-settings_icon = ctk.CTkImage(light_image=Image.open("settings.png"),
-                     dark_image=Image.open("settings.png"),
-                     size=(24, 24))  # Resize to 24x24 pixels
-logout_icon = ctk.CTkImage(light_image=Image.open("log-out.png"),
-                     dark_image=Image.open("log-out.png"),
-                     size=(24, 24))  # Resize to 24x24 pixels
+# #button icon 
+# add_icon = ctk.CTkImage(light_image=Image.open("add-button.png"),
+#                      dark_image=Image.open("add-button.png"),
+#                      size=(24, 24))  # Resize to 24x24 pixels
+# update_icon = ctk.CTkImage(light_image=Image.open("update.png"),
+#                      dark_image=Image.open("update.png"),
+#                      size=(24, 24))  # Resize to 24x24 pixels
+# remove_icon = ctk.CTkImage(light_image=Image.open("trash-can.png"),
+#                      dark_image=Image.open("trash-can.png"),
+#                      size=(24, 24))  # Resize to 24x24 pixels
+# settings_icon = ctk.CTkImage(light_image=Image.open("settings.png"),
+#                      dark_image=Image.open("settings.png"),
+#                      size=(24, 24))  # Resize to 24x24 pixels
+# logout_icon = ctk.CTkImage(light_image=Image.open("log-out.png"),
+#                      dark_image=Image.open("log-out.png"),
+#                      size=(24, 24))  # Resize to 24x24 pixels
 
 # Create buttons for adding, deleting, and updating records
-add_button = ctk.CTkButton(sidebar_frame, text="  Add Record  ", anchor='w', image=add_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: add_record())
+add_button = ctk.CTkButton(sidebar_frame, text="  Add Record  ", compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: add_record())
 add_button.pack(pady=10)
 
-update_button = ctk.CTkButton(sidebar_frame, text="Update Record", anchor='w', image=update_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: update_record())
+update_button = ctk.CTkButton(sidebar_frame, text="Update Record",  compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: update_record())
 update_button.pack(pady=10)
 
-remove_button = ctk.CTkButton(sidebar_frame, text="Remove Record", anchor='w',image=remove_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: remove_record())
+remove_button = ctk.CTkButton(sidebar_frame, text="Remove Record", compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: remove_record())
 remove_button.pack(pady=10)
 
-settings_button = ctk.CTkButton(sidebar_frame, text="  Settings  ",anchor='w', image=settings_icon, compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: settings_for_admin())
+settings_button = ctk.CTkButton(sidebar_frame, text="  Settings  ", compound="left", text_color="#000", fg_color="white", hover_color="#de9420", command=lambda: settings_for_admin())
 settings_button.pack(pady=10)
 
-logout_button = ctk.CTkButton(sidebar_frame, text="  Log out  ",anchor='w', image=logout_icon, compound="left", text_color="#fff", fg_color="#1768ff", hover_color="#de9420", command=lambda: confirm_logout())
+logout_button = ctk.CTkButton(sidebar_frame, text="  Log out  ", compound="left", text_color="#fff", fg_color="#1768ff", hover_color="#de9420", command=lambda: confirm_logout())
 logout_button.pack(side="bottom", pady='30')
 
 # Table Frame to handle all table
@@ -123,7 +131,7 @@ table_frame.pack(side="right", fill="both", expand=True)
 #Navbar frame
 search_icon = ctk.CTkImage(light_image=Image.open("search.png"),#seach ison
                      dark_image=Image.open("search.png"),
-                     size=(20, 20))  # Resize to 24x24 pixels
+                     size=(15, 15))  # Resize to 24x24 pixels
 
 nav_frame = ctk.CTkFrame(table_frame, width=800, height=60, fg_color='#d68b26')
 nav_frame.pack(side='top', fill='x')
@@ -270,7 +278,7 @@ for member_name in member_list:
     
     member_tables[member_name] = table_member  # Store the table reference for each tab
 
-#table for passwords
+
 global course_name
 # Function to add unique data to a table
 def add_unique_data_to_table(tree, data):
@@ -330,6 +338,7 @@ def update_table(choice):
         tab_member.pack(fill="both", expand=True, pady=(0,20))  # Show the tab view for students
 
         title_label.configure(text="Members table")
+        close_admin_frame()
   
         #Unhide this wedgit
         cancel_search.pack(side='right',pady=20, padx=(5,20))
@@ -356,6 +365,8 @@ def update_table(choice):
         tab_member.pack_forget()
 
         title_label.configure(text="Queue table")
+        close_admin_frame()
+
         #Unhide this wedgit
         cancel_search.pack(side='right',pady=20, padx=(5,20))
         search_button.pack(side='right',pady=20, padx=(5,0))
@@ -371,6 +382,7 @@ def update_table(choice):
         # tab_member.pack_forget()
         define_password_columns()
         title_label.configure(text="Oprators table")
+        close_admin_frame()
 
         #Unhide this wedgit
         cancel_search.pack(side='right',pady=20, padx=(5,20))
@@ -382,6 +394,7 @@ def update_table(choice):
             tab_view.pack(fill="both", expand=True, pady=(0,20))  # Show the tab view for students
 
             title_label.configure(text="Students table")
+            close_admin_frame()
 
             #Unhide this wedgit
             cancel_search.pack(side='right',pady=20, padx=(5,20))
@@ -408,6 +421,7 @@ def update_table(choice):
             table.delete(item)
 
         title_label.configure(text="Dashboard")
+        close_admin_frame()
 
         cancel_search.pack_forget()
         search_button.pack_forget()
@@ -838,6 +852,15 @@ def add_record():
         add_button.pack(padx=10, pady=10)
 
     elif dropdown_var.get() == "Members":
+        # Get the main window's geometry
+        x = admin.winfo_x()
+        y = admin.winfo_y()
+        width = 320  # Desired width of the pop-up window
+        height = 400  # Desired height of the pop-up window
+        # Calculate the center position
+        x_position = x + (admin.winfo_width() // 2) - (width // 2)
+        y_position = y + (admin.winfo_height() // 2) - (height // 2)
+
         member_window = ctk.CTkToplevel(admin)
         member_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
         member_window.title("Add member")
@@ -1188,8 +1211,7 @@ def update_record():
             )
         )
         update_button.pack(padx=10, pady=20)
-    # else:
-    #     messagebox.showerror("Update Failed", "Only Students, Members and Passwords table can Update record.")
+
     elif dropdown_var.get() == "Members":
         x = admin.winfo_x()
         y = admin.winfo_y()
@@ -1619,19 +1641,45 @@ def remove_operator_data(school_id, conn, cursor):
         print("Remove canceled.")
 
 # admin settings
+#query to display admin username and password to entry wedgit
+def fetch_admin_data(user_id=2):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT username, password FROM admin WHERE id=%s", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
+
+#query to database for update
+def update_admin_data(user_id, new_username, new_password):
+    conn = create_connection()
+    cursor = conn.cursor()
+    cursor.execute("UPDATE admin SET username =%s, password = %s WHERE id = %s",(
+        new_username, 
+        new_password, 
+        user_id))
+    conn.commit()
+    conn.close()
+
 # Global variable to track if admin_frame is open
 is_admin_frame_open = False
 admin_frame = None  # Declare admin_frame globally
 
-def settings_for_admin():
+def settings_for_admin(user_id=2):
     global is_admin_frame_open, admin_frame  # Access the global variable
-
     # If the admin frame is already open, do nothing
     if is_admin_frame_open:
         return  # Exit the function if admin_frame is already open
 
     # Hide the previous table_frame
     table_frame.pack_forget()
+    add_button.configure(state="disabled")
+    update_button.configure(state="disabled")
+    remove_button.configure(state="disabled")
+
+    admin_data = fetch_admin_data(user_id)
+    current_username = admin_data[0]
+    current_password = admin_data[1]
 
     # Create and pack the admin frame
     admin_frame = ctk.CTkFrame(main_frame, fg_color='lightgray')
@@ -1652,16 +1700,53 @@ def settings_for_admin():
     admin_hero_frame = ctk.CTkFrame(admin_frame, width=800, height=60, fg_color='#fff')
     admin_hero_frame.pack(expand=True, fill='both', pady=20, padx=20)
 
-    # Create and pack the label in the admin frame
-    admin_label = ctk.CTkLabel(admin_hero_frame, text="Admin Settings")
-    admin_label.pack(pady=20, padx=20)
 
     # Add a button to close the admin_frame
     close_button = ctk.CTkButton(admin_hero_frame, text="Close", command=close_admin_frame)
-    close_button.pack(pady=10, anchor='w')
+    close_button.pack(pady=10, padx=10, anchor='w')
+
+    # Create and pack the label in the admin frame
+    admin_label = ctk.CTkLabel(admin_hero_frame, text="Update admin username and password")
+    admin_label.pack()
+
+    form_frame = ctk.CTkFrame(admin_hero_frame, width=350, height=320, fg_color='lightblue')
+    form_frame.pack(expand=True)
+
+    form_label = ctk.CTkLabel(form_frame, text='Usename')
+    form_label.pack(pady=(50,0), padx=20, anchor='w')
+    form_username = ctk.CTkEntry(form_frame, placeholder_text='Username', width=320)
+    form_username.pack(padx=20)
+    form_username.insert(0, current_username)
+
+    form_label = ctk.CTkLabel(form_frame, text='Password')
+    form_label.pack(pady=(10, 0), padx=20, anchor='w')
+    form_pass = ctk.CTkEntry(form_frame, placeholder_text='Password', width=320)
+    form_pass.pack(padx=20)
+    form_pass.insert(0, current_password)
+    
+    #update submit
+    def submit_update():
+        new_username = form_username.get()
+        new_password = form_pass.get()
+         
+        #update validation
+        if len(new_username) < 4:
+            messagebox.showerror("Error", "Username atleast 4 character.")
+            return
+        if len(new_password) < 4:
+            messagebox.showerror("Error", "Password atleast 4 character.")
+            return           
+
+        update_admin_data(user_id, new_username, new_password)
+
+        messagebox.showinfo("Success", "Update successfully.")
+
+    form_button = ctk.CTkButton(form_frame, text='Save', height=30, command=submit_update)
+    form_button.pack(pady=30, padx=20)
 
     # Set the flag to indicate that the admin frame is now open
     is_admin_frame_open = True
+
 
 #to close admin frame
 def close_admin_frame():
@@ -1673,7 +1758,11 @@ def close_admin_frame():
     
     is_admin_frame_open = False  # Reset the flag to allow reopening
     table_frame.pack(side="right", fill="both", expand=True)
-      
+
+    add_button.configure(state="normal")
+    update_button.configure(state="normal")
+    remove_button.configure(state="normal")
+   
 #logout confirmation   
 def confirm_logout():
     response = messagebox.askyesno("Log out", "Are you sure you want to log out?")
