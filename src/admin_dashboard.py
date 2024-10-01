@@ -77,9 +77,9 @@ table_label = ctk.CTkLabel(
 table_label.pack(anchor="w", padx=(8, 0), pady=(10, 0))
 
 # Create dropdown menu for selecting members, queue, and passwords
-dropdown_var = ctk.StringVar(value="Select Option")
+dropdown_var = ctk.StringVar(value="Queue")
 dropdown = ctk.CTkOptionMenu(sidebar_frame, variable=dropdown_var, 
-                              values=['Select Option', "Queue", 'Students', 
+                              values=["Queue", 'Students', 
                                       "Members", "Operators"], 
                               fg_color="#fff",
                               text_color="#000",
@@ -137,7 +137,7 @@ nav_frame = ctk.CTkFrame(table_frame, width=800, height=60, fg_color='#d68b26')
 nav_frame.pack(side='top', fill='x')
 
 title_label = ctk.CTkLabel(nav_frame,
-                            text='Dashboard',
+                            text='Queue table',
                             anchor='w',
                             compound='left', 
                             text_color='#fff',
@@ -148,7 +148,7 @@ cancel_search = ctk.CTkButton(nav_frame, text='Cancel', width=50, command=lambda
 cancel_search.pack(side='right',pady=20, padx=(5,20))
 cancel_search.configure(state="disabled")
 
-search_button = ctk.CTkButton(nav_frame, 
+search_button = ctk.CTkButton(nav_frame,
                               text='Search  ',
                               image=search_icon,
                               anchor='w', 
@@ -158,11 +158,6 @@ search_button.pack(side='right',pady=20, padx=(5,0))
 
 search_bar = ctk.CTkEntry(nav_frame, width=250, placeholder_text='Search ID...')
 search_bar.pack(side='right',pady=20, padx=(20,0))
-
-#Hide wedgit from navbar
-cancel_search.pack_forget()
-search_button.pack_forget()
-search_bar.pack_forget()
 
 # TabView for students , padx=(0, 20)
 tab_view = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw", fg_color='lightgray')
@@ -226,6 +221,71 @@ for tab_name in tab_list:
 table = ttk.Treeview(table_frame)
 table.pack(fill="both", expand=True, pady=20, padx=20)
 
+#queue table logic-----------------------------------------------------------------------------------------------
+def fetch_queue_data():
+    connection = create_connection()
+    cursor = connection.cursor()
+    cursor.execute("SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+    rows = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return rows
+
+# Remove all existing rows from the TreeView table
+def clear_table(table):
+    # Remove all existing rows from the TreeView table
+    for row in table.get_children():
+        table.delete(row)
+
+#Queue table
+table['columns'] = ('Queue number',
+                        'School ID', 
+                        'Full name', 
+                        'Transaction', 
+                        'Affiliation',
+                        'Phone', 
+                        'Compilation time', 
+                        'Voided')  
+table.column("#0", width=0, stretch="no")  # Hide the first column
+table.column("Queue number", anchor="center", width=80)  # Lowercase 'n' to match the columns definition
+table.column("School ID", anchor="center", width=80)
+table.column("Full name", anchor="center", width=80)
+table.column("Transaction", anchor="center", width=80)
+table.column("Affiliation", anchor="center", width=80)
+table.column("Phone", anchor="center", width=80)
+table.column("Compilation time", anchor="center", width=80)  # Ensure same column name
+table.column("Voided", anchor="center", width=80)
+
+table.heading("#0", text="")
+table.heading("Queue number", text="Queue Number")  # Use correct name for heading too
+table.heading("School ID", text="School ID")
+table.heading("Full name", text="Full name")
+table.heading("Transaction", text="Transaction")
+table.heading("Affiliation", text="Affiliation")
+table.heading("Phone", text="Phone")
+table.heading("Compilation time", text="Compilation Time")
+table.heading("Voided", text="Voided")
+
+# Fetch and display data
+data = fetch_queue_data()
+for row in data:
+    table.insert("", "end", values=row)
+
+item_values = None
+
+#get value wehn selected operator table
+def on_item_selected_password(event):
+    global item_values
+    selected_item = table.selection()  # Get the selected items (returns a tuple)
+
+    if selected_item:  # Check if any item is selected
+        item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
+        print(f"Selected values: {item_values}")  # Do something with the values
+    else:
+        print("No item selected")  # Handle the case where no item is selected
+
+table.bind("<<TreeviewSelect>>", on_item_selected_password)
+#queue table logic-----------------------------------------------------------------------------------------------
 
 # Create Treeview tables inside each Tab
 # TabView for Members
@@ -372,11 +432,69 @@ def update_table(choice):
         search_button.pack(side='right',pady=20, padx=(5,0))
         search_bar.pack(side='right',pady=20, padx=(20,0))
 
-        define_queue_columns()
-        queue_data = [(1, "Queue 1", "Details 1", "Affiliation 1fdgfdgdgf", 100, "10:30", "No"),
-                      (2, "Queue 2", "Details 2", "Affiliation 2", 101, "11:00", "Yes")]
-        for queue in queue_data:
-            table.insert("", "end", values=queue)
+        def fetch_queue_data():
+            connection = create_connection()
+            cursor = connection.cursor()
+            cursor.execute("SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+            rows = cursor.fetchall()
+            cursor.close()
+            connection.close()
+            return rows
+
+        # Remove all existing rows from the TreeView table
+        def clear_table(table):
+            # Remove all existing rows from the TreeView table
+            for row in table.get_children():
+                table.delete(row)
+        #Queue table
+
+        table['columns'] = ('Queue number',
+                                'School ID', 
+                                'Full name', 
+                                'Transaction', 
+                                'Affiliation',
+                                'Phone', 
+                                'Compilation time', 
+                                'Voided')  
+        table.column("#0", width=0, stretch="no")  # Hide the first column
+        table.column("Queue number", anchor="center", width=80)  # Lowercase 'n' to match the columns definition
+        table.column("School ID", anchor="center", width=80)
+        table.column("Full name", anchor="center", width=80)
+        table.column("Transaction", anchor="center", width=80)
+        table.column("Affiliation", anchor="center", width=80)
+        table.column("Phone", anchor="center", width=80)
+        table.column("Compilation time", anchor="center", width=80)  # Ensure same column name
+        table.column("Voided", anchor="center", width=80)
+
+        table.heading("#0", text="")
+        table.heading("Queue number", text="Queue Number")  # Use correct name for heading too
+        table.heading("School ID", text="School ID")
+        table.heading("Full name", text="Full name")
+        table.heading("Transaction", text="Transaction")
+        table.heading("Affiliation", text="Affiliation")
+        table.heading("Phone", text="Phone")
+        table.heading("Compilation time", text="Compilation Time")
+        table.heading("Voided", text="Voided")
+
+        # Fetch and display data
+        data = fetch_queue_data()
+        for row in data:
+            table.insert("", "end", values=row)
+
+        item_values = None
+
+        #get value wehn selected operator table
+        def on_item_selected_password(event):
+            global item_values
+            selected_item = table.selection()  # Get the selected items (returns a tuple)
+
+            if selected_item:  # Check if any item is selected
+                item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
+                print(f"Selected values: {item_values}")  # Do something with the values
+            else:
+                print("No item selected")  # Handle the case where no item is selected
+
+        table.bind("<<TreeviewSelect>>", on_item_selected_password)
 
     elif choice == "Operators":
         # tab_member.pack_forget()
@@ -414,29 +532,7 @@ def update_table(choice):
                         tables[course_name].insert("", "end", values=student)
                 else:
                     messagebox.showinfo('Show info',f"No students found for the course: {course_name}")
-
-    elif choice == "Select Option":
-        # Clear current table data
-        for item in table.get_children():
-            table.delete(item)
-
-        title_label.configure(text="Dashboard")
-        close_admin_frame()
-
-        cancel_search.pack_forget()
-        search_button.pack_forget()
-        search_bar.pack_forget()
-
-         # Clear the headings
-        table["columns"] = ()
-        table.heading("#0", text="")  # Hide the default column header
-
-
-# Function to define columns for the queue table
-def define_queue_columns():
-    queue_table(table)
-
-    
+  
 #Cancel the search of operator
 def update_operator_table(data=None):
     # Clear existing entries in the table
@@ -565,14 +661,41 @@ def search():
         # Clear and update the Operator table with search results
         update_operator_table(results)
 
-        # # Show a message if no results were found
-        # if not results:
-        #     messagebox.showinfo("Search Result", "User does not exist")
+        if results:
+            results_found = True  # Mark that we found results
+
+    elif dropdown_var.get() == "Queue":
+                # After a search, re-enable the cancel button
+        cancel_search.configure(state="normal")
+        cancel_clicked = False# Reset flag for future cancel operations
+        
+        connection = create_connection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return []
+
+        cursor = connection.cursor()
+
+        search_value = search_bar.get().strip()  # Get and strip the search input
+
+        if not search_value:  # Check if the search input is empty
+            messagebox.showinfo("Input Error", "Please enter a value to search")
+            return
+
+        search_value = "%" + search_value + "%"  # Add wildcards for LIKE clause
+
+        # Execute the search query for Operators
+        query = "SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue WHERE school_id LIKE %s"
+        cursor.execute(query, (search_value,))
+        results = cursor.fetchall()  # Fetch all matching results
+
+        # Clear and update the Operator table with search results
+        update_operator_table(results)
 
         if results:
             results_found = True  # Mark that we found results
-    
-       # Show a message if no results were found across all categories
+
+    # Show a message if no results were found across all categories
     if not results_found:
         messagebox.showinfo("Search Result", "User does not exist")  # Show a message box indicating no results found
                     
@@ -683,9 +806,18 @@ def cancel_search_action():
         cursor.close()
         connection.close()
         return members  # Return the list of members
-
-
-   
+    
+    elif dropdown_var.get() == "Queue":
+        if cancel_clicked:
+            return  # If already clicked once, do nothing
+        
+        data = fetch_queue_data()  # Fetch all data from the operator table
+        update_operator_table(data)  # Refresh the table with all data
+        search_bar.delete(0, tk.END)  # Clear the search bar
+        # Disable the cancel button after one use
+        cancel_search.configure(state="disabled")
+        cancel_clicked = True  # Set the flag to prevent further clicks
+ 
 # Operator table
 def define_password_columns():
     table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
@@ -704,7 +836,6 @@ def define_password_columns():
     table.heading("Phone", text="Phone")
     table.heading("Username", text="Username")
     table.heading("Password", text="Password")
-
 
 
     # Fetch and display data
