@@ -1,7 +1,12 @@
 import customtkinter as ctk
+import tkinter as tk
+from tkinter import messagebox
 from PIL import Image
+import random
+import re
+from db import create_connection
 
-def visitor_queue(root):
+def visitor_queue(root, button_text, select_student):
     user_visitor = ctk.CTkToplevel(root)
     user_visitor.title("Visitor")
     user_visitor.iconbitmap("old-logo.ico")
@@ -69,7 +74,7 @@ def visitor_queue(root):
                                   command=lambda:cancel())
     cancel_button.pack(side="left", padx=20)
 
-    create_button = ctk.CTkButton(button_frame , height=35, text='Create Ticket', fg_color='#fff', text_color='#000', border_width=1, border_color='#000')
+    create_button = ctk.CTkButton(button_frame , height=35, text='Create Ticket', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', command=lambda: create_ticket(button_text, select_student))
     create_button.pack(side="left", padx=20)
 
 
@@ -77,7 +82,93 @@ def visitor_queue(root):
     def cancel():
         user_visitor.destroy()
 
+    def create_ticket(button_text, select_student):
+        connection = create_connection()
+        if connection is None:
+            print("Failed to connect to the database.")
+            return
+
+        cursor = connection.cursor()    
+        
+        ticket_number = random.randint(1, 200)
+
+        visitor_name = e1.get()
+        visitor_phone = e2.get()
+
+        if not visitor_phone or not visitor_phone:
+            messagebox.showerror("Error", "All fields are required.")
+            return
+        
+        phone_pattern = r'^\+?\d{10,15}$' 
+        # Validate phone number format
+        if not re.match(phone_pattern, visitor_phone):
+            messagebox.showerror("Error", "Error: Invalid phone number format. Please enter a valid number with 10-15 digits.")
+            return
+
+         # Insert into queue table
+        query_insert = """
+                INSERT INTO `queue` (`queue_number`, `full_name`, `transaction`, `affiliation`, `phone`) 
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            
+        # Use actual values instead of placeholders
+        cursor.execute(query_insert, (
+                ticket_number,               
+                visitor_name,    
+                button_text,    
+                select_student,
+                visitor_phone 
+            ))
+                        
+        # Commit the changes
+        connection.commit()
+
+        messagebox.showinfo("Success", f"Create tikcket {visitor_name} found. Proceeding to next step.")
+        root.destroy()
+        open_ticket_window(visitor_name)
+
+
+        connection.close()       
+
 
     user_visitor.grab_set()
+
+#Example print
+def print_ticket(ticket_number, visitor_name):
+    # Create a new window for printing the ticket
+    print_window = tk.Tk()
+    print_window.title("Print Ticket")
+
+    # Create a label for the ticket
+    ticket_label = tk.Label(print_window, text=f"Ticket Number: {ticket_number}\nStudent Name: {visitor_name}", font=("Helvetica", 16))
+    ticket_label.pack(pady=10)
+
+    # Add a button to close the print window
+    close_button = tk.Button(print_window, text="Close", command=print_window.destroy)
+    close_button.pack(pady=5)
+
+    print_window.mainloop()
+
+def open_ticket_window(visitor_name):
+    new_window = tk.Tk()  # Create a new window
+    new_window.title("Create Ticket")
+    
+    global ticket_number
+    # Generate a random ticket number between 1 and 200
+    ticket_number = random.randint(1, 200) 
+    
+    # Create a label to display the random ticket number
+    label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))
+    label.pack(pady=10)
+    
+    # Add a button to print the ticket
+    print_button = tk.Button(new_window, text="Print Ticket", command=lambda: print_ticket(ticket_number, visitor_name))
+    print_button.pack(pady=5)
+    
+    # Add a button to close the window
+    close_button = tk.Button(new_window, text="Close", command=new_window.destroy)
+    close_button.pack(pady=5)
+
+    new_window.mainloop()
 
 

@@ -159,7 +159,7 @@ def input_id_student(root, button_text, select_student):
             cursor.execute(query_insert, (
                 ticket_number,               
                 entered_id,
-                result_student[1],    
+                student_name,    
                 button_text,    
                 select_student,  
             ))
@@ -189,7 +189,7 @@ def input_id_student(root, button_text, select_student):
 
     input_id_window.grab_set()
 
-
+#Exampke print
 def print_ticket(ticket_number, student_name):
     # Create a new window for printing the ticket
     print_window = tk.Tk()
@@ -206,12 +206,12 @@ def print_ticket(ticket_number, student_name):
     print_window.mainloop()
 
 def open_ticket_window(student_name):
-    new_window = tk.Tk()  # Create a new window
+    new_window = tk.Tk() 
     new_window.title("Create Ticket")
     
     global ticket_number
     # Generate a random ticket number between 1 and 200
-    ticket_number = random.randint(1, 200)  # Generate a random number
+    ticket_number = random.randint(1, 200)  
     
     # Create a label to display the random ticket number
     label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))

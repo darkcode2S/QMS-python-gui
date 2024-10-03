@@ -92,10 +92,12 @@ def affiliation(root, button_text):
         input_id_student(root, button_text, select_student)
 
     def staff():
-        satff_input_id(root)
+        select_student = 'Staff/Faculty'
+        satff_input_id(root, button_text, select_student)
 
     def visitor():
-        visitor_queue(root)
+        select_student = 'Visitor'
+        visitor_queue(root, button_text, select_student)
 
 
     user_aff.grab_set()
