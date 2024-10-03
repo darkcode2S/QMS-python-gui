@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import END, Event, PhotoImage, StringVar, ttk
+from tkinter import BOTTOM, END, HORIZONTAL, RIGHT, VERTICAL, Event, PhotoImage, Scrollbar, StringVar, ttk
 from PIL import Image 
 from tkinter import messagebox
 import re
@@ -227,7 +227,7 @@ table.pack(fill="both", expand=True, pady=20, padx=20)
 def fetch_queue_data():
     connection = create_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+    cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
     rows = cursor.fetchall()
     cursor.close()
     connection.close()
@@ -239,27 +239,44 @@ def clear_table(table):
     for row in table.get_children():
         table.delete(row)
 
+# scrollbarx = Scrollbar(table_frame, orient=HORIZONTAL)
+# scrollbary = Scrollbar(table_frame, orient=VERTICAL)
 #Queue table
 table['columns'] = ('Queue number',
-                        'School ID', 
+                        'Created at', 
+                        'School ID',
                         'Full name', 
                         'Transaction', 
                         'Affiliation',
                         'Phone', 
                         'Compilation time', 
                         'Voided')  
+
+# Horizontal and vertical scrollbars
+scrollbarx = Scrollbar(table, orient=HORIZONTAL, command=table.xview)
+scrollbary = Scrollbar(table, orient=VERTICAL, command=table.yview)
+
+# Configure scrollbars to work with the table
+table.configure(xscrollcommand=scrollbarx.set, yscrollcommand=scrollbary.set)
+
+# Place scrollbars
+scrollbarx.pack(side='bottom', fill='x')
+scrollbary.pack(side='right', fill='y')
+
 table.column("#0", width=0, stretch="no")  # Hide the first column
-table.column("Queue number", anchor="center", width=80)  # Lowercase 'n' to match the columns definition
-table.column("School ID", anchor="center", width=80)
-table.column("Full name", anchor="center", width=80)
-table.column("Transaction", anchor="center", width=80)
-table.column("Affiliation", anchor="center", width=80)
-table.column("Phone", anchor="center", width=80)
-table.column("Compilation time", anchor="center", width=80)  # Ensure same column name
-table.column("Voided", anchor="center", width=80)
+table.column("Queue number", stretch="no", anchor="center")
+table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
+table.column("School ID", anchor="center")
+table.column("Full name", anchor="center",)
+table.column("Transaction", anchor="center")
+table.column("Affiliation", anchor="center")
+table.column("Phone", anchor="center")
+table.column("Compilation time", anchor="center")  # Ensure same column name
+table.column("Voided", anchor="center")
 
 table.heading("#0", text="")
-table.heading("Queue number", text="Queue Number")  # Use correct name for heading too
+table.heading("Queue number", text="Queue Number") 
+table.heading("Created at", text="Created at") # Use correct name for heading too
 table.heading("School ID", text="School ID")
 table.heading("Full name", text="Full name")
 table.heading("Transaction", text="Transaction")
@@ -438,7 +455,7 @@ def update_table(choice):
         def fetch_queue_data():
             connection = create_connection()
             cursor = connection.cursor()
-            cursor.execute("SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+            cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
             rows = cursor.fetchall()
             cursor.close()
             connection.close()
@@ -452,7 +469,8 @@ def update_table(choice):
         #Queue table
 
         table['columns'] = ('Queue number',
-                                'School ID', 
+                                'Created at',
+                                'School ID',
                                 'Full name', 
                                 'Transaction', 
                                 'Affiliation',
@@ -460,17 +478,19 @@ def update_table(choice):
                                 'Compilation time', 
                                 'Voided')  
         table.column("#0", width=0, stretch="no")  # Hide the first column
-        table.column("Queue number", anchor="center", width=80)  # Lowercase 'n' to match the columns definition
-        table.column("School ID", anchor="center", width=80)
-        table.column("Full name", anchor="center", width=80)
-        table.column("Transaction", anchor="center", width=80)
-        table.column("Affiliation", anchor="center", width=80)
-        table.column("Phone", anchor="center", width=80)
-        table.column("Compilation time", anchor="center", width=80)  # Ensure same column name
-        table.column("Voided", anchor="center", width=80)
+        table.column("Queue number", anchor="center")
+        table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
+        table.column("School ID", anchor="center")
+        table.column("Full name", anchor="center")
+        table.column("Transaction", anchor="center")
+        table.column("Affiliation", anchor="center")
+        table.column("Phone", anchor="center")
+        table.column("Compilation time", anchor="center")  # Ensure same column name
+        table.column("Voided", anchor="center")
 
         table.heading("#0", text="")
-        table.heading("Queue number", text="Queue Number")  # Use correct name for heading too
+        table.heading("Queue number", text="Queue Number") 
+        table.heading("Created at", text="Created at") # Use correct name for heading too
         table.heading("School ID", text="School ID")
         table.heading("Full name", text="Full name")
         table.heading("Transaction", text="Transaction")
