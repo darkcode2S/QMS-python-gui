@@ -30,7 +30,7 @@ y = (screen_height // 2) - (window_height // 2)
 admin.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
 # Show the sensitive data warning message
-messagebox.showinfo("Info", "Please be aware that you are accessing sensitive data.")
+# messagebox.showinfo("Info", "Please be aware that you are accessing sensitive data.")
 
 
 # Configure the style
@@ -186,19 +186,21 @@ def on_item_selected(event, tab_name):
 for tab_name in tab_list:
     tab_view.add(tab_name)  # Add the tab
     table_student = ttk.Treeview(tab_view.tab(tab_name), show="headings")
-    table_student['columns'] = ('School ID', 'Full name', 'Course', 'Year&level')
+    table_student['columns'] = ('id','School ID', 'Full name', 'Course', 'Year&level')
     
     table_student.column("#0", width=0, stretch="no")
+    table_student.column("id", anchor="center", width=0, stretch=tk.NO)
     table_student.column("School ID", anchor="center", width=80)
     table_student.column("Full name", anchor="center", width=80)
     table_student.column("Course", anchor="center", width=80)
     table_student.column("Year&level", anchor="center", width=80)
-    
+    # , width=0, stretch=tk.NO
     table_student.heading("#0", text="")
+    table_student.heading("id", text="id")
     table_student.heading("School ID", text="School ID")
     table_student.heading("Full name", text="Full name")
     table_student.heading("Course", text="Course")
-    table_student.heading("Year&level", text="Year & Level")
+    table_student.heading("Year&level", text="Year Level")
 
         # Create a vertical scrollbar
     scrollbar = ttk.Scrollbar(tab_view.tab(tab_name), orient="vertical", command=table_student.yview)
@@ -315,9 +317,10 @@ def member_selected(event, member_name):
 for member_name in member_list:
     tab_member.add(member_name)  # Add the tab
     table_member = ttk.Treeview(tab_member.tab(member_name), show="headings")
-    table_member['columns'] = ('School ID', 'Full name', 'Affiliation', 'Role', 'Office')
+    table_member['columns'] = ('id','School ID', 'Full name', 'Affiliation', 'Role', 'Office')
     
     table_member.column("#0", width=0, stretch="no")
+    table_member.column("id", anchor="center", width=0, stretch=tk.NO)
     table_member.column("School ID", anchor="center", width=80)
     table_member.column("Full name", anchor="center", width=80)
     table_member.column("Affiliation", anchor="center", width=80)
@@ -325,6 +328,7 @@ for member_name in member_list:
     table_member.column("Office", anchor="center", width=80)
     
     table_member.heading("#0", text="")
+    table_member.heading("id", text="id")
     table_member.heading("School ID", text="School ID")
     table_member.heading("Full name", text="Full name")
     table_member.heading("Affiliation", text="Affiliation")
@@ -356,7 +360,7 @@ def fetch_students_by_course(course_name):
         return []
 
     cursor = connection.cursor()
-    query = "SELECT school_id, full_name, course, year_level FROM student WHERE course = %s"  # Query to fetch students by course
+    query = "SELECT id, school_id, full_name, course, year_level FROM student WHERE course = %s"  # Query to fetch students by course
     cursor.execute(query, (course_name,))  # Execute the query with the course name
 
     students = cursor.fetchall()  # Fetch all results
@@ -371,14 +375,13 @@ def fetch_members_data(member_item_name):
         return []
 
     cursor = connection.cursor()
-    query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE office = %s"  # Query to fetch students by course
+    query = "SELECT id, school_id, full_name, affiliation, role, office FROM member WHERE office = %s"  # Query to fetch students by course
     cursor.execute(query, (member_item_name,))  # Execute the query with the course name
 
     member = cursor.fetchall()  # Fetch all results
     cursor.close()
     connection.close()
     return member  # Return the list of students
-
 
 
 # Update table based on selection
@@ -708,7 +711,7 @@ def search():
 def fetch_data():
     connection = create_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT school_id, full_name, operate_area, phone_number, username, password, role FROM operator")
+    cursor.execute("SELECT id, school_id, full_name, operate_area, phone_number, username, password, role FROM operator")
     rows = cursor.fetchall()
     cursor.close()
     connection.close()
@@ -820,8 +823,9 @@ def cancel_search_action():
  
 # Operator table
 def define_password_columns():
-    table['columns'] = ('School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
+    table['columns'] = ('id','School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
     table.column("#0", width=0, stretch="no")  # Hide the first column
+    table.column("id", anchor="center", width=0,stretch="no")
     table.column("School ID", anchor="center", width=80)
     table.column("Full name", anchor="center", width=80)
     table.column("Operate area", anchor="center", width=80)
@@ -830,6 +834,7 @@ def define_password_columns():
     table.column("Password", anchor="center", width=80)
 
     table.heading("#0", text="", anchor="center")
+    table.heading("id", text="id")
     table.heading("School ID", text="School ID")
     table.heading("Full name", text="Full name")
     table.heading("Operate area", text="Operate area")
@@ -949,7 +954,7 @@ def add_record():
                               button_hover_color="#de9420")
         dropdown_layout.pack(padx=10, pady=10)
 
-        dropdown_year = ctk.StringVar(value="Select Year & level")
+        dropdown_year = ctk.StringVar(value="Select Year level")
         dropdown_level = ctk.CTkOptionMenu(input_frame, variable=dropdown_year, width=250,
                               values=[
                                       "1st Year", 
@@ -971,7 +976,7 @@ def add_record():
         dropdown_level.pack(padx=10, pady=10)
 
         # Button to add the student record
-        add_button = ctk.CTkButton(input_frame, text="Add",width=250, command=lambda: insert_student_data(
+        add_button = ctk.CTkButton(input_frame, text="Add reacord",width=250, fg_color='#d68b26', command=lambda: insert_student_data(
             input_schoolid.get(),
             input_fullname.get(),
             dropdown_course.get(),
@@ -1045,7 +1050,8 @@ def add_record():
                               button_hover_color="#de9420")
         dropdown_member_layout.pack(padx=10, pady=10)
         # Button to add the queue record
-        add_member = ctk.CTkButton(member_frame, text="Add",width=250,
+        add_member = ctk.CTkButton(member_frame, text="Add record",width=250,
+                                   fg_color='#d68b26',
                                    command=lambda: insert_member_data(
                                         member_id.get(),
                                         member_name.get(),
@@ -1118,7 +1124,8 @@ def add_record():
         password_password.pack(padx=10)  # Centering
 
         #Button to add the queue record
-        add_password = ctk.CTkButton(password_frame, text="Add operators",width=250,
+        add_password = ctk.CTkButton(password_frame, text="Add operators",width=250, 
+                                     fg_color='#d68b26',
                                    command=lambda: insert_password_data(
                                         password_id.get(),
                                         password_name.get(),
@@ -1283,6 +1290,14 @@ def update_record():
             messagebox.showwarning("Warning","No item selected for update.")
             return  # Exit if no item is selected
 
+        x = admin.winfo_x()
+        y = admin.winfo_y()
+        width = 320  # Desired width of the pop-up window
+        height = 400  # Desired height of the pop-up window
+        # Calculate the center position
+        x_position = x + (admin.winfo_width() // 2) - (width // 2)
+        y_position = y + (admin.winfo_height() // 2) - (height // 2)
+
         # Create a modal update window
         update_window = ctk.CTkToplevel(admin)
         update_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
@@ -1300,42 +1315,83 @@ def update_record():
         update_label = ctk.CTkLabel(update_member_frame, text='Update record', font=ctk.CTkFont(size=20, weight="bold"))
         update_label.pack(padx=10, pady=10)
 
+        id = selected_item_values[0]
+
         # Create input fields for updating a student and set their initial values
         schoolid_text = ctk.CTkLabel(update_member_frame, text='School ID', width=250, anchor='w')
         schoolid_text.pack()
-        update_schoolid = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='School ID', fg_color='lightgray')
+        update_schoolid = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='School ID')
         update_schoolid.pack(padx=10)
-        update_schoolid.insert(0, selected_item_values[0])  # Set the School ID
-        update_schoolid.configure(state="disabled")
+        update_schoolid.insert(0, selected_item_values[1])  # Set the School ID
 
         fullname_text = ctk.CTkLabel(update_member_frame, text='Full name', width=250, anchor='w')
         fullname_text.pack()
         update_fullname = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Full name')
         update_fullname.pack(padx=10)
-        update_fullname.insert(0, selected_item_values[1])  # Set the Full name
+        update_fullname.insert(0, selected_item_values[2])  # Set the Full name
 
-        course_text = ctk.CTkLabel(update_member_frame, text='Course', width=250, anchor='w')
-        course_text.pack()
-        update_course = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Course')
-        update_course.pack(padx=10)
-        update_course.insert(0, selected_item_values[2])  # Set the Course
 
-        year_text = ctk.CTkLabel(update_member_frame, text='Year level', width=250, anchor='w')
-        year_text.pack()
-        update_year = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Year & level')
-        update_year.pack(padx=10)
-        update_year.insert(0, selected_item_values[3])  # Set the Year & Level
+        update_course = ctk.StringVar(value="Select Course")
+        couser_layout = ctk.CTkOptionMenu(update_member_frame, 
+                                        variable=update_course, 
+                                        width=250,
+                                        values=[
+                                            "BSCS", 
+                                            'BS-CRIM', 
+                                            "BSSW", 
+                                            "BSEE",
+                                            'BSMT',
+                                            'BSM',
+                                            'BEED',
+                                            'BSED',
+                                            'BSBA',
+                                            'BSHM',
+                                            'BSA',
+                                            'BAPS'], 
+                                        fg_color="#fff",
+                                        text_color="#000",
+                                        dropdown_fg_color="#fff",
+                                        button_color="orange",
+                                        dropdown_hover_color="orange",
+                                        button_hover_color="#de9420")
+        couser_layout.pack(padx=10, pady=10)
+        update_course.set(selected_item_values[3])
+
+
+        update_year = ctk.StringVar(value="Select Year level")
+        year_layout = ctk.CTkOptionMenu(update_member_frame, variable=update_year, width=250,
+                              values=[
+                                      "1st Year", 
+                                      '2nd Year', 
+                                      "3rd Year", 
+                                      "4rth Year",
+                                      '5th Year',
+                                      '6th Year',
+                                      '7th Year',
+                                      '8th Year',
+                                      '9th Year',
+                                      '10th Year'], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        year_layout.pack(padx=10, pady=10)
+        update_year.set(selected_item_values[4])
 
         # Update button with functionality
         update_button = ctk.CTkButton(
             update_member_frame,
             width=250,
             text='Update record',
+            fg_color='#d68b26',
             command=lambda: save_changes_to_database(
                 update_schoolid.get(),
                 update_fullname.get(),
                 update_course.get(),
                 update_year.get(),
+                id,
                 connection,
                 cursor,
                 update_window  # Pass the update window to close it later
@@ -1373,42 +1429,54 @@ def update_record():
         update_label = ctk.CTkLabel(update_member_frame, text='Update record', font=ctk.CTkFont(size=20, weight="bold"))
         update_label.pack()
 
+        memberid = select_member_value[0]
+
         # Create input fields for updating a student and set their initial values
         schoolid_text = ctk.CTkLabel(update_member_frame, text='School ID', width=250, anchor='w')
         schoolid_text.pack()
-        update_schoolid = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='School ID', fg_color='lightgray')
+        update_schoolid = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='School ID')
         update_schoolid.pack(padx=10)
-        update_schoolid.insert(0, select_member_value[0])  # Set the School ID
-        update_schoolid.configure(state="disabled")
+        update_schoolid.insert(0, select_member_value[1])  # Set the School ID
 
         fullname_text = ctk.CTkLabel(update_member_frame, text='Full name', width=250, anchor='w')
         fullname_text.pack()
         update_fullname = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Full name')
         update_fullname.pack(padx=10)
-        update_fullname.insert(0, select_member_value[1])  # Set the Full name
+        update_fullname.insert(0, select_member_value[2])  # Set the Full name
 
         course_text = ctk.CTkLabel(update_member_frame, text='Affiliation', width=250, anchor='w')
         course_text.pack()
         update_course = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Affiliation')
         update_course.pack(padx=10)
-        update_course.insert(0, select_member_value[2])  # Set the Course
+        update_course.insert(0, select_member_value[3])  # Set the Course
 
         year_text = ctk.CTkLabel(update_member_frame, text='Role', width=250, anchor='w')
         year_text.pack()
         update_year = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Role')
         update_year.pack(padx=10)
-        update_year.insert(0, select_member_value[3])  # Set the Year & Level
+        update_year.insert(0, select_member_value[4])  # Set the Year & Level
 
-        office_text = ctk.CTkLabel(update_member_frame, text='Office', width=250, anchor='w')
-        office_text.pack()
-        office_member = ctk.CTkEntry(update_member_frame, width=250, placeholder_text='Office')
-        office_member.pack(padx=10)
-        office_member.insert(0, select_member_value[4])  # Set the Year & Level
+
+        office_member = ctk.StringVar(value="Select office")
+        office_member_layout = ctk.CTkOptionMenu(update_member_frame, variable=office_member, width=250,
+                              values=[
+                                      "School staff", 
+                                      'School faculty'
+                                     ], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        office_member_layout.pack(padx=10, pady=10)
+        office_member.set(select_member_value[5])
 
         # Update button with functionality
         update_button = ctk.CTkButton(
             update_member_frame,
             width=250,
+            fg_color='#d68b26',
             text='Update record',
             command=lambda: save_changes_member(
                 update_schoolid.get(),
@@ -1416,6 +1484,7 @@ def update_record():
                 update_course.get(),
                 update_year.get(),
                 office_member.get(),
+                memberid,
                 connection,
                 cursor,
                 update_member  # Pass the update window to close it later
@@ -1456,44 +1525,46 @@ def update_record():
         password_heading = ctk.CTkLabel(password_operator, text='Update operators record',font=ctk.CTkFont(size=20, weight="bold"))
         password_heading.pack(padx=10, pady=20)
 
+        id = item_values[0]
+
         password_password = ctk.CTkLabel(password_operator, text='School ID', width=250, anchor='w')
         password_password.pack() 
-        password_id = ctk.CTkEntry(password_operator, width=250, placeholder_text='School ID', fg_color='lightgray')
+        password_id = ctk.CTkEntry(password_operator, width=250, placeholder_text='School ID')
         password_id.pack(padx=10)  # Centering
-        password_id.insert(0, item_values[0])
-        password_id.configure(state="disabled")
+        password_id.insert(0, item_values[1])
 
         password_password = ctk.CTkLabel(password_operator, text='Full name', width=250, anchor='w')
         password_password.pack() 
         password_name = ctk.CTkEntry(password_operator, width=250, placeholder_text='Full name')
         password_name.pack(padx=10)  # Centering
-        password_name.insert(0, item_values[1])
+        password_name.insert(0, item_values[2])
 
         password_password = ctk.CTkLabel(password_operator, text='Operate area', width=250, anchor='w')
         password_password.pack() 
         pasword_operate = ctk.CTkEntry(password_operator, width=250, placeholder_text='Operate area')
         pasword_operate.pack(padx=10)  # Centering
-        pasword_operate.insert(0, item_values[2])
+        pasword_operate.insert(0, item_values[3])
 
         password_password = ctk.CTkLabel(password_operator, text='Phone', width=250, anchor='w')
         password_password.pack() 
         password_num = ctk.CTkEntry(password_operator, width=250, placeholder_text='Phone')
         password_num.pack(padx=10)  # Centering
-        password_num.insert(0, item_values[3])
+        password_num.insert(0, item_values[4])
         password_password = ctk.CTkLabel(password_operator, text='Username', width=250, anchor='w')
         password_password.pack() 
         password_username = ctk.CTkEntry(password_operator, width=250, placeholder_text='Username')
         password_username.pack(padx=10)  # Centering
-        password_username.insert(0, item_values[4])
+        password_username.insert(0, item_values[5])
 
         password_password = ctk.CTkLabel(password_operator, text='Password', width=250, anchor='w')
         password_password.pack() 
         password_password = ctk.CTkEntry(password_operator, width=250, placeholder_text='Password')
         password_password.pack(padx=10)  # Centering
-        password_password.insert(0, item_values[5])
+        password_password.insert(0, item_values[6])
 
         # Button to add the queue record
         update_opearator = ctk.CTkButton(password_operator, text="Update operators",width=250,
+                                                        fg_color='#d68b26',
                                                         command=lambda: update_password_data(
                                                             password_id.get(),
                                                             password_name.get(),
@@ -1501,6 +1572,7 @@ def update_record():
                                                             password_num.get(),
                                                             password_username.get(),
                                                             password_password.get(),
+                                                            id,
                                                             connection,
                                                             cursor,
                                                             password_update  # Pass the add window to close it later
@@ -1511,7 +1583,7 @@ def update_record():
 
 
 #Action of update in databse
-def save_changes_to_database(school_id, fullname, course, year, conn, cursor, update):
+def save_changes_to_database(school_id, fullname, course, year,id, conn, cursor, update):
     try:
 
         year_format = [
@@ -1526,6 +1598,7 @@ def save_changes_to_database(school_id, fullname, course, year, conn, cursor, up
                 '9th Year',
                 '10th Year'
                 ]
+        
          # Input validation
         if not school_id or not fullname or not course or not year:
             messagebox.showerror("Update record", "All fields are required.")
@@ -1535,10 +1608,11 @@ def save_changes_to_database(school_id, fullname, course, year, conn, cursor, up
            return
         elif year not in year_format:
            messagebox.showerror("Update record", "Please input valid Year level")
-           return                             
+           return
+                                    
 
-        query = "UPDATE student SET school_id = %s, full_name = %s, course =%s, year_level =%s WHERE school_id = %s"
-        cursor.execute(query, (school_id, fullname, course, year, school_id))
+        query = "UPDATE student SET school_id = %s, full_name = %s, course =%s, year_level =%s WHERE id = %s"
+        cursor.execute(query, (school_id, fullname, course, year, id))
         conn.commit()  # Commit the changes to the database       
         update_table("Students")
         update.destroy()  # Close the add window
@@ -1558,7 +1632,7 @@ def save_changes_to_database(school_id, fullname, course, year, conn, cursor, up
     except Error as err:  # Catch MySQL specific errors
         print(f"Error: {err}")  # Handle MySQL errors as warnings
 
-def save_changes_member(school_id, fullname, affiliation, role, office, conn, cursor, update):
+def save_changes_member(school_id, fullname, affiliation, role, office,memberid, conn, cursor, update):
     try:
 
         office_format = [
@@ -1574,8 +1648,8 @@ def save_changes_member(school_id, fullname, affiliation, role, office, conn, cu
            messagebox.showerror("Update record member", "Please input valid office")
            return                             
 
-        query = "UPDATE member SET school_id = %s, full_name = %s, affiliation =%s, role =%s, office =%s WHERE school_id = %s"
-        cursor.execute(query, (school_id, fullname, affiliation, role, office, school_id))
+        query = "UPDATE member SET school_id = %s, full_name = %s, affiliation =%s, role =%s, office =%s WHERE id = %s"
+        cursor.execute(query, (school_id, fullname, affiliation, role, office, memberid))
         conn.commit()  # Commit the changes to the database       
         update_table("Members")
         update.destroy()  # Close the add window
@@ -1597,7 +1671,7 @@ def save_changes_member(school_id, fullname, affiliation, role, office, conn, cu
     except Error as err:  # Catch MySQL specific errors
         print(f"Error: {err}")  # Handle MySQL errors as warnings update_password_data
 
-def update_password_data(school_id, fullname, operate, phone, username, password, conn, cursor, update):
+def update_password_data(school_id, fullname, operate, phone, username, password,id, conn, cursor, update):
     try:
 
         phone_pattern = r'^\+?\d{10,15}$'
@@ -1631,8 +1705,8 @@ def update_password_data(school_id, fullname, operate, phone, username, password
         # Hash the password before storing it
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        query = "UPDATE operator SET school_id = %s, full_name = %s, operate_area =%s, phone_number =%s, username =%s, password =%s WHERE school_id = %s"
-        cursor.execute(query, (school_id, fullname, operate, phone, username, hashed_password, school_id))
+        query = "UPDATE operator SET school_id = %s, full_name = %s, operate_area =%s, phone_number =%s, username =%s, password =%s WHERE id = %s"
+        cursor.execute(query, (school_id, fullname, operate, phone, username, hashed_password, id))
         conn.commit()  # Commit the changes to the database       
         update_table("Operators")
         update.destroy()  # Close the add window
@@ -1669,9 +1743,10 @@ def remove_record():
         if selected_item_values is None:
            messagebox.showwarning("Warning","No item selected for remove.")
            return  # Exit if no item is selected
+           
         
         global student_id
-        student_id = selected_item_values[0]
+        student_id = selected_item_values[1]
 
         remove_data_from_database(student_id, connection, cursor)
 
@@ -1682,7 +1757,7 @@ def remove_record():
            return  # Exit if no item is selected
         
         global member_id
-        member_id = select_member_value[0]
+        member_id = select_member_value[1]
         remove_member_data(member_id, connection, cursor)
 
     elif dropdown_var.get() == "Operators":
@@ -1692,7 +1767,7 @@ def remove_record():
            return  # Exit if no item is selected
         
         global operator_id
-        operator_id = item_values[0]
+        operator_id = item_values[1]
         remove_operator_data(operator_id, connection, cursor)
 
     else:
@@ -1772,31 +1847,53 @@ def remove_operator_data(school_id, conn, cursor):
         print("Remove canceled.")
 
 # admin settings
-#query to display admin username and password to entry wedgit
-def fetch_admin_data(user_id=2):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT username, password FROM admin WHERE id=%s", (user_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return result
+# Function to validate the current username and password
+def validate_credentials(username, password):
+    connection = create_connection()
+    if connection is None:
+        return False
 
-#query to database for update
-def update_admin_data(user_id, new_username, new_password):
-    conn = create_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE admin SET username =%s, password = %s WHERE id = %s",(
-        new_username, 
-        new_password, 
-        user_id))
-    conn.commit()
-    conn.close()
+    cursor = connection.cursor()
+    query = "SELECT * FROM admin WHERE username = %s AND password = %s"
+    cursor.execute(query, (username, password))
+    result = cursor.fetchone()
+    cursor.close()
+    connection.close()
+
+    if result:
+        return True
+    else:
+        return False
+    
+# Function to update username and password in the database
+def update_credentials(old_username, old_password, new_username, new_password):
+    if not validate_credentials(old_username, old_password):
+        messagebox.showerror("Error", "Current username or password is incorrect.")
+        return False
+
+    connection = create_connection()
+    if connection is None:
+        return False
+
+    cursor = connection.cursor()
+    update_query = "UPDATE admin SET username = %s, password = %s WHERE username = %s"
+    try:
+        cursor.execute(update_query, (new_username, new_password, old_username))
+        connection.commit()
+        messagebox.showinfo("Success", "Username and password updated successfully.")
+        return True
+    except Error as err:
+        messagebox.showerror("Error", f"Failed to update: {err}")
+        return False
+    finally:
+        cursor.close()
+        connection.close()
 
 # Global variable to track if admin_frame is open
 is_admin_frame_open = False
 admin_frame = None  # Declare admin_frame globally
 
-def settings_for_admin(user_id=2):
+def settings_for_admin():
     global is_admin_frame_open, admin_frame  # Access the global variable
     # If the admin frame is already open, do nothing
     if is_admin_frame_open:
@@ -1807,10 +1904,6 @@ def settings_for_admin(user_id=2):
     add_button.configure(state="disabled")
     update_button.configure(state="disabled")
     remove_button.configure(state="disabled")
-
-    admin_data = fetch_admin_data(user_id)
-    current_username = admin_data[0]
-    current_password = admin_data[1]
 
     # Create and pack the admin frame
     admin_frame = ctk.CTkFrame(main_frame, fg_color='lightgray')
@@ -1832,52 +1925,77 @@ def settings_for_admin(user_id=2):
     admin_hero_frame.pack(expand=True, fill='both', pady=20, padx=20)
 
 
-    # Add a button to close the admin_frame
-    close_button = ctk.CTkButton(admin_hero_frame, text="Close", command=close_admin_frame)
-    close_button.pack(pady=10, padx=10, anchor='w')
+    # # Add a button to close the admin_frame
+    # close_button = ctk.CTkButton(admin_hero_frame, text="Close", command=close_admin_frame)
+    # close_button.pack(pady=10,padx=10, anchor='w')
 
     # Create and pack the label in the admin frame
-    admin_label = ctk.CTkLabel(admin_hero_frame, text="Update admin username and password")
-    admin_label.pack()
+    admin_label = ctk.CTkLabel(admin_hero_frame, text="Update admin username and password", font=ctk.CTkFont(size=20, weight="bold"))
+    admin_label.pack(pady=10)
 
-    form_frame = ctk.CTkFrame(admin_hero_frame, width=350, height=320, fg_color='lightblue')
+    form_frame = ctk.CTkFrame(admin_hero_frame, width=350, height=320)
     form_frame.pack(expand=True)
 
-    form_label = ctk.CTkLabel(form_frame, text='Usename')
-    form_label.pack(pady=(50,0), padx=20, anchor='w')
+    #Current credintials
+    form_label = ctk.CTkLabel(form_frame, text='Current usename')
+    form_label.pack(pady=(30,0), padx=20, anchor='w')
     form_username = ctk.CTkEntry(form_frame, placeholder_text='Username', width=320)
     form_username.pack(padx=20)
-    form_username.insert(0, current_username)
 
-    form_label = ctk.CTkLabel(form_frame, text='Password')
+    form_label = ctk.CTkLabel(form_frame, text='Current password')
     form_label.pack(pady=(10, 0), padx=20, anchor='w')
     form_pass = ctk.CTkEntry(form_frame, placeholder_text='Password', width=320)
     form_pass.pack(padx=20)
-    form_pass.insert(0, current_password)
+
+    #New credintials
+    new_form_label = ctk.CTkLabel(form_frame, text='New username')
+    new_form_label.pack(pady=(20,0), padx=20, anchor='w')
+    new_form_username = ctk.CTkEntry(form_frame, placeholder_text='Username', width=320)
+    new_form_username.pack(padx=20)
+
+    new_form_label = ctk.CTkLabel(form_frame, text='New password')
+    new_form_label.pack(pady=(10, 0), padx=20, anchor='w')
+    new_form_password = ctk.CTkEntry(form_frame, placeholder_text='Password', width=320)
+    new_form_password.pack(padx=20)
     
-    #update submit
-    def submit_update():
-        new_username = form_username.get()
-        new_password = form_pass.get()
-         
-        #update validation
-        if len(new_username) < 4:
-            messagebox.showerror("Error", "Username atleast 4 character.")
+    # Function to clear all entry fields
+    def clear_entries():
+        form_username.delete(0, tk.END)
+        form_pass.delete(0, tk.END)
+        new_form_username.delete(0, tk.END)
+        new_form_password.delete(0, tk.END)
+
+    # Function to handle the update button click
+    def on_update_button_click():
+        old_username = form_username.get()
+        old_password = form_pass.get()
+        new_username = new_form_username.get()
+        new_password = new_form_password.get()
+
+        if not old_username or not old_password or not new_username or not new_password:
+            messagebox.showerror("Error", "All fields are required!")
             return
+        
+        if len(new_username) < 4:
+            messagebox.showerror("Error", "Error: Username must be at least 4 characters long.")
+            return
+        
         if len(new_password) < 4:
-            messagebox.showerror("Error", "Password atleast 4 character.")
-            return           
+            messagebox.showerror("Error", "Error: Password must be at least 4 characters long.")
+            return  
 
-        update_admin_data(user_id, new_username, new_password)
+        # Call the function to update credentials
+        success = update_credentials(old_username, old_password, new_username, new_password)
 
-        messagebox.showinfo("Success", "Update successfully.")
+        if success:
+            clear_entries()  # Clear the input fields if update is successful
 
-    form_button = ctk.CTkButton(form_frame, text='Save', height=30, command=submit_update)
-    form_button.pack(pady=30, padx=20)
+
+    form_button = ctk.CTkButton(form_frame, text='Save', fg_color='#d68b26', height=30, command=on_update_button_click)
+    form_button.pack(pady=20, padx=20)
 
     # Set the flag to indicate that the admin frame is now open
     is_admin_frame_open = True
-
 
 #to close admin frame
 def close_admin_frame():

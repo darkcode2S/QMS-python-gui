@@ -184,48 +184,116 @@ import customtkinter
 # # Run the main loop
 # root.mainloop()
 
-import tkinter as tk
-from tkinter import ttk
+# import tkinter as tk
+# from tkinter import ttk
 
-def on_select(event):
-    # Capture the selected item from the table
-    global selected_item
-    selected_item = table.focus()  # Get the ID of the selected item
-    selected_values = table.item(selected_item, 'values')  # Get the actual value
-    print(f"Selected: {selected_values}")  # Debugging
+# def on_select(event):
+#     # Capture the selected item from the table
+#     global selected_item
+#     selected_item = table.focus()  # Get the ID of the selected item
+#     selected_values = table.item(selected_item, 'values')  # Get the actual value
+#     print(f"Selected: {selected_values}")  # Debugging
 
-def reset_selection():
-    # Reset the selected value
-    table.selection_remove(table.selection())  # Deselect the item in the table
-    global selected_item
-    selected_item = None  # Clear the stored value
-    print("Selection reset")
+# def reset_selection():
+#     # Reset the selected value
+#     table.selection_remove(table.selection())  # Deselect the item in the table
+#     global selected_item
+#     selected_item = None  # Clear the stored value
+#     print("Selection reset")
 
-# Create the main window
-root = tk.Tk()
-root.geometry("400x300")
+# # Create the main window
+# root = tk.Tk()
+# root.geometry("400x300")
 
-# Create a table using Treeview
-columns = ('#1', '#2', '#3')
-table = ttk.Treeview(root, columns=columns, show='headings')
-table.heading('#1', text='ID')
-table.heading('#2', text='Name')
-table.heading('#3', text='Value')
+# # Create a table using Treeview
+# columns = ('#1', '#2', '#3')
+# table = ttk.Treeview(root, columns=columns, show='headings')
+# table.heading('#1', text='ID')
+# table.heading('#2', text='Name')
+# table.heading('#3', text='Value')
 
-# Insert sample data into the table
-table.insert('', tk.END, values=('1', 'Item A', '100'))
-table.insert('', tk.END, values=('2', 'Item B', '200'))
-table.insert('', tk.END, values=('3', 'Item C', '300'))
+# # Insert sample data into the table
+# table.insert('', tk.END, values=('1', 'Item A', '100'))
+# table.insert('', tk.END, values=('2', 'Item B', '200'))
+# table.insert('', tk.END, values=('3', 'Item C', '300'))
 
-table.pack(pady=20)
+# table.pack(pady=20)
 
-# Bind the select event
-table.bind('<<TreeviewSelect>>', on_select)
+# # Bind the select event
+# table.bind('<<TreeviewSelect>>', on_select)
 
-# Create Cancel Button
-cancel_button = tk.Button(root, text="Cancel", command=reset_selection)
-cancel_button.pack()
+# # Create Cancel Button
+# cancel_button = tk.Button(root, text="Cancel", command=reset_selection)
+# cancel_button.pack()
 
-selected_item = None  # Variable to store the selected item
+# selected_item = None  # Variable to store the selected item
 
-root.mainloop()
+# root.mainloop()
+
+import customtkinter as ctk
+from PIL import Image
+
+class EntryQueueApp(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+        self.title("Entry Queue")
+        self.iconbitmap("old-logo.ico")
+
+        # Set appearance mode and color theme (Light/Dark modes)
+        ctk.set_appearance_mode("light")
+        ctk.set_default_color_theme("dark-blue")
+
+        # Center the window on the screen
+        window_width = 800
+        window_height = 440
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+        x = (screen_width // 2) - (window_width // 2)
+        y = (screen_height // 2) - (window_height // 2)
+        self.geometry(f"{window_width}x{window_height}+{x}+{y}")
+
+        # Create the main frame for content
+        self.create_main_frame()
+
+    def create_main_frame(self):
+        # Main frame
+        frame = ctk.CTkFrame(self, width=700, height=300, fg_color="transparent")
+        frame.pack(expand=True)
+
+        # Load image using PIL and customtkinter
+        photo = ctk.CTkImage(light_image=Image.open("old-logo.png"),
+                             dark_image=Image.open("old-logo.png"),
+                             size=(150, 150))
+
+        # Create label for image
+        image_label = ctk.CTkLabel(frame, image=photo, text="", anchor='center')
+        image_label.pack(pady=(20, 20), side='left', padx=10)
+
+        # Bold heading label
+        heading_label = ctk.CTkLabel(frame, text="Welcome!",
+                                     font=ctk.CTkFont(size=80, weight="bold"), 
+                                     text_color="#000000", anchor="center")
+        heading_label.pack(pady=(130, 0), padx=(0, 20))
+
+        # Subheading label
+        sub_label = ctk.CTkLabel(frame, text="Join the Entry Queue Here.",
+                                 font=ctk.CTkFont(size=30, weight="bold"),
+                                 text_color="#000000", anchor="center")
+        sub_label.pack(pady=(0, 10))
+
+        # Button frame
+        button_frame = ctk.CTkFrame(frame, width=700, height=300, fg_color="transparent")
+        button_frame.pack(expand=True, fill='x')
+
+        # Proceed button
+        proc_button = ctk.CTkButton(button_frame, text='Proceed', fg_color='#d68b26', command=self.button_pros)
+        proc_button.pack(pady=40, side="left", padx=20)
+
+    def button_pros(self):
+        import students_table
+
+
+if __name__ == "__main__":
+    app = EntryQueueApp()
+    app.mainloop()
