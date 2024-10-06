@@ -6,7 +6,7 @@ import random
 import re
 from db import create_connection
 
-def visitor_queue(root, button_text, select_student):
+def visitor_queue(root, button_text, select_student, purpose):
     user_visitor = ctk.CTkToplevel(root)
     user_visitor.title("Visitor")
     user_visitor.iconbitmap("old-logo.ico")
@@ -82,6 +82,10 @@ def visitor_queue(root, button_text, select_student):
     def cancel():
         user_visitor.destroy()
 
+    global ticket_number
+    # Generate a random ticket number between 1 and 200
+    ticket_number = random.randint(1, 200) 
+
     def create_ticket(button_text, select_student):
         connection = create_connection()
         if connection is None:
@@ -89,8 +93,6 @@ def visitor_queue(root, button_text, select_student):
             return
 
         cursor = connection.cursor()    
-        
-        ticket_number = random.randint(1, 200)
 
         visitor_name = e1.get()
         visitor_phone = e2.get()
@@ -107,17 +109,19 @@ def visitor_queue(root, button_text, select_student):
 
          # Insert into queue table
         query_insert = """
-                INSERT INTO `queue` (`queue_number`, `full_name`, `transaction`, `affiliation`, `phone`) 
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `phone`, `purpose_of_visit`) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             
         # Use actual values instead of placeholders
         cursor.execute(query_insert, (
-                ticket_number,               
+                ticket_number, 
+                "None",              
                 visitor_name,    
                 button_text,    
                 select_student,
-                visitor_phone 
+                visitor_phone,
+                purpose
             ))
                         
         # Commit the changes
@@ -153,9 +157,7 @@ def open_ticket_window(visitor_name):
     new_window = tk.Tk()  # Create a new window
     new_window.title("Create Ticket")
     
-    global ticket_number
-    # Generate a random ticket number between 1 and 200
-    ticket_number = random.randint(1, 200) 
+
     
     # Create a label to display the random ticket number
     label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))

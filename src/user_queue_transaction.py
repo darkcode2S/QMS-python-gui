@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from PIL import Image 
-from user_queue_affiliation import affiliation
+from purpose_of_visit import purpose_visit_student, purpose_visit_staff, purpose_visit_visitor
 
 def transaction(root):
     user_transaction = ctk.CTkToplevel(root)
@@ -39,7 +39,7 @@ def transaction(root):
     button_frame.pack(expand=True, fill='x')
 
     proc_button = ctk.CTkButton(button_frame, 
-                                text='Cashier Service', 
+                                text='CASHIER SERVICE', 
                                 fg_color='#d68b26',
                                 border_color='#000', 
                                 border_width=1, 
@@ -50,7 +50,7 @@ def transaction(root):
     proc_button.pack(pady=20, side="left", padx=20)
 
     proc_button = ctk.CTkButton(button_frame , 
-                                text='Promisorry Note',  
+                                text='PROMISORRY NOTE COORDINATOR',  
                                 border_color='#000', 
                                 border_width=1,
                                 fg_color='#d68b26',
@@ -61,13 +61,13 @@ def transaction(root):
     proc_button.pack(pady=20, side="right", padx=20)
 
     proc_button = ctk.CTkButton(frame , 
-                                text='Scholarship Application',  
+                                text='SCHOLARSHIP COORDINATOR',  
                                 border_color='#000', 
                                 border_width=1,
                                 fg_color='#d68b26',
                                 height=80, 
                                 font=ctk.CTkFont(size=20, weight="bold"),
-                                command=lambda:scholarship_application(),
+                                command=lambda:scholarship_coordinator(),
                                 width=300)
     proc_button.pack(pady=20, padx=20)
 
@@ -87,15 +87,15 @@ def transaction(root):
 
     def cashier_service():
         button_text = 'Cashier Service'
-        affiliation(root, button_text)
+        purpose_visit_student(root, button_text)
 
     def promisorry_note():
-        button_text = 'Promisorry Note'
-        affiliation(root, button_text)
+        button_text = 'Promisorry note coordinator'
+        purpose_visit_staff(root, button_text)
 
-    def scholarship_application():
-        button_text = 'Scholarship Application'
-        affiliation(root, button_text)
+    def scholarship_coordinator():
+        button_text = 'Scholarship coordinator'
+        purpose_visit_visitor(root, button_text)
 
     user_transaction.grab_set()
 

@@ -5,7 +5,7 @@ from db import create_connection
 from tkinter import messagebox, simpledialog
 import random
 
-def satff_input_id(root, button_text, select_student):
+def satff_input_id(root, button_text, select_student, purpose):
     input_id_staff = ctk.CTkToplevel(root)
     input_id_staff.title("Input ID Staff")
     input_id_staff.iconbitmap("old-logo.ico")
@@ -26,14 +26,14 @@ def satff_input_id(root, button_text, select_student):
     main_frame = ctk.CTkFrame(input_id_staff, fg_color='transparent')
     main_frame.pack(expand=True)
 
-    heading_label = ctk.CTkLabel(main_frame, text="PLEASE INSERT SCHOOL ID NUMBER",
+    heading_label = ctk.CTkLabel(main_frame, text="PLEASE ENTER SCHOOL ID NUMBER",
                                         font=ctk.CTkFont(size=20, weight="bold"), 
                                         text_color="#000000", anchor="center")
     heading_label.pack(pady=(20,0), side='top')
 
     # Create the main frame for content
     frame = ctk.CTkFrame(main_frame, width=800, height=300, fg_color='#fff')
-    frame.pack(expand=True, fill='both',pady=20, padx=230)
+    frame.pack(expand=True, fill='both', padx=230)
 
     frame.columnconfigure(0, weight=1)
     frame.columnconfigure(1, weight=1)
@@ -44,6 +44,7 @@ def satff_input_id(root, button_text, select_student):
     frame.rowconfigure(2, weight=1)
     frame.rowconfigure(3, weight=1)
     frame.rowconfigure(4, weight=1)
+    frame.rowconfigure(5, weight=1)
 
     e1 = ctk.CTkEntry(frame, height=60, font=ctk.CTkFont(size=20, weight="bold"), placeholder_text='0')
     e1.grid(row=0, column=0, columnspan=3, sticky='wnes', pady=5, padx=5)
@@ -85,12 +86,15 @@ def satff_input_id(root, button_text, select_student):
     b9 = ctk.CTkButton(frame, text='9',fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('9'))
     b9.grid(row=3, column=2, sticky='wnes', pady=5, padx=5)
 
+    dash_button = ctk.CTkButton(frame, text='-', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('-'))
+    dash_button.grid(row=4, column=2, sticky='wnes', pady=5, padx=5)
+
     delete_button = ctk.CTkButton(frame, text='Del', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=lambda: delete_last_char())
     delete_button .grid(row=4, column=0, sticky='wnes', pady=5, padx=5)
     b0 = ctk.CTkButton(frame, text='0',fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('0'))
     b0.grid(row=4, column=1, sticky='wnes', pady=5, padx=5)
     clear_button = ctk.CTkButton(frame, text='Clear', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=lambda: clear_entry())
-    clear_button.grid(row=4, column=2, sticky='wnes', pady=5, padx=5)
+    clear_button.grid(row=5, column=0, columnspan=3, sticky='wnes', pady=5, padx=5)
 
 
     heading_label = ctk.CTkLabel(main_frame, text="Please proceed to create a ticket after entering your",
@@ -112,7 +116,11 @@ def satff_input_id(root, button_text, select_student):
 
     def cancel():
         input_id_staff.destroy()
-
+    
+    global ticket_number
+    # Generate a random ticket number between 1 and 200
+    ticket_number = random.randint(1, 200) 
+    
     def generate_ticket(button_text, select_student):
         entered_id = e1.get()
 
@@ -121,8 +129,6 @@ def satff_input_id(root, button_text, select_student):
             return  
 
         print(f"School ID: {entered_id}") 
-
-        ticket_number = random.randint(1, 200)
 
         connection = create_connection()
         if connection is None:
@@ -144,8 +150,8 @@ def satff_input_id(root, button_text, select_student):
             
             # Insert into queue table
             query_insert = """
-                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`) 
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
             
             # Use actual values instead of placeholders
@@ -154,7 +160,8 @@ def satff_input_id(root, button_text, select_student):
                 entered_id,
                 member_name,    
                 button_text,    
-                select_student,  
+                select_student,
+                purpose, 
             ))
                         
             # Commit the changes
@@ -200,9 +207,7 @@ def open_ticket_window(member_name):
     new_window = tk.Tk()  # Create a new window
     new_window.title("Create Ticket")
     
-    global ticket_number
-    # Generate a random ticket number between 1 and 200
-    ticket_number = random.randint(1, 200) 
+
     
     # Create a label to display the random ticket number
     label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))

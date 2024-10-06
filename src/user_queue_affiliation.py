@@ -4,7 +4,7 @@ from student_queue_input_id import input_id_student
 from user_queue_staff_input_id import satff_input_id
 from user_queue_visitor import visitor_queue
 
-def affiliation(root, button_text):
+def affiliation(root, button_text, purpose):
     user_aff = ctk.CTkToplevel(root)
     user_aff.title("Queue affiliation")
     user_aff.iconbitmap("old-logo.ico")
@@ -89,15 +89,15 @@ def affiliation(root, button_text):
 
     def student():
         select_student = 'Student'
-        input_id_student(root, button_text, select_student)
+        input_id_student(root, button_text, select_student, purpose)
 
     def staff():
         select_student = 'Staff/Faculty'
-        satff_input_id(root, button_text, select_student)
+        satff_input_id(root, button_text, select_student, purpose)
 
     def visitor():
         select_student = 'Visitor'
-        visitor_queue(root, button_text, select_student)
+        visitor_queue(root, button_text, select_student, purpose)
 
 
     user_aff.grab_set()

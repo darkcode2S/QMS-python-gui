@@ -2,6 +2,7 @@ import customtkinter as ctk
 import tkinter as tk
 from tkinter import ttk
 from counter_staff_profile_interface import counter_staff_home
+from db import create_connection
 
 def cashier_window(op_name, op_area):
     counter_staff = ctk.CTk()
@@ -91,12 +92,22 @@ def cashier_window(op_name, op_area):
     table_frame.columnconfigure(1, weight=1)
     table_frame.rowconfigure(0, weight=1)
 
+
+    def fetch_queue_data():
+        connection = create_connection()
+        cursor = connection.cursor()
+        cursor.execute("SELECT  queue_number, purpose_of_visit, affiliation FROM queue")
+        rows = cursor.fetchall()
+        cursor.close()
+        connection.close()
+        return rows
+
     # Define columns for the Treeview
     columns = ("Queue number", "Purpose of visit", "Affiliation")  # Ensure correct names
 
     # Create the first Treeview with a specified height
     tb1 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)  # Set height to show 15 rows
-    tb1.grid(row=0, column=0, pady=10, padx=10, sticky='news')
+    tb1.grid(row=0, column=0, padx=(0,10), sticky='news')
 
     # Configure column properties for tb1
     tb1.column("#0", width=0, stretch="no")
@@ -110,9 +121,29 @@ def cashier_window(op_name, op_area):
     tb1.heading("Purpose of visit", text="Purpose of Visit") 
     tb1.heading("Affiliation", text="Affiliation")
 
+    # Fetch and display data
+    data = fetch_queue_data()
+    for row in data:
+        tb1.insert("", "end", values=row)
+
+    item_values = None
+
+    #get value wehn selected operator table
+    def on_item_selected_password(event):
+        global item_values
+        selected_item = tb1.selection()  # Get the selected items (returns a tuple)
+
+        if selected_item:  # Check if any item is selected
+            item_values = tb1.item(selected_item[0], 'values')  # Get the values of the selected item
+            print(f"Selected values: {item_values}")  # Do something with the values
+        else:
+            print("No item selected")  # Handle the case where no item is selected
+
+    tb1.bind("<<TreeviewSelect>>", on_item_selected_password)
+
     # Create the second Treeview with a specified height
     tb2 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)  # Set height to show 15 rows
-    tb2.grid(row=0, column=1, pady=10, padx=10, sticky='news')
+    tb2.grid(row=0, column=1, sticky='news')
 
     # Configure column properties for tb2
     tb2.column("#0", width=0, stretch="no")

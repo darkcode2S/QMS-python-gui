@@ -5,7 +5,7 @@ from db import create_connection
 from tkinter import messagebox, simpledialog
 import random
 
-def input_id_student(root, button_text, select_student):
+def input_id_student(root, button_text, select_student, purpose):
     input_id_window = ctk.CTkToplevel(root)
     input_id_window.title("Input ID Student")
     input_id_window.iconbitmap("old-logo.ico")
@@ -27,7 +27,7 @@ def input_id_student(root, button_text, select_student):
     main_frame = ctk.CTkFrame(input_id_window, fg_color='transparent')
     main_frame.pack(expand=True)
 
-    heading_label = ctk.CTkLabel(main_frame, text="PLEASE INSERT SCHOOL ID NUMBER",
+    heading_label = ctk.CTkLabel(main_frame, text="PLEASE ENTER SCHOOL ID NUMBER",
                                         font=ctk.CTkFont(size=20, weight="bold"), 
                                         text_color="#000000", anchor="center")
     heading_label.pack(pady=(20,0), side='top')
@@ -119,6 +119,9 @@ def input_id_student(root, button_text, select_student):
     def cancel():
         input_id_window.destroy()
 
+    global ticket_number
+    # Generate a random ticket number between 1 and 200
+    ticket_number = random.randint(1, 200)
 
     def generate_ticket(button_text, select_student):
         entered_id = e1.get()
@@ -128,8 +131,6 @@ def input_id_student(root, button_text, select_student):
             return  
 
         print(f"School ID: {entered_id}") 
-
-        ticket_number = random.randint(1, 200)
 
         connection = create_connection()
         if connection is None:
@@ -151,8 +152,8 @@ def input_id_student(root, button_text, select_student):
             
             # Insert into queue table
             query_insert = """
-                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`) 
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
             
             # Use actual values instead of placeholders
@@ -161,7 +162,8 @@ def input_id_student(root, button_text, select_student):
                 entered_id,
                 student_name,    
                 button_text,    
-                select_student,  
+                select_student, 
+                purpose, 
             ))
                         
             # Commit the changes
@@ -209,9 +211,7 @@ def open_ticket_window(student_name):
     new_window = tk.Tk() 
     new_window.title("Create Ticket")
     
-    global ticket_number
-    # Generate a random ticket number between 1 and 200
-    ticket_number = random.randint(1, 200)  
+  
     
     # Create a label to display the random ticket number
     label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))
