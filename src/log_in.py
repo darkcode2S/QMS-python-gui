@@ -10,13 +10,12 @@ def open_login_window(root):
     log_in_window.geometry("400x300")
     log_in_window.title("Log in")
     log_in_window.iconbitmap("old-logo.ico")
- 
 
     # Disable maximize button
     log_in_window.resizable(False, False)  # Disable resizing
 
-    window_width = 300
-    window_height = 320
+    window_width = 320
+    window_height = 350
 
     screen_width = log_in_window.winfo_screenwidth()
     screen_height = log_in_window.winfo_screenheight()
@@ -27,32 +26,76 @@ def open_login_window(root):
     log_in_window.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
     photo = ctk.CTkImage(light_image=Image.open("old-logo.png"),
-                                  dark_image=Image.open("old-logo.png"),
-                                  size=(80, 80))
-
+                          dark_image=Image.open("old-logo.png"),
+                          size=(80, 80))
 
     # Center the username entry, password entry, and button
-    frame = ctk.CTkFrame(log_in_window, fg_color="transparent")
-    frame.pack(expand=True, fill='x')
-
+    frame = ctk.CTkFrame(log_in_window, fg_color='transparent')
+    frame.pack(expand=True, fill='both')
 
     image_label = ctk.CTkLabel(frame, image=photo, text="")  # Empty text to display only the image
     image_label.pack(pady=10)
 
-    username_label = ctk.CTkLabel(frame, text='Username')
-    username_label.pack(padx=(0,150))
-    username_entry = ctk.CTkEntry(frame, width=220, placeholder_text='Username')
-    username_entry.pack(padx=20)
+    username_label = ctk.CTkLabel(frame, text='Username', width=280, anchor='w')
+    username_label.pack()
 
-    password_label = ctk.CTkLabel(frame, text='Password')
-    password_label.pack(padx=(0,150))
-    password_entry = ctk.CTkEntry(frame, width=220, show="*", placeholder_text='Password')
-    password_entry.pack(pady=(0,10), padx=20)
+    username_input = ctk.CTkFrame(frame, fg_color='transparent', border_width=2, border_color='lightgray')
+    username_input.pack(pady=(0, 10), fill='x', padx=20)
+
+    username_entry = ctk.CTkEntry(username_input,
+                                  width=300, 
+                                  placeholder_text='Username', 
+                                  border_width=0,
+                                  fg_color='transparent')
+    username_entry.pack(padx=5, pady=5)
+
+    password_label = ctk.CTkLabel(frame, text='Password', width=280, anchor='w')
+    password_label.pack()
+
+    # Create password entry
+    password_input = ctk.CTkFrame(frame, fg_color='transparent', border_width=2, border_color='lightgray')
+    password_input.pack(pady=(0, 10), fill='x', padx=20)
+
+    password_entry = ctk.CTkEntry(password_input, 
+                                  width=230, 
+                                  show="*", 
+                                  placeholder_text='Password', 
+                                  border_width=0,
+                                  fg_color='transparent')
+    password_entry.pack(side='left', pady=5, padx=(5,0))
+
+    # Load icons for showing/hiding password
+    eye_open_image = ctk.CTkImage(light_image=Image.open("eye_open.png"),
+                                   dark_image=Image.open("eye_open.png"),
+                                   size=(20, 20))
+    eye_closed_image = ctk.CTkImage(light_image=Image.open("eye_closed.png"),
+                                     dark_image=Image.open("eye_closed.png"),
+                                     size=(20, 20))
+
+    # Function to toggle password visibility
+    def toggle_password_visibility():
+        if password_entry.cget('show') == "*":
+            password_entry.configure(show="")
+            eye_button.configure(image=eye_open_image)
+        else:
+            password_entry.configure(show="*")
+            eye_button.configure(image=eye_closed_image)
+
+    # Button to toggle password visibility
+    eye_button = ctk.CTkButton(password_input, 
+                               fg_color='transparent', 
+                               image=eye_closed_image, 
+                               text="",
+                               hover='transparent',
+                               command=toggle_password_visibility, 
+                               width=30)
+    eye_button.pack(side="right", pady=5, padx=(0,5))
 
     # Create custom button with orange background color
-    button = ctk.CTkButton(frame, width=220, text="Log in",
+    button = ctk.CTkButton(frame, width=280, text="Log in",
                            corner_radius=6, 
-                           fg_color='orange', 
+                           fg_color='orange',
+                           height=35,
                            hover_color="#de9420",
                            command=lambda: log_in(username_entry.get(), password_entry.get(), log_in_window, root))
     button.pack(pady=15, padx=20)
@@ -65,8 +108,10 @@ def open_login_window(root):
     # Make the sign-in window modal
     log_in_window.grab_set()  # Prevent interaction with other windows
 
-# # Function to handle sign-in logic to database
+# Function to handle sign-in logic to database
 def log_in(username, password, log_in_window, root):
+    from counter_staff_profile_interface import counter_staff_home
+
     connection = create_connection()
     cursor = None
 
@@ -108,12 +153,15 @@ def log_in(username, password, log_in_window, root):
             # Check if user is found in operator table
             elif operator_user:
                 stored_password = operator_user[6]  # Assuming password is the sixth field
+                op_name = operator_user[1]
+                op_area = operator_user[3]
+
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field
                     messagebox.showinfo("Success", f"Logged in successfully as {role.capitalize()}!")
                     log_in_window.destroy()
                     root.destroy()
-                    import operator_dashboard  # Redirect to operator dashboard            
+                    counter_staff_home(op_name, op_area) 
                 else:
                     messagebox.showerror("Login Failed", "Incorrect password.")
             else:

@@ -1,64 +1,74 @@
 import customtkinter as ctk
+import tkinter as tk
 from PIL import Image
 
-class TransactionQueueApp(ctk.CTk):
+
+class CounterStaffApp:
     def __init__(self):
-        super().__init__()
+        self.counter_staff = ctk.CTk()
+        self.setup_window()
+        self.setup_frames()
+        self.setup_content()
+        self.counter_staff.mainloop()
 
-        self.title("Queue transaction")
-        self.iconbitmap("old-logo.ico")
-
-        # Set appearance mode and color theme (Light/Dark modes)
+    def setup_window(self):
+        self.counter_staff.title("Counter Staff")
+        self.counter_staff.iconbitmap("old-logo.ico")
         ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("dark-blue")
+        self.center_window(800, 440)
 
-        # Center the window on the screen
-        window_width = 800
-        window_height = 440
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x = (screen_width // 2) - (window_width // 2)
-        y = (screen_height // 2) - (window_height // 2)
-        self.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    def center_window(self, width, height):
+        screen_width = self.counter_staff.winfo_screenwidth()
+        screen_height = self.counter_staff.winfo_screenheight()
+        x = (screen_width // 2) - (width // 2)
+        y = (screen_height // 2) - (height // 2)
+        self.counter_staff.geometry(f"{width}x{height}+{x}+{y}")
 
-        # Create the main frame for content
-        self.create_main_frame()
+    def setup_frames(self):
+        self.counter_staff.columnconfigure(0, weight=1)
+        self.counter_staff.columnconfigure(1, weight=1)
+        self.left_frame = self.create_frame(0)
+        self.right_frame = self.create_frame(1, fg_color='transparent')
 
-    def create_main_frame(self):
-        # Main frame
-        frame = ctk.CTkFrame(self, width=700, height=300, fg_color="transparent")
-        frame.pack(expand=True)
+    def create_frame(self, column, **kwargs):
+        frame = ctk.CTkFrame(self.counter_staff, **kwargs)
+        frame.grid(row=0, column=column, sticky='news')
+        return frame
 
-        # Load image using PIL and customtkinter
-        photo = ctk.CTkImage(light_image=Image.open("old-logo.png"),
-                             dark_image=Image.open("old-logo.png"),
-                             size=(150, 150))
+    def setup_content(self):
+        self.setup_image_label()
+        self.setup_right_content()
 
-        # Create label for image
-        image_label = ctk.CTkLabel(frame, image=photo, text="", anchor='center')
-        image_label.pack(pady=(20, 20), side='left', padx=10)
+    def setup_image_label(self):
+        self.original_image = Image.open("building1.jpg")
+        self.image_label = ctk.CTkLabel(self.left_frame, text="")
+        self.image_label.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.left_frame.bind("<Configure>", self.resize_image)
 
-        # Bold heading label
-        heading_label = ctk.CTkLabel(frame, text="Welcome!",
-                                     font=ctk.CTkFont(size=80, weight="bold"), 
-                                     text_color="#000000", anchor="center")
-        heading_label.pack(pady=(130, 0), padx=(0, 20))
+    def resize_image(self, event):
+        new_width = self.left_frame.winfo_width()
+        new_height = self.left_frame.winfo_height()
+        resized_image = self.original_image.resize((new_width, new_height))
+        new_ctk_image = ctk.CTkImage(light_image=resized_image, size=(new_width, new_height))
+        self.image_label.configure(image=new_ctk_image)
+        self.image_label.image = new_ctk_image
 
-        # Subheading label
-        sub_label = ctk.CTkLabel(frame, text="Join the Entry Queue Here.",
-                                 font=ctk.CTkFont(size=30, weight="bold"),
-                                 text_color="#000000", anchor="center")
-        sub_label.pack(pady=(0, 10))
+    def setup_right_content(self):
+        content_frame = ctk.CTkFrame(self.right_frame, fg_color='transparent')
+        content_frame.pack(expand=True)
 
-        # Button frame
-        button_frame = ctk.CTkFrame(frame, width=700, height=300, fg_color="transparent")
-        button_frame.pack(expand=True, fill='x')
+        title_label = ctk.CTkLabel(content_frame, text='Welcome back!', font=ctk.CTkFont(size=30, weight="bold"))
+        title_label.pack(pady=20, padx=20)
 
-        # Proceed button
-        proc_button = ctk.CTkButton(button_frame, text='Proceed', fg_color='#d68b26')
-        proc_button.pack(pady=40, side="left", padx=20)
-    
+        name_label = ctk.CTkLabel(content_frame, text='John Doe', font=ctk.CTkFont(size=20, weight="bold"))
+        name_label.pack(pady=(20, 0), padx=20)
 
+        # Continue setting up other UI elements...
+
+    def stand_by(self):
+        self.counter_staff.destroy()
+
+# Start the application
 if __name__ == "__main__":
-    app = TransactionQueueApp()
-    app.mainloop()
+    CounterStaffApp()

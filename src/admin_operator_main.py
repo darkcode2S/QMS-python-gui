@@ -8,6 +8,7 @@ from log_in import open_login_window
 # Function to open a new sign-in window
 def open_new_window():
     open_login_window(root)
+    
 # Initialize the main window
 root = ctk.CTk()
 root.geometry("800x400")
