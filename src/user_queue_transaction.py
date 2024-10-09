@@ -40,7 +40,8 @@ def transaction(root):
 
     proc_button = ctk.CTkButton(button_frame, 
                                 text='CASHIER SERVICE', 
-                                fg_color='#d68b26',
+                                fg_color="#d68b26", 
+                                hover_color="#a45e14",
                                 border_color='#000', 
                                 border_width=1, 
                                 font=ctk.CTkFont(size=20, weight="bold"),
@@ -53,7 +54,8 @@ def transaction(root):
                                 text='PROMISORRY NOTE COORDINATOR',  
                                 border_color='#000', 
                                 border_width=1,
-                                fg_color='#d68b26',
+                                fg_color="#d68b26", 
+                                hover_color="#a45e14",
                                 height=80, 
                                 font=ctk.CTkFont(size=20, weight="bold"),
                                 command=lambda:promisorry_note(),
@@ -64,7 +66,8 @@ def transaction(root):
                                 text='SCHOLARSHIP COORDINATOR',  
                                 border_color='#000', 
                                 border_width=1,
-                                fg_color='#d68b26',
+                                fg_color="#d68b26", 
+                                hover_color="#a45e14",
                                 height=80, 
                                 font=ctk.CTkFont(size=20, weight="bold"),
                                 command=lambda:scholarship_coordinator(),
@@ -76,6 +79,7 @@ def transaction(root):
                                 border_color='#000', 
                                 border_width=1,
                                 height=35,
+                                hover_color="#a45e14",
                                 fg_color='#fff',
                                 command=lambda: cancel_button(),
                                 text_color='#000')
@@ -87,15 +91,18 @@ def transaction(root):
 
     def cashier_service():
         button_text = 'Cashier Service'
+        #purpose of visit cashier service
         purpose_visit_student(root, button_text)
 
     def promisorry_note():
-        button_text = 'Promisorry note coordinator'
-        purpose_visit_staff(root, button_text)
+        button_text = 'Promisorry note coordinator' 
+        #purpose of visit promisorry note coordinator    
+        purpose_visit_visitor(root, button_text)
 
     def scholarship_coordinator():
         button_text = 'Scholarship coordinator'
-        purpose_visit_visitor(root, button_text)
+        #purpose of visit scholarship coordinator
+        purpose_visit_staff(root, button_text)
 
     user_transaction.grab_set()
 

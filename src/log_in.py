@@ -94,9 +94,9 @@ def open_login_window(root):
     # Create custom button with orange background color
     button = ctk.CTkButton(frame, width=280, text="Log in",
                            corner_radius=6, 
-                           fg_color='orange',
                            height=35,
-                           hover_color="#de9420",
+                           fg_color="#d68b26", 
+                           hover_color="#a45e14",
                            command=lambda: log_in(username_entry.get(), password_entry.get(), log_in_window, root))
     button.pack(pady=15, padx=20)
 
@@ -148,6 +148,9 @@ def log_in(username, password, log_in_window, root):
                     log_in_window.destroy()
                     root.destroy()
                     import admin_dashboard  # Redirect to admin dashboard
+
+                    connection.close()
+                    cursor.close()
                 else:
                     messagebox.showerror("Login Failed", "Incorrect password.")
             # Check if user is found in operator table
@@ -159,9 +162,12 @@ def log_in(username, password, log_in_window, root):
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field
                     messagebox.showinfo("Success", f"Logged in successfully as {role.capitalize()}!")
-                    log_in_window.destroy()
+                    # log_in_window.destroy()
                     root.destroy()
                     counter_staff_home(op_name, op_area) 
+                    
+                    connection.close()
+                    cursor.close()
                 else:
                     messagebox.showerror("Login Failed", "Incorrect password.")
             else:

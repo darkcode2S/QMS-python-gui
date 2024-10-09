@@ -44,7 +44,7 @@ sub_label.pack(pady=(0, 10))
 button_frame = ctk.CTkFrame(frame, width=700, height=300, fg_color="transparent")
 button_frame.pack(expand=True, fill='x')
 
-proc_button = ctk.CTkButton(button_frame , height=35, text='Proceed', fg_color='#d68b26', command=lambda:open_transaction_window())
+proc_button = ctk.CTkButton(button_frame , height=35, text='Proceed', fg_color="#d68b26", hover_color="#a45e14", command=lambda:open_transaction_window())
 proc_button.pack(pady=40, side="left", padx=20)
 
 def open_transaction_window():

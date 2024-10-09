@@ -70,11 +70,11 @@ def visitor_queue(root, button_text, select_student, purpose):
     button_frame = ctk.CTkFrame(frame, width=700, height=300, fg_color="transparent")
     button_frame.pack(expand=True, pady=20)
 
-    cancel_button = ctk.CTkButton(button_frame , height=35, text='Cancel', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', 
+    cancel_button = ctk.CTkButton(button_frame , height=35, text='Cancel', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', 
                                   command=lambda:cancel())
     cancel_button.pack(side="left", padx=20)
 
-    create_button = ctk.CTkButton(button_frame , height=35, text='Create Ticket', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', command=lambda: create_ticket(button_text, select_student))
+    create_button = ctk.CTkButton(button_frame , height=35, text='Create Ticket', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', command=lambda: create_ticket(button_text, select_student))
     create_button.pack(side="left", padx=20)
 
 
@@ -126,8 +126,6 @@ def visitor_queue(root, button_text, select_student, purpose):
                         
         # Commit the changes
         connection.commit()
-
-        messagebox.showinfo("Success", f"Create tikcket {visitor_name} found. Proceeding to next step.")
         root.destroy()
         open_ticket_window(visitor_name)
 

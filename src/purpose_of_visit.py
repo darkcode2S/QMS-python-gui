@@ -58,23 +58,23 @@ def purpose_visit_student(root, button_text):
         # radio2.pack(padx=30,pady=10, anchor='w')
         radio2.grid(row=1, column=0, padx=30,pady=10, sticky='w')
 
-        radio3 = ctk.CTkRadioButton(visit_frame, 
-                                    text="  Research fee", 
-                                    variable=selected_option, 
-                                    value="Research fee", 
-                                    fg_color="#d68b26", 
-                                    hover_color="#d68b26")
-        # radio3.pack(padx=30,pady=10, anchor='w')
-        radio3.grid(row=2, column=0, padx=30,pady=10, sticky='w')
+        # radio3 = ctk.CTkRadioButton(visit_frame, 
+        #                             text="  Research fee", 
+        #                             variable=selected_option, 
+        #                             value="Research fee", 
+        #                             fg_color="#d68b26", 
+        #                             hover_color="#d68b26")
+        # # radio3.pack(padx=30,pady=10, anchor='w')
+        # radio3.grid(row=2, column=0, padx=30,pady=10, sticky='w')
 
-        radio4 = ctk.CTkRadioButton(visit_frame, 
-                                    text="  Endorsement fee", 
-                                    variable=selected_option, 
-                                    value="Endorsement fee", 
-                                    fg_color="#d68b26", 
-                                    hover_color="#d68b26")
-        # radio1.pack(padx=30,pady=10, anchor='w')
-        radio4.grid(row=0, column=1, padx=30,pady=10, sticky='w')
+        # radio4 = ctk.CTkRadioButton(visit_frame, 
+        #                             text="  Endorsement fee", 
+        #                             variable=selected_option, 
+        #                             value="Endorsement fee", 
+        #                             fg_color="#d68b26", 
+        #                             hover_color="#d68b26")
+        # # radio1.pack(padx=30,pady=10, anchor='w')
+        # radio4.grid(row=0, column=1, padx=30,pady=10, sticky='w')
 
         radio5 = ctk.CTkRadioButton(visit_frame, 
                                     text="  Graduation fee", 
@@ -83,7 +83,7 @@ def purpose_visit_student(root, button_text):
                                     fg_color="#d68b26", 
                                     hover_color="#d68b26")
         # radio2.pack(padx=30,pady=10, anchor='w')
-        radio5.grid(row=1, column=1, padx=30,pady=10, sticky='w')
+        radio5.grid(row=2, column=0, padx=30,pady=10, sticky='w')
 
         radio6 = ctk.CTkRadioButton(visit_frame, 
                                     text="  Others", 
@@ -92,7 +92,7 @@ def purpose_visit_student(root, button_text):
                                     fg_color="#d68b26", 
                                     hover_color="#d68b26")
         # radio3.pack(padx=30,pady=10, anchor='w')
-        radio6.grid(row=2, column=1, padx=30,pady=10, sticky='w')
+        radio6.grid(row=0, column=1, padx=30,pady=10, sticky='w')
 
         # Function to handle confirmation----------------------------------------------------------
         def confirm_selection():
@@ -100,13 +100,26 @@ def purpose_visit_student(root, button_text):
             dialog.destroy()  # Close the dialog window
             affiliation(root, button_text, purpose)
 
+        def on_exit():
+              dialog.destroy()
+
         # Create a button to confirm selection with custom styling
-        confirm_button = ctk.CTkButton(dialog, 
+        buttom_dialog = ctk.CTkFrame(dialog, fg_color='transparent')
+        buttom_dialog.pack(expand=True)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
                                     text="Confirm", 
                                     command=confirm_selection,
                                     fg_color="#d68b26", 
                                     hover_color="#a45e14")
-        confirm_button.pack(pady=(50,0))
+        confirm_button.pack(pady=20, side="left", padx=20)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
+                                    text="Cancel", 
+                                    command=on_exit,
+                                    fg_color="#d68b26", 
+                                    hover_color="#a45e14")
+        confirm_button.pack(pady=20, side="left", padx=20)
 
         dialog.grab_set()
 
@@ -114,7 +127,7 @@ def purpose_visit_student(root, button_text):
 def purpose_visit_staff(root, button_text):
         # Create a Toplevel window (like a dialog)
         dialog2 = ctk.CTkToplevel(root)
-        dialog2.title("Promisorry note coordinator")
+        dialog2.title("Scholarship coordiantor")
 
         dialog2.resizable(False, False)
 
@@ -195,24 +208,37 @@ def purpose_visit_staff(root, button_text):
             dialog2.destroy()  # Close the dialog2 window
             affiliation(root, button_text, purpose)
 
+        def on_exit():
+              dialog2.destroy()
+
         # Create a button to confirm selection with custom styling
-        confirm_button = ctk.CTkButton(dialog2, 
+        buttom_dialog = ctk.CTkFrame(dialog2, fg_color='transparent')
+        buttom_dialog.pack(expand=True)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
                                     text="Confirm", 
                                     command=confirm_selection,
                                     fg_color="#d68b26", 
                                     hover_color="#a45e14")
-        confirm_button.pack(pady=(50,0))
+        confirm_button.pack(pady=20, side="left", padx=20)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
+                                    text="Cancel", 
+                                    command=on_exit,
+                                    fg_color="#d68b26", 
+                                    hover_color="#a45e14")
+        confirm_button.pack(pady=20, side="left", padx=20)
 
         dialog2.grab_set()
 
 def purpose_visit_visitor(root, button_text):
         # Create a Toplevel window (like a dialog)
         dialog3 = ctk.CTkToplevel(root)
-        dialog3.title("Scholarship coordinator")
+        dialog3.title("Promisorry note coordinator")
 
         dialog3.resizable(False, False)
 
-        window_width = 300
+        window_width = 350
         window_height = 230
         screen_width = dialog3.winfo_screenwidth()
         screen_height = dialog3.winfo_screenheight()
@@ -261,12 +287,25 @@ def purpose_visit_visitor(root, button_text):
             dialog3.destroy()  # Close the dialog3 window
             affiliation(root, button_text, purpose)
 
+        def on_exit():
+              dialog3.destroy()
+
         # Create a button to confirm selection with custom styling
-        confirm_button = ctk.CTkButton(dialog3, 
+        buttom_dialog = ctk.CTkFrame(dialog3, fg_color='transparent')
+        buttom_dialog.pack(expand=True)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
                                     text="Confirm", 
                                     command=confirm_selection,
                                     fg_color="#d68b26", 
                                     hover_color="#a45e14")
-        confirm_button.pack(pady=(20,0))
+        confirm_button.pack(pady=20, side="left", padx=20)
+
+        confirm_button = ctk.CTkButton(buttom_dialog, 
+                                    text="Cancel", 
+                                    command=on_exit,
+                                    fg_color="#d68b26", 
+                                    hover_color="#a45e14")
+        confirm_button.pack(pady=20, side="left", padx=20)
 
         dialog3.grab_set()

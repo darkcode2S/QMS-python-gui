@@ -54,14 +54,15 @@ def on_exit():
 button_frame = ctk.CTkFrame(frame, width=700, height=300, fg_color="transparent")
 button_frame.pack(expand=True)
 
-button_login = ctk.CTkButton(button_frame, text="Log in", width=120, height=30, 
-                                   fg_color="orange", hover_color="#de9420", text_color="white", 
+button_login = ctk.CTkButton(button_frame, text="Log in", width=120, height=35, 
+                                   fg_color="#d68b26", hover_color="#a45e14", text_color="white", 
                                    font=ctk.CTkFont(size=12, weight="bold"),
                                    command=open_new_window)  # Call the defined function
 button_login.pack(pady=20, side="left", padx=20)
 
-button_exit = ctk.CTkButton(button_frame, text="Exit", width=120, height=30, 
-                                   fg_color="orange", hover_color="#de9420", text_color="white", 
+
+button_exit = ctk.CTkButton(button_frame, text="Exit", width=120, height=35, 
+                                   fg_color="#d68b26", hover_color="#a45e14", text_color="white", 
                                    font=ctk.CTkFont(size=12, weight="bold"),
                                    command=on_exit)  # Call the defined function
 button_exit.pack(pady=20, side="left", padx=20)
@@ -71,6 +72,7 @@ def on_enter(event):
 
 # Bind Enter key to the sign-in window
 root.bind('<Return>', on_enter)
+
 
 # Start the main loop
 root.mainloop()

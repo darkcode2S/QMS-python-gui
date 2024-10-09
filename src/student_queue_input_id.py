@@ -68,35 +68,35 @@ def input_id_student(root, button_text, select_student, purpose):
         e1.delete(0, "end")
 
     # Create buttons and bind them to append the respective values to the entry
-    b1 = ctk.CTkButton(frame, text='1', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('1'))
+    b1 = ctk.CTkButton(frame, text='1', fg_color='#fff',hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('1'))
     b1.grid(row=1, column=0, sticky='wnes', pady=5, padx=5)
-    b2 = ctk.CTkButton(frame, text='2', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('2'))
+    b2 = ctk.CTkButton(frame, text='2', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('2'))
     b2.grid(row=1, column=1, sticky='wnes', pady=5, padx=5)
-    b3 = ctk.CTkButton(frame, text='3', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('3'))
+    b3 = ctk.CTkButton(frame, text='3', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('3'))
     b3.grid(row=1, column=2, sticky='wnes', pady=5, padx=5)
 
-    b4 = ctk.CTkButton(frame, text='4', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('4'))
+    b4 = ctk.CTkButton(frame, text='4', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('4'))
     b4.grid(row=2, column=0, sticky='wnes', pady=5, padx=5)
-    b5 = ctk.CTkButton(frame, text='5', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('5'))
+    b5 = ctk.CTkButton(frame, text='5', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('5'))
     b5.grid(row=2, column=1, sticky='wnes', pady=5, padx=5)
-    b6 = ctk.CTkButton(frame, text='6', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('6'))
+    b6 = ctk.CTkButton(frame, text='6', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('6'))
     b6.grid(row=2, column=2, sticky='wnes', pady=5, padx=5)
 
-    b7 = ctk.CTkButton(frame, text='7', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('7'))
+    b7 = ctk.CTkButton(frame, text='7', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('7'))
     b7.grid(row=3, column=0, sticky='wnes', pady=5, padx=5)
-    b8 = ctk.CTkButton(frame, text='8', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('8'))
+    b8 = ctk.CTkButton(frame, text='8', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('8'))
     b8.grid(row=3, column=1, sticky='wnes', pady=5, padx=5)
-    b9 = ctk.CTkButton(frame, text='9', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('9'))
+    b9 = ctk.CTkButton(frame, text='9', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('9'))
     b9.grid(row=3, column=2, sticky='wnes', pady=5, padx=5)
 
-    dash_button = ctk.CTkButton(frame, text='-', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('-'))
+    dash_button = ctk.CTkButton(frame, text='-', fg_color="#d68b26", hover_color="#a45e14", text_color='#fff', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('-'))
     dash_button.grid(row=4, column=2, sticky='wnes', pady=5, padx=5)
 
-    delete_button = ctk.CTkButton(frame, text='Del', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=delete_last_char)
+    delete_button = ctk.CTkButton(frame, text='Del', fg_color="#d68b26", hover_color="#a45e14", text_color='#fff', border_width=1, border_color='#000', height=60, command=delete_last_char)
     delete_button.grid(row=4, column=0, sticky='wnes', pady=5, padx=5)
-    b0 = ctk.CTkButton(frame, text='0', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('0'))
+    b0 = ctk.CTkButton(frame, text='0', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', height=60, command=lambda: append_to_entry('0'))
     b0.grid(row=4, column=1, sticky='wnes', pady=5, padx=5)
-    clear_button = ctk.CTkButton(frame, text='Clear', fg_color='#d68b26', text_color='#fff', border_width=1, border_color='#000', height=60, command=clear_entry)
+    clear_button = ctk.CTkButton(frame, text='Clear', fg_color="#d68b26", hover_color="#a45e14", text_color='#fff', border_width=1, border_color='#000', height=60, command=clear_entry)
     clear_button.grid(row=5, column=0, columnspan=3, sticky='wnes', pady=5, padx=5)
 
     # Label text below
@@ -109,10 +109,10 @@ def input_id_student(root, button_text, select_student, purpose):
     button_frame = ctk.CTkFrame(main_frame, fg_color='transparent')
     button_frame.pack(expand=True)
 
-    cancel_button = ctk.CTkButton(button_frame, height=35, text='Cancel', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', command=lambda: cancel())
+    cancel_button = ctk.CTkButton(button_frame, height=35, text='Cancel', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', command=lambda: cancel())
     cancel_button.pack(side='left', padx=20)
 
-    create_ticket = ctk.CTkButton(button_frame, height=35, text='Create Ticket', fg_color='#fff', text_color='#000', border_width=1, border_color='#000', command=lambda: generate_ticket(button_text, select_student))
+    create_ticket = ctk.CTkButton(button_frame, height=35, text='Create Ticket', fg_color='#fff', hover_color="#a45e14", text_color='#000', border_width=1, border_color='#000', command=lambda: generate_ticket(button_text, select_student))
     create_ticket.pack(side='left', padx=20)
 
     # Cancel button functionality
@@ -148,7 +148,6 @@ def input_id_student(root, button_text, select_student, purpose):
         if result_student:
             # Assuming result_student[1] is the full name
             student_name = result_student[1]  
-            print(f"Student ID {entered_id} found in the student table.")
             
             # Insert into queue table
             query_insert = """
@@ -168,8 +167,6 @@ def input_id_student(root, button_text, select_student, purpose):
                         
             # Commit the changes
             connection.commit()
-            
-            messagebox.showinfo("Success", f"Student ID {entered_id} found. Proceeding to next step.")
             root.destroy()
             open_ticket_window(student_name)
 

@@ -3,12 +3,13 @@ import tkinter as tk
 from tkinter import ttk
 from counter_staff_profile_interface import counter_staff_home
 from db import create_connection
+from tkinter import ttk, messagebox  # Added messagebox for displaying warnings
+
 
 def cashier_window(op_name, op_area):
     counter_staff = ctk.CTk()
     counter_staff.title("Operator")
     counter_staff.iconbitmap("old-logo.ico")
-
     # Set appearance mode and color theme (Light/Dark modes)
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("dark-blue")
@@ -22,7 +23,7 @@ def cashier_window(op_name, op_area):
     y = (screen_height // 2) - (window_height // 2)
     counter_staff.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
-    # Create the main frame for navigation-------------------------------------------------------------------------------------------------------------
+    # Create the main frame for navigation
     nav_frame = ctk.CTkFrame(counter_staff, width=700, height=60, fg_color='#d68b26')
     nav_frame.pack(side='top', fill='x', pady=10, padx=10)
 
@@ -35,128 +36,156 @@ def cashier_window(op_name, op_area):
                                command=lambda: back_home(op_name, op_area))
     nav_button.pack(side='left', pady=20, padx=20)
 
-    #home button
     def back_home(op_name, op_area):
         counter_staff.destroy()
         counter_staff_home(op_name, op_area)
-  
+
     title_label = ctk.CTkLabel(nav_frame,
                                 text='Cashier window 1',
                                 anchor='w',
                                 compound='left', 
                                 text_color='#fff',
                                 font=ctk.CTkFont(size=15, weight="bold"))
-    title_label.pack(side='left',pady=20)
-
+    title_label.pack(side='left', pady=20)
 
     prep_num = ctk.CTkLabel(nav_frame,
-                                text='07',
-                                anchor='w',
-                                compound='left', 
-                                text_color='#000',
-                                font=ctk.CTkFont(size=30, weight="bold"))
-    prep_num.pack(side='right', pady=20, padx=(0,20))
-
+                            text='00',
+                            anchor='w',
+                            compound='left', 
+                            text_color='#fff',
+                            font=ctk.CTkFont(size=50, weight="bold"))
+    prep_num.pack(side='right', pady=20, padx=(0, 20))
 
     prep_label = ctk.CTkLabel(nav_frame,
-                                text='Serving: ',
-                                anchor='w',
-                                compound='left', 
-                                text_color='#fff',
-                                font=ctk.CTkFont(size=15, weight="bold"))
-    prep_label.pack(side='right', pady=20, padx=(20,0))
+                              text='Serving: ',
+                              anchor='w',
+                              compound='left', 
+                              text_color='#fff',
+                              font=ctk.CTkFont(size=15, weight="bold"))
+    prep_label.pack(side='right', pady=20, padx=(20, 0))
 
     serve_num = ctk.CTkLabel(nav_frame,
-                                text='08',
-                                anchor='w',
-                                compound='left', 
-                                text_color='#000',
-                                font=ctk.CTkFont(size=30, weight="bold"))
-    serve_num.pack(side='right',pady=20)
+                             text='00',
+                             anchor='w',
+                             compound='left', 
+                             text_color='#fff',
+                             font=ctk.CTkFont(size=50, weight="bold"))
+    serve_num.pack(side='right', pady=20)
 
     serve_label = ctk.CTkLabel(nav_frame,
-                                text='Preparing: ',
-                                anchor='w',
-                                compound='left', 
-                                text_color='#fff',
-                                font=ctk.CTkFont(size=15, weight="bold"))
-    serve_label.pack(side='right',pady=20)
+                               text='Preparing: ',
+                               anchor='w',
+                               compound='left', 
+                               text_color='#fff',
+                               font=ctk.CTkFont(size=15, weight="bold"))
+    serve_label.pack(side='right', pady=20)
 
-
-
-    # Create the table frame----------------------------------------------------------------------------------------------------------------------
-    table_frame = ctk.CTkFrame(counter_staff, width=700, height=600, fg_color='transparent')
+    # Create the table frame
+    table_frame = ctk.CTkFrame(counter_staff, width=700, height=800, fg_color='transparent')
     table_frame.pack(side='bottom', fill='x', pady=10, padx=10)
 
     table_frame.columnconfigure(0, weight=1)
     table_frame.columnconfigure(1, weight=1)
     table_frame.rowconfigure(0, weight=1)
 
-
     def fetch_queue_data():
         connection = create_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT  queue_number, purpose_of_visit, affiliation FROM queue")
+        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation FROM queue")
         rows = cursor.fetchall()
         cursor.close()
         connection.close()
         return rows
 
-    # Define columns for the Treeview
-    columns = ("Queue number", "Purpose of visit", "Affiliation")  # Ensure correct names
+    columns = ("Queue number", "Purpose of visit", "Affiliation")
 
-    # Create the first Treeview with a specified height
-    tb1 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)  # Set height to show 15 rows
+    # First Treeview (tb1)
+    tb1 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)
     tb1.grid(row=0, column=0, padx=(0,10), sticky='news')
-
-    # Configure column properties for tb1
     tb1.column("#0", width=0, stretch="no")
-    tb1.column("Queue number", anchor="center", width=100)  # Increased width for better visibility
-    tb1.column("Purpose of visit", anchor="center", width=200)  # Increased width for better visibility
-    tb1.column("Affiliation", anchor="center", width=100)  # Increased width for better visibility
-
-    # Configure headings for tb1
+    tb1.column("Queue number", anchor="center", width=100)
+    tb1.column("Purpose of visit", anchor="center", width=200)
+    tb1.column("Affiliation", anchor="center", width=100)
     tb1.heading("#0", text="")
-    tb1.heading("Queue number", text="Queue Number") 
-    tb1.heading("Purpose of visit", text="Purpose of Visit") 
+    tb1.heading("Queue number", text="Queue Number")
+    tb1.heading("Purpose of visit", text="Purpose of Visit")
     tb1.heading("Affiliation", text="Affiliation")
 
-    # Fetch and display data
     data = fetch_queue_data()
     for row in data:
         tb1.insert("", "end", values=row)
 
-    item_values = None
+    # Second Treeview (tb2)--------------------------------------------------------------------------------
+    # Define a function to handle the selection event in tb2
+    def on_tb2_select(event):
+        # Get the selected item from tb2
+        selected_item = tb2.selection()
 
-    #get value wehn selected operator table
-    def on_item_selected_password(event):
-        global item_values
-        selected_item = tb1.selection()  # Get the selected items (returns a tuple)
+        # Ensure that an item is selected
+        if selected_item:
+            # Retrieve the values of the selected item
+            item_values = tb2.item(selected_item, 'values')
 
-        if selected_item:  # Check if any item is selected
-            item_values = tb1.item(selected_item[0], 'values')  # Get the values of the selected item
-            print(f"Selected values: {item_values}")  # Do something with the values
-        else:
-            print("No item selected")  # Handle the case where no item is selected
+            # Create a small custom pop-up window
+            popup = tk.Toplevel(counter_staff)
+            popup.geometry("350x150")  # Set the size of the pop-up window
+            popup.title("Ticket Action")
+            popup.resizable(False, False)
 
-    tb1.bind("<<TreeviewSelect>>", on_item_selected_password)
+            # Display the selected values in the pop-up window (for reference)
+            tk.Label(popup, text=f"Queue Number: {item_values[0]}", font=("Arial", 12)).pack(pady=10)
+            tk.Label(popup, text=f"Purpose of Visit: {item_values[1]}", font=("Arial", 10)).pack()
+            tk.Label(popup, text=f"Affiliation: {item_values[2]}", font=("Arial", 10)).pack()
 
-    # Create the second Treeview with a specified height
-    tb2 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)  # Set height to show 15 rows
+            # Frame to hold the buttons
+            button_frame = tk.Frame(popup)
+            button_frame.pack(pady=20)
+
+            # Function to handle the "Complete Ticket" button
+            def complete_ticket():
+                conn = create_connection()
+                cursor = conn.cursor()
+                
+                # Perform any action needed (e.g., update database or UI)
+                tk.messagebox.showinfo("Ticket Completed", f"Ticket {item_values[0]} has been marked as complete.")
+                tb2.delete(selected_item)  # Remove the ticket from tb2
+                popup.destroy()  # Close the pop-up window
+
+                q_num = item_values[0]
+
+                query = "DELETE FROM queue_display"
+                cursor.execute(query)
+                conn.commit()
+
+            # Function to handle the "Void Ticket" button
+            def void_ticket():
+                # Perform any action needed (e.g., update database or UI)
+                tk.messagebox.showinfo("Ticket Voided", f"Ticket {item_values[0]} has been voided.")
+                tb2.delete(selected_item)  # Remove the ticket from tb2
+                popup.destroy()  # Close the pop-up window
+
+            # Create buttons for completing or voiding the ticket
+            complete_button = tk.Button(button_frame, text="Complete Ticket", width=15, bg="green", fg="white", command=complete_ticket)
+            complete_button.pack(side="left", padx=10)
+
+            void_button = tk.Button(button_frame, text="Void Ticket", width=15, bg="red", fg="white", command=void_ticket)
+            void_button.pack(side="right", padx=10)
+                
+
+    # Create tb2 with columns and headers
+    tb2 = ttk.Treeview(table_frame, columns=columns, show='headings', height=15)
     tb2.grid(row=0, column=1, sticky='news')
-
-    # Configure column properties for tb2
     tb2.column("#0", width=0, stretch="no")
-    tb2.column("Queue number", anchor="center", width=100)  # Increased width for better visibility
-    tb2.column("Purpose of visit", anchor="center", width=200)  # Increased width for better visibility
-    tb2.column("Affiliation", anchor="center", width=100)  # Increased width for better visibility
-
-    # Configure headings for tb2
+    tb2.column("Queue number", anchor="center", width=100)
+    tb2.column("Purpose of visit", anchor="center", width=200)
+    tb2.column("Affiliation", anchor="center", width=100)
     tb2.heading("#0", text="")
-    tb2.heading("Queue number", text="Queue Number") 
-    tb2.heading("Purpose of visit", text="Purpose of Visit") 
+    tb2.heading("Queue number", text="Queue Number")
+    tb2.heading("Purpose of visit", text="Purpose of Visit")
     tb2.heading("Affiliation", text="Affiliation")
 
+    # Bind the TreeviewSelect event to the on_tb2_select function
+    tb2.bind("<<TreeviewSelect>>", on_tb2_select)
     #table title name---------------------------------------------------------------------------------------------------------------------------
     table_name = ctk.CTkFrame(counter_staff, width=700, height=0, border_color='darkgray', border_width=1)
     table_name.pack(side='bottom', fill='x')
@@ -181,62 +210,119 @@ def cashier_window(op_name, op_area):
                                 font=ctk.CTkFont(size=15, weight="bold"))
     heading_tit2.grid(row=0, column=1, pady=3)
 
-    #table button functions------------------------------------------------------------------------------------------------------------------------
+
+    # Selected item storage
+    selected_item = None
+
+
+    # Function to transfer selected item from tb1 to tb2
+    def call_ticket():
+        conn = create_connection()
+        if conn is None:
+            print("Failed to connect to the database.")
+            return
+
+        cursor = conn.cursor()
+
+        # Check if tb2 already has data (a ticket is being processed)
+        if tb2.get_children():
+            # If tb2 has data, show a message and prevent further action
+            messagebox.showwarning("Processing", "Please complete the current ticket before calling the next one.")
+            return  # Exit the function if tb2 has data
+
+        # Get all the children (items) in Treeview TB1
+        children = tb1.get_children()
+
+        # Check if tb1 is empty (no tickets available to process)
+        if not children:
+            # If tb1 is empty, show a message and prevent further action
+            messagebox.showinfo("No Data", "No tickets found in the queue to process.")
+            # Clear the "Serving" and "Preparing" labels
+            prep_num.configure(text="--")
+            serve_num.configure(text="--")
+            return  # Exit the function early if tb1 has no data
+
+        # Get the first item (the one that is being served)
+        first_item = children[0]
+        first_item_values = tb1.item(first_item, 'values')
+
+        # Update the "Serving" label with the queue number of the first item
+        prep_num.configure(text=first_item_values[0])
+
+        q_num = first_item_values[0]
+
+        print(q_num)
+
+        query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+        cursor.execute(query, (q_num,))
+        conn.commit()  # Commit the changes to the database
+
+        cursor.close()
+        conn.close()
+
+        # Check if there's a second item to set for "Preparing"
+        if len(children) > 1:
+            second_item = children[1]
+            second_item_values = tb1.item(second_item, 'values')
+            # Update the "Preparing" label with the queue number of the second item
+            serve_num.configure(text=second_item_values[0])
+
+            s_num = second_item_values[0]
+            print(s_num)
+
+            conn = create_connection()
+            if conn is None:
+                print("Failed to connect to the database.")
+                return
+
+            cursor = conn.cursor()
+
+            query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+            cursor.execute(query, (s_num,))
+            conn.commit()  # Commit the changes to the database
+
+            cursor.close()
+            conn.close()
+        else:
+            # If there's no second item, clear the "Preparing" label
+            serve_num.configure(text="--")
+
+        # Automatically transfer the first item from tb1 to tb2
+        tb2.insert("", 0, values=first_item_values)
+        tb1.delete(first_item)  # Remove the first item from tb1
+
+
+
+    # Function to complete or void ticket in tb2
+    def complete_or_void_ticket():
+        if tb2.selection():
+            tb2.delete(tb2.selection())  # Remove from tb2
+
+    # Capture selected item from tb1
+    def on_item_selected(event):
+        global selected_item
+        selected = tb1.selection()
+        first_item = tb1.get_children()[0]  # Get the first item
+
+        if selected:
+            # # Check if the selected item is the first item in TB1
+            # if selected[0] != first_item:
+            #     # Show a warning message if the user clicks on any item other than the first one
+            #     messagebox.showwarning("Invalid Selection", "Please select the first data in the queue.")
+            #     tb1.selection_remove(selected)  # Deselect the invalid selection
+            # else:
+            #     # If the first item is selected, store it for transferring
+                selected_item = tb1.item(selected, "values")
+
+    tb1.bind("<<TreeviewSelect>>", on_item_selected)
+
+    # Buttons---------------------------------------------------------------------------------
     table_btn = ctk.CTkFrame(counter_staff, width=700, height=0, fg_color='transparent')
     table_btn.pack(side='bottom', fill='x', pady=10)
 
-    table_btn.columnconfigure(0, weight=1)
-    table_btn.columnconfigure(1, weight=1)
-    table_btn.columnconfigure(2, weight=1)
-    table_btn.columnconfigure(3, weight=1)
-    table_btn.rowconfigure(0, weight=1)
-
-    #button function interact database
-    # Button function interacting with the database
-    next_btn = ctk.CTkButton(
-        table_btn, text='Next ticket',
-        height=35, text_color='#fff'
-    )
-    next_btn.grid(row=0, column=0)
-
-    call_btn = ctk.CTkButton(
-        table_btn, text='Call ticket',
-        height=35, text_color='#fff'
-    )
-    call_btn.grid(row=0, column=1)
-
-    complete_btn = ctk.CTkButton(
-        table_btn, text='Complete ticket',
-        height=35, text_color='#fff'
-    )
-    complete_btn.grid(row=0, column=2)
-
-    voided_btn = ctk.CTkButton(
-        table_btn, text='Voided',
-        height=35, text_color='#fff'
-    )
-    voided_btn.grid(row=0, column=3)
+    call_btn = ctk.CTkButton(table_btn, text='Call ticket', height=35, text_color='#fff', command=call_ticket)
+    call_btn.pack(side='left', padx=10)
 
 
-    # # Function to change the button text color on hover
-    # def change_btn_text_color(button, hover_text_color):
-    #     def on_enter(event):
-    #         button.configure(text_color=hover_text_color)
-
-    #     def on_leave(event):
-    #         button.configure(text_color='#000')  # Set text back to black
-
-    #     button.bind("<Enter>", on_enter)
-    #     button.bind("<Leave>", on_leave)
-
-
-    # # Applying hover effect on all buttons
-    # change_btn_text_color(next_btn, '#fff')    # Set to white text on hover
-    # change_btn_text_color(call_btn, '#fff')
-    # change_btn_text_color(complete_btn, '#fff')
-    # change_btn_text_color(voided_btn, '#fff')
-
-
-
-    # Run the application
     counter_staff.mainloop()
+
