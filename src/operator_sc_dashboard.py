@@ -6,10 +6,10 @@ from db import create_connection
 from tkinter import ttk, messagebox  # Added messagebox for displaying warnings
 
 
-def cashier_window(op_name, op_area):
-    counter_staff = ctk.CTk()
-    counter_staff.title("Cashier 1")
-    counter_staff.iconbitmap("old-logo.ico")
+def sc_window(op_name, op_area):
+    scholar = ctk.CTk()
+    scholar.title("Scholarship coordinator")
+    scholar.iconbitmap("old-logo.ico")
     # Set appearance mode and color theme (Light/Dark modes)
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("dark-blue")
@@ -17,14 +17,14 @@ def cashier_window(op_name, op_area):
     # Center the window on the screen
     window_width = 1000
     window_height = 600
-    screen_width = counter_staff.winfo_screenwidth()
-    screen_height = counter_staff.winfo_screenheight()
+    screen_width = scholar.winfo_screenwidth()
+    screen_height = scholar.winfo_screenheight()
     x = (screen_width // 2) - (window_width // 2)
     y = (screen_height // 2) - (window_height // 2)
-    counter_staff.geometry(f"{window_width}x{window_height}+{x}+{y}")
+    scholar.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
     # Create the main frame for navigation
-    nav_frame = ctk.CTkFrame(counter_staff, width=700, height=60, fg_color='#d68b26')
+    nav_frame = ctk.CTkFrame(scholar, width=700, height=60, fg_color='#d68b26')
     nav_frame.pack(side='top', fill='x', pady=10, padx=10)
 
     nav_button = ctk.CTkButton(nav_frame, 
@@ -37,7 +37,7 @@ def cashier_window(op_name, op_area):
     nav_button.pack(side='left', pady=20, padx=20)
 
     def back_home(op_name, op_area):
-        counter_staff.destroy()
+        scholar.destroy()
         counter_staff_home(op_name, op_area)
 
     title_label = ctk.CTkLabel(nav_frame,
@@ -81,7 +81,7 @@ def cashier_window(op_name, op_area):
     serve_label.pack(side='right', pady=20)
 
     # Create the table frame----------------------------------------------------------------------------------
-    table_frame = ctk.CTkFrame(counter_staff, width=700, height=800, fg_color='transparent')
+    table_frame = ctk.CTkFrame(scholar, width=700, height=800, fg_color='transparent')
     table_frame.pack(side='bottom', expand=True, fill='both', pady=10, padx=10)
 
     table_frame.columnconfigure(0, weight=1)
@@ -91,7 +91,7 @@ def cashier_window(op_name, op_area):
     def fetch_queue_data():
         connection = create_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation FROM queue WHERE transaction = 'Cashier Service'")
+        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation FROM queue WHERE transaction = 'Scholarship coordinator'")
         rows = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -127,7 +127,7 @@ def cashier_window(op_name, op_area):
             item_values = tb2.item(selected_item, 'values')
 
             # Create a small custom pop-up window
-            popup = tk.Toplevel(counter_staff)
+            popup = tk.Toplevel(scholar)
             popup.geometry("350x150")  # Set the size of the pop-up window
             popup.title("Ticket Action")
             popup.resizable(False, False)
@@ -153,7 +153,7 @@ def cashier_window(op_name, op_area):
 
                 q_num = item_values[0]
 
-                query = "DELETE FROM queue_display"
+                query = "DELETE FROM queue_display_sc"
                 cursor.execute(query)
                 conn.commit()
 
@@ -191,7 +191,7 @@ def cashier_window(op_name, op_area):
     # Bind the TreeviewSelect event to the on_tb2_select function
     tb2.bind("<<TreeviewSelect>>", on_tb2_select)
     #table title name---------------------------------------------------------------------------------------------------------------------------
-    table_name = ctk.CTkFrame(counter_staff, width=700, height=0, border_color='darkgray', border_width=1)
+    table_name = ctk.CTkFrame(scholar, width=700, height=0, border_color='darkgray', border_width=1)
     table_name.pack(side='bottom', fill='x')
 
     table_name.columnconfigure(0, weight=1)
@@ -257,7 +257,7 @@ def cashier_window(op_name, op_area):
 
         print(q_num)
 
-        query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+        query = "INSERT INTO queue_display_sc (queue_sc) VALUES (%s)"
         cursor.execute(query, (q_num,))
         conn.commit()  # Commit the changes to the database
 
@@ -281,7 +281,7 @@ def cashier_window(op_name, op_area):
 
             cursor = conn.cursor()
 
-            query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+            query = "INSERT INTO queue_display_sc (queue_sc) VALUES (%s)"
             cursor.execute(query, (s_num,))
             conn.commit()  # Commit the changes to the database
 
@@ -321,12 +321,12 @@ def cashier_window(op_name, op_area):
     tb1.bind("<<TreeviewSelect>>", on_item_selected)
 
     # Buttons---------------------------------------------------------------------------------
-    table_btn = ctk.CTkFrame(counter_staff, width=700, height=0, fg_color='transparent')
+    table_btn = ctk.CTkFrame(scholar, width=700, height=0, fg_color='transparent')
     table_btn.pack(side='bottom', fill='x', pady=10)
 
     call_btn = ctk.CTkButton(table_btn, text='Call ticket', height=35, text_color='#fff', command=call_ticket)
     call_btn.pack(side='left', padx=10)
 
 
-    counter_staff.mainloop()
+    scholar.mainloop()
 

@@ -7,6 +7,8 @@ from tkinter import messagebox
 
 def counter_staff_home(op_name, op_area):
     from operator_cashier_dashboard import cashier_window
+    from operator_pnc_dashboard import pnc_window
+    from operator_sc_dashboard import sc_window
 
     counter_staff = ctk.CTk()
     counter_staff.title("Counter Staff")
@@ -107,7 +109,7 @@ def counter_staff_home(op_name, op_area):
                                 fg_color="#d68b26", 
                                 hover_color="#a45e14",
                                 height=35,
-                                command=lambda: stand_by(counter_staff))
+                                command=lambda: stand_by(counter_staff,op_name, op_area))
     standby_btn.pack(side='left',pady=20, padx=20)
 
     logout_btn = ctk.CTkButton(content_frame, 
@@ -119,9 +121,19 @@ def counter_staff_home(op_name, op_area):
     logout_btn.pack(side='top',pady=20, padx=20)
 
 #button fucntion of buttom frame--------------------------------------------------------------------------------
-    def stand_by(counter_staff):
-        counter_staff.destroy()
-        cashier_window(op_name, op_area)
+    def stand_by(counter_staff, op_name, op_area):
+
+        if op_area == 'Cashier service':
+            counter_staff.destroy()
+            cashier_window(op_name, op_area)
+        elif op_area == 'Promisorry note coordinator':
+             counter_staff.destroy()
+             pnc_window(op_name, op_area)
+        elif op_area == 'Scholarship coordinator':
+             counter_staff.destroy()
+             sc_window(op_name, op_area)
+        else:
+             print("Error: Invalid operation area")           
     
     # Run the application
     counter_staff.mainloop()

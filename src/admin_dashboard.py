@@ -7,7 +7,6 @@ import re
 import bcrypt
 from db import create_connection
 from mysql.connector import Error
-from admin_tables import queue_table
 
 
 # Initialize the main application window
