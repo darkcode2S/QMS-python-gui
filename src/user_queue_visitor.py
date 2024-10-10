@@ -7,7 +7,7 @@ import re
 from db import create_connection
 
 def visitor_queue(root, button_text, select_student, purpose):
-    user_visitor = ctk.CTkToplevel(root)
+    user_visitor = tk.Toplevel(root)
     user_visitor.title("Visitor")
     user_visitor.iconbitmap("old-logo.ico")
 

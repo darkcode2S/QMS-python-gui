@@ -6,7 +6,7 @@ from tkinter import messagebox, simpledialog
 import random
 
 def input_id_student(root, button_text, select_student, purpose):
-    input_id_window = ctk.CTkToplevel(root)
+    input_id_window = tk.Toplevel(root)
     input_id_window.title("Input ID Student")
     input_id_window.iconbitmap("old-logo.ico")
 

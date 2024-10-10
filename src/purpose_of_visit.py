@@ -9,8 +9,9 @@ from user_queue_affiliation import affiliation
 
 def purpose_visit_student(root, button_text):
         # Create a Toplevel window (like a dialog)
-        dialog = ctk.CTkToplevel(root)
+        dialog = tk.Toplevel(root)
         dialog.title("Cashier service")
+        dialog.iconbitmap("old-logo.ico")
 
         dialog.resizable(False, False)
 
@@ -126,8 +127,9 @@ def purpose_visit_student(root, button_text):
 
 def purpose_visit_staff(root, button_text):
         # Create a Toplevel window (like a dialog)
-        dialog2 = ctk.CTkToplevel(root)
+        dialog2 = tk.Toplevel(root)
         dialog2.title("Scholarship coordiantor")
+        dialog2.iconbitmap("old-logo.ico")
 
         dialog2.resizable(False, False)
 
@@ -233,8 +235,9 @@ def purpose_visit_staff(root, button_text):
 
 def purpose_visit_visitor(root, button_text):
         # Create a Toplevel window (like a dialog)
-        dialog3 = ctk.CTkToplevel(root)
+        dialog3 = tk.Toplevel(root)
         dialog3.title("Promisorry note coordinator")
+        dialog3.iconbitmap("old-logo.ico")
 
         dialog3.resizable(False, False)
 

@@ -1,18 +1,23 @@
 import customtkinter as ctk
 from tkinter import messagebox
+import tkinter as tk
 import bcrypt
 from PIL import Image, ImageTk
 from db import create_connection
 
 def open_login_window(root):
     # Create sign-in window
-    log_in_window = ctk.CTkToplevel(root)
+    # Create sign-in window
+    log_in_window = tk.Toplevel(root)
     log_in_window.geometry("400x300")
     log_in_window.title("Log in")
     log_in_window.iconbitmap("old-logo.ico")
 
     # Disable maximize button
     log_in_window.resizable(False, False)  # Disable resizing
+
+    # Center the Toplevel window on screen
+    log_in_window.update_idletasks()  # To get the proper width/height before centering
 
     window_width = 320
     window_height = 350
@@ -162,7 +167,7 @@ def log_in(username, password, log_in_window, root):
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field
                     messagebox.showinfo("Success", f"Logged in successfully as {role.capitalize()}!")
-                    # log_in_window.destroy()
+                    log_in_window.destroy()
                     root.destroy()
                     counter_staff_home(op_name, op_area) 
                     

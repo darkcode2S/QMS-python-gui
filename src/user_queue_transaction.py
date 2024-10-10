@@ -1,9 +1,10 @@
 import customtkinter as ctk
 from PIL import Image 
+import tkinter as tk
 from purpose_of_visit import purpose_visit_student, purpose_visit_staff, purpose_visit_visitor
 
 def transaction(root):
-    user_transaction = ctk.CTkToplevel(root)
+    user_transaction = tk.Toplevel(root)
     user_transaction.title("Queue transaction")
     user_transaction.iconbitmap("old-logo.ico")
 

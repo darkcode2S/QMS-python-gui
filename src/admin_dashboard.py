@@ -226,7 +226,7 @@ table.pack(fill="both", expand=True, pady=20, padx=20)
 def fetch_queue_data():
     connection = create_connection()
     cursor = connection.cursor()
-    cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+    cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, purpose_of_visit, compilation_time, voided FROM queue_admin")
     rows = cursor.fetchall()
     cursor.close()
     connection.close()
@@ -247,7 +247,8 @@ table['columns'] = ('Queue number',
                         'Full name', 
                         'Transaction', 
                         'Affiliation',
-                        'Phone', 
+                        'Phone',
+                        'Purpose of visit',
                         'Compilation time', 
                         'Voided')  
 
@@ -270,6 +271,7 @@ table.column("Full name", anchor="center",)
 table.column("Transaction", anchor="center")
 table.column("Affiliation", anchor="center")
 table.column("Phone", anchor="center")
+table.column("Purpose of visit", anchor="center")
 table.column("Compilation time", anchor="center")  # Ensure same column name
 table.column("Voided", anchor="center")
 
@@ -281,6 +283,7 @@ table.heading("Full name", text="Full name")
 table.heading("Transaction", text="Transaction")
 table.heading("Affiliation", text="Affiliation")
 table.heading("Phone", text="Phone")
+table.heading("Purpose of visit", text="Purpose of visit")
 table.heading("Compilation time", text="Compilation Time")
 table.heading("Voided", text="Voided")
 
@@ -454,7 +457,7 @@ def update_table(choice):
         def fetch_queue_data():
             connection = create_connection()
             cursor = connection.cursor()
-            cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue")
+            cursor.execute("SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, purpose_of_visit, compilation_time, voided FROM queue_admin")
             rows = cursor.fetchall()
             cursor.close()
             connection.close()
@@ -473,7 +476,8 @@ def update_table(choice):
                                 'Full name', 
                                 'Transaction', 
                                 'Affiliation',
-                                'Phone', 
+                                'Phone',
+                                'Purpose of visit',
                                 'Compilation time', 
                                 'Voided')  
         table.column("#0", width=0, stretch="no")  # Hide the first column
@@ -484,6 +488,7 @@ def update_table(choice):
         table.column("Transaction", anchor="center")
         table.column("Affiliation", anchor="center")
         table.column("Phone", anchor="center")
+        table.column("Purpose of visit", anchor="center")
         table.column("Compilation time", anchor="center")  # Ensure same column name
         table.column("Voided", anchor="center")
 
@@ -495,6 +500,7 @@ def update_table(choice):
         table.heading("Transaction", text="Transaction")
         table.heading("Affiliation", text="Affiliation")
         table.heading("Phone", text="Phone")
+        table.heading("Purpose of visit", text="Purpose of visit")
         table.heading("Compilation time", text="Compilation Time")
         table.heading("Voided", text="Voided")
 
@@ -605,7 +611,7 @@ def search():
         cancel_search.configure(state="normal")
         cancel_clicked = False# Reset flag for future cancel operations
         # Use a parameterized query to prevent SQL injection
-        query = "SELECT school_id, full_name, course, year_level FROM student WHERE school_id LIKE %s"
+        query = "SELECT id, school_id, full_name, course, year_level FROM student WHERE school_id LIKE %s"
         
         cursor.execute(query, (search_value,))
         results = cursor.fetchall()  # Fetch all matching results
@@ -632,7 +638,7 @@ def search():
         cancel_clicked = False# Reset flag for future cancel operations
 
         # Use a parameterized query to prevent SQL injection
-        query = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id LIKE %s"
+        query = "SELECT id, school_id, full_name, affiliation, role, office FROM member WHERE school_id LIKE %s"
         
         cursor.execute(query, (search_value,))
         results = cursor.fetchall()  # Fetch all matching results
@@ -675,7 +681,7 @@ def search():
         search_value = "%" + search_value + "%"  # Add wildcards for LIKE clause
 
         # Execute the search query for Operators
-        query = "SELECT school_id, full_name, operate_area, phone_number, username, password FROM operator WHERE school_id LIKE %s"
+        query = "SELECT id, school_id, full_name, operate_area, phone_number, username, password FROM operator WHERE school_id LIKE %s"
         
         cursor.execute(query, (search_value,))
         results = cursor.fetchall()  # Fetch all matching results
@@ -707,7 +713,7 @@ def search():
         search_value = "%" + search_value + "%"  # Add wildcards for LIKE clause
 
         # Execute the search query for Operators
-        query = "SELECT  queue_number, school_id, full_name, transaction, affiliation, phone, compilition_time, voided FROM queue WHERE school_id LIKE %s"
+        query = "SELECT  queue_number, created_at, school_id, full_name, transaction, affiliation, phone, purpose_of_visit, compilation_time, voided FROM queue_admin WHERE school_id LIKE %s"
         cursor.execute(query, (search_value,))
         results = cursor.fetchall()  # Fetch all matching results
 
@@ -922,7 +928,7 @@ def add_record():
     y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
     if dropdown_var.get() == "Students":
-        add_window = ctk.CTkToplevel(admin)
+        add_window = tk.Toplevel(admin)
         add_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
         add_window.title("Add Student")
         add_window.iconbitmap("old-logo.ico")
@@ -1016,7 +1022,7 @@ def add_record():
         x_position = x + (admin.winfo_width() // 2) - (width // 2)
         y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
-        member_window = ctk.CTkToplevel(admin)
+        member_window = tk.Toplevel(admin)
         member_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
         member_window.title("Add member")
         member_window.iconbitmap("old-logo.ico")
@@ -1093,7 +1099,7 @@ def add_record():
         x_position = x + (admin.winfo_width() // 2) - (width // 2)
         y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
-        password_window = ctk.CTkToplevel(admin)
+        password_window = tk.Toplevel(admin)
         password_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
         password_window.title("Add oprators")
         password_window.iconbitmap("old-logo.ico")
@@ -1156,7 +1162,7 @@ def add_record():
                                         cursor,
                                         password_window  # Pass the add window to close it later
                                     ))  # Centering
-        add_password.pack(padx=10, pady=10)
+        add_password.pack(padx=10, pady=(20,0))
     else:
          messagebox.showwarning("Warning", "Only Students, Members and Operators table can activate the button records.")
 
@@ -1312,13 +1318,13 @@ def update_record():
         x = admin.winfo_x()
         y = admin.winfo_y()
         width = 320  # Desired width of the pop-up window
-        height = 400  # Desired height of the pop-up window
+        height = 350  # Desired height of the pop-up window
         # Calculate the center position
         x_position = x + (admin.winfo_width() // 2) - (width // 2)
         y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
         # Create a modal update window
-        update_window = ctk.CTkToplevel(admin)
+        update_window = tk.Toplevel(admin)
         update_window.geometry(f"{width}x{height}+{x_position}+{y_position}")
         update_window.title("Update Student")
         update_window.iconbitmap("old-logo.ico")
@@ -1432,7 +1438,7 @@ def update_record():
             messagebox.showwarning("Warning","No item selected for update.")
             return  # Exit if no item is selected
         # Create a modal update window
-        update_member = ctk.CTkToplevel(admin)
+        update_member = tk.Toplevel(admin)
         update_member.geometry(f"{width}x{height}+{x_position}+{y_position}")
         update_member.title("Update member")
         update_member.iconbitmap("old-logo.ico")
@@ -1526,7 +1532,7 @@ def update_record():
         x_position = x + (admin.winfo_width() // 2) - (width // 2)
         y_position = y + (admin.winfo_height() // 2) - (height // 2)
 
-        password_update = ctk.CTkToplevel(admin)
+        password_update = tk.Toplevel(admin)
         password_update.geometry(f"{width}x{height}+{x_position}+{y_position}")
         password_update.title("Update oprators")
         password_update.iconbitmap("old-logo.ico")
@@ -1596,7 +1602,7 @@ def update_record():
                                                             cursor,
                                                             password_update  # Pass the add window to close it later
                                                         ))  # Centering
-        update_opearator.pack(padx=10, pady=10)
+        update_opearator.pack(padx=10, pady=(20,0))
     else:
         messagebox.showwarning("Warning", "Only Students, Members and Operators table can activate the button records.")
 

@@ -57,24 +57,24 @@ serving_label = ttk.Label(q_display,
                           font=('Helvetica', 48, 'bold'))
 serving_label.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
 
-# Sidebar labels with modern design
+# Sidebar labels with modern design--------------------------------------------------------------------------
 cashier_label = ttk.Label(q_display,
                           text='CASHIER',
-                          bootstyle="secondary",
+                          bootstyle="light",
                           anchor='center',
                           font=('Helvetica', 32, 'bold'))
 cashier_label.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
 
 scholarship_label = ttk.Label(q_display,
                               text='SCHOLARSHIP\nCOORDINATOR',
-                              bootstyle="secondary",
+                              bootstyle="light",
                               anchor='center',
                               font=('Helvetica', 32, 'bold'))
 scholarship_label.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
 
 promissory_label = ttk.Label(q_display,
                              text='PROMISSORY \nNOTE\nCOORDINATOR',
-                             bootstyle="secondary",
+                             bootstyle="light",
                              anchor='center',
                              font=('Helvetica', 32, 'bold'))
 promissory_label.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)

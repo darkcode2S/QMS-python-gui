@@ -1,11 +1,12 @@
 import customtkinter as ctk
 from PIL import Image 
+import tkinter as tk
 from student_queue_input_id import input_id_student
 from user_queue_staff_input_id import satff_input_id
 from user_queue_visitor import visitor_queue
 
 def affiliation(root, button_text, purpose):
-    user_aff = ctk.CTkToplevel(root)
+    user_aff = tk.Toplevel(root)
     user_aff.title("Queue affiliation")
     user_aff.iconbitmap("old-logo.ico")
 

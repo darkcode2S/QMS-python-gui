@@ -16,7 +16,7 @@ def pnc_window(op_name, op_area):
 
     # Center the window on the screen
     window_width = 1000
-    window_height = 600
+    window_height = 550
     screen_width = promisorry.winfo_screenwidth()
     screen_height = promisorry.winfo_screenheight()
     x = (screen_width // 2) - (window_width // 2)
@@ -41,7 +41,7 @@ def pnc_window(op_name, op_area):
         counter_staff_home(op_name, op_area)
 
     title_label = ctk.CTkLabel(nav_frame,
-                                text='Cashier 1',
+                                text='Promisorry note coordinator',
                                 anchor='w',
                                 compound='left', 
                                 text_color='#fff',
@@ -91,7 +91,7 @@ def pnc_window(op_name, op_area):
     def fetch_queue_data():
         connection = create_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation FROM queue WHERE transaction = 'Promisorry note coordinator'")
+        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation, school_id, full_name, transaction, phone, compilition_time, voided, created_at FROM queue WHERE transaction = 'Promisorry note coordinator'")
         rows = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -115,6 +115,18 @@ def pnc_window(op_name, op_area):
     for row in data:
         tb1.insert("", "end", values=row)
 
+    # Capture selected item from tb1
+    def on_item_selected(event):
+        global selected_item
+        selected = tb1.selection()
+
+        if selected:
+            item_values = tb1.item(selected[0], 'values')  # Get the values of the selected item
+            print(f"Selected values: {item_values}")  # Do something with the values
+        else:
+            selected_item = tb1.item(selected, "values")
+
+    tb1.bind("<<TreeviewSelect>>", on_item_selected)
     # Second Treeview (tb2)--------------------------------------------------------------------------------
     # Define a function to handle the selection event in tb2
     def on_tb2_select(event):
@@ -126,11 +138,24 @@ def pnc_window(op_name, op_area):
             # Retrieve the values of the selected item
             item_values = tb2.item(selected_item, 'values')
 
+            print(f"Selected values: {item_values}") 
+
             # Create a small custom pop-up window
             popup = tk.Toplevel(promisorry)
-            popup.geometry("350x150")  # Set the size of the pop-up window
             popup.title("Ticket Action")
             popup.resizable(False, False)
+            popup.iconbitmap('old-logo.ico')
+
+            window_width = 320
+            window_height = 165
+
+            screen_width = popup.winfo_screenwidth()
+            screen_height = popup.winfo_screenheight()
+
+            x = (screen_width // 2) - (window_width // 2)
+            y = (screen_height // 2) - (window_height // 2)
+
+            popup.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
             # Display the selected values in the pop-up window (for reference)
             tk.Label(popup, text=f"Queue Number: {item_values[0]}", font=("Arial", 12)).pack(pady=10)
@@ -141,26 +166,61 @@ def pnc_window(op_name, op_area):
             button_frame = tk.Frame(popup)
             button_frame.pack(pady=20)
 
-            # Function to handle the "Complete Ticket" button
+
             def complete_ticket():
-                conn = create_connection()
-                cursor = conn.cursor()
-                
-                # Perform any action needed (e.g., update database or UI)
-                tk.messagebox.showinfo("Ticket Completed", f"Ticket {item_values[0]} has been marked as complete.")
-                tb2.delete(selected_item)  # Remove the ticket from tb2
-                popup.destroy()  # Close the pop-up window
 
-                q_num = item_values[0]
+                confirm = messagebox.askyesno("Confirm", "Are your sure?")
 
-                query = "DELETE FROM queue_display_promisorry"
-                cursor.execute(query)
-                conn.commit()
+                if confirm:
+                    conn = create_connection()
+                    cursor = conn.cursor()
+                    
+                    # Perform any action needed (e.g., update database or UI)
+                    tk.messagebox.showinfo("Ticket Completed", f"Ticket {item_values[0]} has been marked as complete.")
+                    tb2.delete(selected_item)  # Remove the ticket from tb2
+                    popup.destroy()  # Close the pop-up window
 
-                query2 = "DELETE FROM queue WHERE queue_number = %s"
-                cursor.execute(query2, (q_num,))
-                conn.commit()
+                    query_admin = """
+                                INSERT INTO queue_admin (
+                                queue_number,
+                                created_at,
+                                school_id,
+                                full_name,
+                                transaction,
+                                affiliation,
+                                phone,
+                                compilation_time,
+                                purpose_of_visit,
+                                voided) VALUES (
+                                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
+                                )
+                                """
+                    cursor.execute(query_admin, (
+                        item_values[0],  # queue_number
+                        item_values[9],  # created_at
+                        item_values[3],  # school_id
+                        item_values[4],  # full_name
+                        item_values[5],  # transaction
+                        item_values[2],  # affiliation
+                        item_values[6],  # phone
+                        item_values[7],  # compilation_time
+                        item_values[1],  # purpose_of_visit
+                        item_values[8]   # voided
+                    ))
+                    conn.commit()
 
+
+                    q_num = item_values[0]
+
+                    query = "DELETE FROM queue_display_promisorry"
+                    cursor.execute(query)
+                    conn.commit()
+
+                    query2 = "DELETE FROM queue WHERE queue_number = %s"
+                    cursor.execute(query2, (q_num,))
+                    conn.commit()
+                else:
+                    print("Canceled.")
             # Function to handle the "Void Ticket" button
             def void_ticket():
                 # Perform any action needed (e.g., update database or UI)
@@ -169,10 +229,10 @@ def pnc_window(op_name, op_area):
                 popup.destroy()  # Close the pop-up window
 
             # Create buttons for completing or voiding the ticket
-            complete_button = tk.Button(button_frame, text="Complete Ticket", width=15, bg="green", fg="white", command=complete_ticket)
+            complete_button = ctk.CTkButton(button_frame, text="Complete Ticket", width=15, command=complete_ticket)
             complete_button.pack(side="left", padx=10)
 
-            void_button = tk.Button(button_frame, text="Void Ticket", width=15, bg="red", fg="white", command=void_ticket)
+            void_button = ctk.CTkButton(button_frame, text="Void Ticket", width=15, command=void_ticket)
             void_button.pack(side="right", padx=10)
                 
 
@@ -242,8 +302,8 @@ def pnc_window(op_name, op_area):
             # If tb1 is empty, show a message and prevent further action
             messagebox.showinfo("No Data", "No tickets found in the queue to process.")
             # Clear the "Serving" and "Preparing" labels
-            prep_num.configure(text="--")
-            serve_num.configure(text="--")
+            prep_num.configure(text="00")
+            serve_num.configure(text="00")
             return  # Exit the function early if tb1 has no data
 
         # Get the first item (the one that is being served)
@@ -289,7 +349,7 @@ def pnc_window(op_name, op_area):
             conn.close()
         else:
             # If there's no second item, clear the "Preparing" label
-            serve_num.configure(text="--")
+            serve_num.configure(text="00")
 
         # Automatically transfer the first item from tb1 to tb2
         tb2.insert("", 0, values=first_item_values)
@@ -301,24 +361,6 @@ def pnc_window(op_name, op_area):
     def complete_or_void_ticket():
         if tb2.selection():
             tb2.delete(tb2.selection())  # Remove from tb2
-
-    # Capture selected item from tb1
-    def on_item_selected(event):
-        global selected_item
-        selected = tb1.selection()
-        first_item = tb1.get_children()[0]  # Get the first item
-
-        if selected:
-            # # Check if the selected item is the first item in TB1
-            # if selected[0] != first_item:
-            #     # Show a warning message if the user clicks on any item other than the first one
-            #     messagebox.showwarning("Invalid Selection", "Please select the first data in the queue.")
-            #     tb1.selection_remove(selected)  # Deselect the invalid selection
-            # else:
-            #     # If the first item is selected, store it for transferring
-                selected_item = tb1.item(selected, "values")
-
-    tb1.bind("<<TreeviewSelect>>", on_item_selected)
 
     # Buttons---------------------------------------------------------------------------------
     table_btn = ctk.CTkFrame(promisorry, width=700, height=0, fg_color='transparent')
