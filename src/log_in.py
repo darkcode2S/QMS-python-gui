@@ -163,14 +163,15 @@ def log_in(username, password, log_in_window, root):
                 stored_password = operator_user[6]  # Assuming password is the sixth field
                 op_name = operator_user[1]
                 op_area = operator_user[3]
+                op_id = operator_user[0]
 
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field
                     messagebox.showinfo("Success", f"Logged in successfully as {role.capitalize()}!")
                     log_in_window.destroy()
                     root.destroy()
-                    counter_staff_home(op_name, op_area) 
-                    
+                    counter_staff_home(op_name, op_area, op_id) 
+                    connection.commit()
                     connection.close()
                     cursor.close()
                 else:

@@ -3,10 +3,11 @@ import tkinter as tk
 from tkinter import ttk
 from counter_staff_profile_interface import counter_staff_home
 from db import create_connection
+from mysql.connector import Error
 from tkinter import ttk, messagebox  # Added messagebox for displaying warnings
 
 
-def sc_window(op_name, op_area):
+def sc_window(op_name, op_area, op_id):
     scholar = ctk.CTk()
     scholar.title("Scholarship coordinator")
     scholar.iconbitmap("old-logo.ico")
@@ -33,12 +34,12 @@ def sc_window(op_name, op_area):
                                fg_color='#fff', 
                                text_color='#000',
                                hover_color='lightgray', 
-                               command=lambda: back_home(op_name, op_area))
+                               command=lambda: back_home(op_name, op_area, op_id))
     nav_button.pack(side='left', pady=20, padx=20)
 
-    def back_home(op_name, op_area):
+    def back_home(op_name, op_area, op_id):
         scholar.destroy()
-        counter_staff_home(op_name, op_area)
+        counter_staff_home(op_name, op_area, op_id)
 
     title_label = ctk.CTkLabel(nav_frame,
                                 text='Scholarship coordinator',
@@ -91,7 +92,7 @@ def sc_window(op_name, op_area):
     def fetch_queue_data():
         connection = create_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation, school_id, full_name, transaction, phone, compilition_time, voided, created_at FROM queue WHERE transaction = 'Scholarship coordinator'")
+        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation, school_id, full_name, transaction, phone, voided, created_at FROM queue WHERE transaction = 'Scholarship coordinator'")
         rows = cursor.fetchall()
         cursor.close()
         connection.close()
@@ -159,7 +160,7 @@ def sc_window(op_name, op_area):
             popup.geometry(f"{window_width}x{window_height}+{x}+{y}")
 
             # Display the selected values in the pop-up window (for reference)
-            tk.Label(popup, text=f"Queue Number: {item_values[0]}", font=("Arial", 12)).pack(pady=10)
+            tk.Label(popup, text=f"Queue Number: {item_values[0]}", font=("Arial", 12, "bold")).pack(pady=10)
             tk.Label(popup, text=f"Purpose of Visit: {item_values[1]}", font=("Arial", 10)).pack()
             tk.Label(popup, text=f"Affiliation: {item_values[2]}", font=("Arial", 10)).pack()
 
@@ -181,53 +182,105 @@ def sc_window(op_name, op_area):
                     tb2.delete(selected_item)  # Remove the ticket from tb2
                     popup.destroy()  # Close the pop-up window
 
-                    query_admin = """
-                                INSERT INTO queue_admin (
-                                queue_number,
-                                created_at,
-                                school_id,
-                                full_name,
-                                transaction,
-                                affiliation,
-                                phone,
-                                compilation_time,
-                                purpose_of_visit,
-                                voided) VALUES (
-                                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s
-                                )
-                                """
-                    cursor.execute(query_admin, (
-                        item_values[0],  # queue_number
-                        item_values[9],  # created_at
-                        item_values[3],  # school_id
-                        item_values[4],  # full_name
-                        item_values[5],  # transaction
-                        item_values[2],  # affiliation
-                        item_values[6],  # phone
-                        item_values[7],  # compilation_time
-                        item_values[1],  # purpose_of_visit
-                        item_values[8]   # voided
-                    ))
-                    conn.commit()
+                    try:
+                        query_admin = """
+                                    INSERT INTO queue_admin (
+                                    queue_number,
+                                    created_at,
+                                    school_id,
+                                    full_name,
+                                    transaction,
+                                    affiliation,
+                                    phone,
+                                    purpose_of_visit,
+                                    voided) VALUES (
+                                    %s,%s,%s,%s,%s,%s,%s,%s,%s
+                                    )
+                                    """
+                        cursor.execute(query_admin, (
+                            item_values[0],  # queue_number
+                            item_values[8],  # created_at
+                            item_values[3],  # school_id
+                            item_values[4],  # full_name
+                            item_values[5],  # transaction
+                            item_values[2],  # affiliation
+                            item_values[6],  # phone
+                            item_values[1],  # purpose_of_visit
+                            item_values[7]   # voided
+                        ))
+                        conn.commit()
 
 
-                    q_num = item_values[0]
+                        q_num = item_values[0]
 
-                    query = "DELETE FROM queue_display_sc"
-                    cursor.execute(query)
-                    conn.commit()
+                        query = "DELETE FROM queue_display_sc"
+                        cursor.execute(query)
+                        conn.commit()
 
-                    query2 = "DELETE FROM queue WHERE queue_number = %s"
-                    cursor.execute(query2, (q_num,))
-                    conn.commit()
+                        query2 = "DELETE FROM queue WHERE queue_number = %s"
+                        cursor.execute(query2, (q_num,))
+                        conn.commit()
+                    except Error as err:
+                        print(f"Error: {err}")
+
                 else:
                     print("Canceled.")
             # Function to handle the "Void Ticket" button
             def void_ticket():
-                # Perform any action needed (e.g., update database or UI)
-                tk.messagebox.showinfo("Ticket Voided", f"Ticket {item_values[0]} has been voided.")
-                tb2.delete(selected_item)  # Remove the ticket from tb2
-                popup.destroy()  # Close the pop-up window
+
+                confirm = messagebox.askyesno("Confirm", "Are your sure?")
+
+                if confirm:
+                    conn = create_connection()
+                    cursor = conn.cursor()
+
+                    tk.messagebox.showinfo("Ticket Voided", f"Ticket {item_values[0]} has been voided.")
+                    tb2.delete(selected_item)  # Remove the ticket from tb2
+                    popup.destroy() 
+
+                    try:
+                        query_admin = """
+                                    INSERT INTO queue_admin (
+                                    queue_number,
+                                    created_at,
+                                    school_id,
+                                    full_name,
+                                    transaction,
+                                    affiliation,
+                                    phone,
+                                    purpose_of_visit,
+                                    voided) VALUES (
+                                    %s,%s,%s,%s,%s,%s,%s,%s,%s
+                                    )
+                                    """
+                        cursor.execute(query_admin, (
+                            item_values[0],  # queue_number
+                            item_values[8],  # created_at
+                            item_values[3],  # school_id
+                            item_values[4],  # full_name
+                            item_values[5],  # transaction
+                            item_values[2],  # affiliation
+                            item_values[6],  # phone
+                            item_values[1],  # purpose_of_visit
+                            "Yes"   # voided
+                        ))
+                        conn.commit()
+
+
+                        q_num = item_values[0]
+
+                        query = "DELETE FROM queue_display_sc"
+                        cursor.execute(query)
+                        conn.commit()
+
+                        query2 = "DELETE FROM queue WHERE queue_number = %s"
+                        cursor.execute(query2, (q_num,))
+                        conn.commit()
+                    except Error as err:
+                          print(f"Error: {err}")
+
+                else:
+                    print("Conceled.")
 
             # Create buttons for completing or voiding the ticket
             complete_button = ctk.CTkButton(button_frame, text="Complete Ticket", width=15, command=complete_ticket)

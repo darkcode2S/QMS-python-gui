@@ -2,10 +2,12 @@ import importlib
 import time
 import customtkinter as ctk
 import tkinter as tk
+from db import create_connection
+from mysql.connector import Error
 from PIL import Image
 from tkinter import messagebox
 
-def counter_staff_home(op_name, op_area):
+def counter_staff_home(op_name, op_area, op_id):
     from operator_cashier_dashboard import cashier_window
     from operator_pnc_dashboard import pnc_window
     from operator_sc_dashboard import sc_window
@@ -69,6 +71,27 @@ def counter_staff_home(op_name, op_area):
     content_frame.pack(expand=True)
 
 
+    try:
+         conn = create_connection()
+         cursor = conn.cursor()
+
+         query = "SELECT * FROM operator WHERE full_name = %s"
+         cursor.execute(query, (op_name,))
+         data = cursor.fetchone()
+
+         op = data[3]
+
+         conn.commit()
+         print(data)
+    except Error as err:
+         print(f"Error: {err}")
+    finally:
+            # Ensure the cursor and connection are properly closed
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
     title_label = ctk.CTkLabel(content_frame ,
                                 text='Welcome back!',
                                 font=ctk.CTkFont(size=50, weight="bold"))
@@ -84,7 +107,7 @@ def counter_staff_home(op_name, op_area):
     serving_office.pack(padx=20)
 
     affi_label = ctk.CTkLabel(content_frame ,
-                                text=op_area,
+                                text=op,
                                 font=ctk.CTkFont(size=20, weight="bold"))
     affi_label.pack(pady=(10,0), padx=20)
 
@@ -101,7 +124,7 @@ def counter_staff_home(op_name, op_area):
                             fg_color="#d68b26", 
                             hover_color="#a45e14",
                             height=35,
-                            command=lambda: button_click_event())
+                            command=lambda: button_click_event(counter_staff, op_name, op_area, op_id))
     switch_btn.pack(side='left',pady=20, padx=20)
 
     standby_btn = ctk.CTkButton(button_frame, 
@@ -109,7 +132,7 @@ def counter_staff_home(op_name, op_area):
                                 fg_color="#d68b26", 
                                 hover_color="#a45e14",
                                 height=35,
-                                command=lambda: stand_by(counter_staff,op_name, op_area))
+                                command=lambda: stand_by(counter_staff,op_name, op, op_id))
     standby_btn.pack(side='left',pady=20, padx=20)
 
     logout_btn = ctk.CTkButton(content_frame, 
@@ -121,17 +144,17 @@ def counter_staff_home(op_name, op_area):
     logout_btn.pack(side='top',pady=20, padx=20)
 
 #button fucntion of buttom frame--------------------------------------------------------------------------------
-    def stand_by(counter_staff, op_name, op_area):
+    def stand_by(counter_staff, op_name, op, op_id):
 
-        if op_area == 'Cashier service':
+        if op == 'Cashier service':
             counter_staff.destroy()
-            cashier_window(op_name, op_area)
-        elif op_area == 'Promisorry note coordinator':
+            cashier_window(op_name, op_area, op_id)
+        elif op == 'Promisorry note coordinator':
              counter_staff.destroy()
-             pnc_window(op_name, op_area)
-        elif op_area == 'Scholarship coordinator':
+             pnc_window(op_name, op_area, op_id)
+        elif op == 'Scholarship coordinator':
              counter_staff.destroy()
-             sc_window(op_name, op_area)
+             sc_window(op_name, op_area, op_id)
         else:
              print("Error: Invalid operation area")           
     
@@ -150,11 +173,14 @@ def confirm_logout(counter_staff):
             print("Logout canceled.")
 
 # Function to create a dialog with radio buttons----------------------------------------------------------------------------
-def button_click_event():
-        # Create a Toplevel window (like a dialog)
-        dialog = ctk.CTkToplevel()
-        dialog.title("Select a Office")
+def button_click_event(counter_staff, op_name, op_area, op_id):
+        from operator_sc_dashboard import sc_window
+        from operator_cashier_dashboard import cashier_window
+        from operator_pnc_dashboard import pnc_window
 
+        dialog = tk.Toplevel()
+        dialog.title("Select a Office")
+        dialog.iconbitmap('old-logo.ico')
         dialog.resizable(False, False)
 
         window_width = 300
@@ -182,25 +208,69 @@ def button_click_event():
         radio1.pack(padx=30,pady=10, anchor='w')
 
         radio2 = ctk.CTkRadioButton(dialog, 
-                                    text="  Scholarship application", 
+                                    text="  Scholarship coordinator", 
                                     variable=selected_option, 
-                                    value="Scholarship application",
+                                    value="Scholarship coordinator",
                                     fg_color="#d68b26", 
                                     hover_color="#d68b26")
         radio2.pack(padx=30,pady=10, anchor='w')
 
         radio3 = ctk.CTkRadioButton(dialog, 
-                                    text="  Promissory note", 
+                                    text="  Promissory note coordinator", 
                                     variable=selected_option, 
-                                    value="Promissory note", 
+                                    value="Promisorry note coordinator", 
                                     fg_color="#d68b26", 
                                     hover_color="#d68b26")
         radio3.pack(padx=30,pady=10, anchor='w')
 
-        # Function to handle confirmation
         def confirm_selection():
             print("Selected service:", selected_option.get())
             dialog.destroy()  # Close the dialog window
+
+            conn = create_connection()
+            if conn is None:
+                print("Failed to connect to the database.")
+                return
+
+            cursor = conn.cursor()
+
+            selected = selected_option.get()  # Make sure selected option is captured
+
+            try:
+                # Check what option is selected and run the appropriate query
+                if selected == 'Cashier service':
+                    query = "UPDATE operator SET operate_area = %s WHERE id = %s"
+                    cursor.execute(query, (selected, op_id))  # Assuming op_area is defined
+                    conn.commit()
+                    counter_staff.destroy()  # Close current window
+                    cashier_window(op_name, op_area, op_id)  # Open cashier window
+                    print("Success: Cashier service updated")
+                    
+                elif selected == 'Scholarship coordinator':
+                    query = "UPDATE operator SET operate_area = %s WHERE id = %s"
+                    cursor.execute(query, (selected, op_id))  # Assuming op_area is defined
+                    conn.commit()
+                    counter_staff.destroy()  # Close current window
+                    sc_window(op_name, op_area, op_id)  # Open scholarship coordinator window
+                    print("Success: Scholarship coordinator updated")
+
+                elif selected == 'Promisorry note coordinator':
+                    query = "UPDATE operator SET operate_area = %s WHERE id = %s"
+                    cursor.execute(query, (selected, op_id))  # Assuming op_area is defined
+                    conn.commit()
+                    counter_staff.destroy()  # Close current window
+                    pnc_window(op_name, op_area, op_id)  # Open scholarship coordinator window
+                    print("Success: Scholarship coordinator updated")
+                else:
+                    print("Invalid selection.")
+            except Error as err:
+                print(f"Error: {err}")
+            finally:
+                # Ensure the cursor and connection are properly closed
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
 
         # Create a button to confirm selection with custom styling
         confirm_button = ctk.CTkButton(dialog, 

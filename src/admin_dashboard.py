@@ -240,7 +240,8 @@ def clear_table(table):
 
 # scrollbarx = Scrollbar(table_frame, orient=HORIZONTAL)
 # scrollbary = Scrollbar(table_frame, orient=VERTICAL)
-#Queue table
+#Queue table-----------------------------------------------------------------------------------------------
+
 table['columns'] = ('Queue number',
                         'Created at', 
                         'School ID',
@@ -264,16 +265,16 @@ scrollbarx.pack(side='bottom', fill='x')
 scrollbary.pack(side='right', fill='y')
 
 table.column("#0", width=0, stretch="no")  # Hide the first column
-table.column("Queue number", stretch="no", anchor="center")
+table.column("Queue number", stretch="no", anchor="center", width=110)
 table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
-table.column("School ID", anchor="center")
+table.column("School ID", anchor="center", width=100)
 table.column("Full name", anchor="center",)
 table.column("Transaction", anchor="center")
-table.column("Affiliation", anchor="center")
-table.column("Phone", anchor="center")
+table.column("Affiliation", anchor="center", width=100)
+table.column("Phone", anchor="center", width=100)
 table.column("Purpose of visit", anchor="center")
 table.column("Compilation time", anchor="center")  # Ensure same column name
-table.column("Voided", anchor="center")
+table.column("Voided", anchor="center", width=100)
 
 table.heading("#0", text="")
 table.heading("Queue number", text="Queue Number") 
@@ -481,16 +482,16 @@ def update_table(choice):
                                 'Compilation time', 
                                 'Voided')  
         table.column("#0", width=0, stretch="no")  # Hide the first column
-        table.column("Queue number", anchor="center")
+        table.column("Queue number", anchor="center", width=110)
         table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
-        table.column("School ID", anchor="center")
+        table.column("School ID", anchor="center", width=100)
         table.column("Full name", anchor="center")
         table.column("Transaction", anchor="center")
-        table.column("Affiliation", anchor="center")
-        table.column("Phone", anchor="center")
+        table.column("Affiliation", anchor="center", width=100)
+        table.column("Phone", anchor="center", width=100)
         table.column("Purpose of visit", anchor="center")
         table.column("Compilation time", anchor="center")  # Ensure same column name
-        table.column("Voided", anchor="center")
+        table.column("Voided", anchor="center", width=100)
 
         table.heading("#0", text="")
         table.heading("Queue number", text="Queue Number") 

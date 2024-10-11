@@ -2,6 +2,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from PIL import Image
 from db import create_connection
+from mysql.connector import Error
 
 # Initialize the queue display window with ttkbootstrap
 q_display = ttk.Window(themename="superhero")  # 'superhero' theme for a modern dark design
@@ -80,30 +81,34 @@ promissory_label = ttk.Label(q_display,
 promissory_label.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
 
 # Preparing queue number------------------------------------------------------------------------------------
-conn = create_connection()
-cursor = conn.cursor()
+try:
+    conn = create_connection()
+    cursor = conn.cursor()
 
-query = "SELECT queue_num FROM queue_display LIMIT 1 OFFSET 1"
-cursor.execute(query)
-get_snum = cursor.fetchone()
+    query = "SELECT queue_num FROM queue_display LIMIT 1 OFFSET 1"
+    cursor.execute(query)
+    get_snum = cursor.fetchone()
 
-# Set the default value to 0 if no result is found
-get_snum = get_snum[0] if get_snum else 0
+    # Set the default value to 0 if no result is found
+    get_snum = get_snum[0] if get_snum else 0
 
-cursor.fetchall()
+    cursor.fetchall()
 
-query_pnc_prep = "SELECT promisorry_number FROM queue_display_promisorry LIMIT 1 OFFSET 1"
-cursor.execute(query_pnc_prep)
-get_num_pnc_prep = cursor.fetchone()
+    query_pnc_prep = "SELECT promisorry_number FROM queue_display_promisorry LIMIT 1 OFFSET 1"
+    cursor.execute(query_pnc_prep)
+    get_num_pnc_prep = cursor.fetchone()
 
-# Set the default value to 0 if no result is found
-get_num_pnc_prep = get_num_pnc_prep[0] if get_num_pnc_prep else 0
+    # Set the default value to 0 if no result is found
+    get_num_pnc_prep = get_num_pnc_prep[0] if get_num_pnc_prep else 0
 
-cursor.fetchall()
+    cursor.fetchall()
 
-query_sc_prep = "SELECT queue_sc FROM queue_display_sc LIMIT 1 OFFSET 1"
-cursor.execute(query_sc_prep)
-get_num_sc_prep = cursor.fetchone()
+    query_sc_prep = "SELECT queue_sc FROM queue_display_sc LIMIT 1 OFFSET 1"
+    cursor.execute(query_sc_prep)
+    get_num_sc_prep = cursor.fetchone()
+except Error as err:
+    print(f"Error: {err}")
+
 
 # Set the default value to 0 if no result is found
 get_num_sc_prep = get_num_sc_prep[0] if get_num_sc_prep else 0
@@ -130,33 +135,34 @@ p_pnc_number = ttk.Label(q_display,
 p_pnc_number.grid(row=3, column=1, sticky='nsew', padx=10, pady=10)
 
 # Serving queue number--------------------------------------------------------------------------------
-# First query: Fetch queue number for the first label
-query = "SELECT queue_num FROM queue_display"
-cursor.execute(query)
-get_num = cursor.fetchone()
+try:
+    query = "SELECT queue_num FROM queue_display"
+    cursor.execute(query)
+    get_num = cursor.fetchone()
 
-# Set the default value to 0 if no result is found
-get_num = get_num[0] if get_num else 0
+    # Set the default value to 0 if no result is found
+    get_num = get_num[0] if get_num else 0
 
-# After fetching the result, use fetchall() or reset the cursor
-cursor.fetchall()  # This ensures all rows are processed (even if no more rows are there)
+    cursor.fetchall()  # This ensures all rows are processed (even if no more rows are there)
 
-# Second query: Fetch promisorry number for the second label
-query_pnc_serve = "SELECT promisorry_number FROM queue_display_promisorry"
-cursor.execute(query_pnc_serve)
-get_num_pnc_serve = cursor.fetchone()
+    # Second query: Fetch promisorry number for the second label
+    query_pnc_serve = "SELECT promisorry_number FROM queue_display_promisorry"
+    cursor.execute(query_pnc_serve)
+    get_num_pnc_serve = cursor.fetchone()
 
-# Set the default value to 0 if no result is found
-get_num_pnc_serve = get_num_pnc_serve[0] if get_num_pnc_serve else 0
+    # Set the default value to 0 if no result is found
+    get_num_pnc_serve = get_num_pnc_serve[0] if get_num_pnc_serve else 0
 
-cursor.fetchall() 
+    cursor.fetchall() 
 
-query_sc_serve = "SELECT queue_sc FROM queue_display_sc"
-cursor.execute(query_sc_serve)
-get_num_sc_serve = cursor.fetchone()
+    query_sc_serve = "SELECT queue_sc FROM queue_display_sc"
+    cursor.execute(query_sc_serve)
+    get_num_sc_serve = cursor.fetchone()
 
-# Set the default value to 0 if no result is found
-get_num_sc_serve = get_num_sc_serve[0] if get_num_sc_serve else 0
+    # Set the default value to 0 if no result is found
+    get_num_sc_serve = get_num_sc_serve[0] if get_num_sc_serve else 0
+except Error as err:
+    print(f"Error: {err}")
 
 # Now proceed with the labels
 s_c_number = ttk.Label(q_display,
