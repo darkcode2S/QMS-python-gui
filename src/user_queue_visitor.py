@@ -29,7 +29,7 @@ def generate_ticket_number():
     global ticket_counter
 
     # Check if the counter exceeds 300
-    if ticket_counter > 300:
+    if ticket_counter >= 300:
         ticket_counter = 1  # Reset to 1 if it goes beyond 300
 
     # Get the current ticket number
@@ -165,6 +165,9 @@ def visitor_queue(root, button_text, select_student, purpose):
         root.destroy()
 
         open_ticket_window(visitor_name)
+        from user_queue_entry_main import example
+        example()
+
         connection.close()       
 
     user_visitor.grab_set()

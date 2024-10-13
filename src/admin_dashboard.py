@@ -5,13 +5,13 @@ from PIL import Image
 from tkinter import messagebox
 import re
 import bcrypt
+from center_window import center_window
 from db import create_connection
 from mysql.connector import Error
 
 
 # Initialize the main application window
 admin = ctk.CTk()
-admin.geometry("1000x500")
 admin.title("Admin")
 admin.iconbitmap("old-logo.ico")
 
@@ -158,6 +158,136 @@ search_button.pack(side='right',pady=20, padx=(5,0))
 search_bar = ctk.CTkEntry(nav_frame, width=250, placeholder_text='Search ID...')
 search_bar.pack(side='right',pady=20, padx=(20,0))
 
+show_info = ctk.CTkButton(table_frame, 
+                          text='Show info', 
+                          fg_color='transparent',
+                          text_color='#000',
+                          command=lambda: show_data())
+show_info.pack(side='top', anchor='e')
+
+def show_data():
+    if dropdown_var.get() == "Queue":
+        global item_values
+        selected_item = table.selection()  
+
+        if selected_item: 
+            item_values = table.item(selected_item[0], 'values')  
+            print(f"Selected values: {item_values}")  
+        else:
+            print("No item selected") 
+
+        if not selected_item:  
+            messagebox.showwarning("Warning", "Please select an item from the table first.")
+            return  
+                
+        mini = tk.Toplevel(admin)
+        mini.title("Information")
+        mini.iconbitmap('old-logo.ico')
+
+        center_window(300, 300, mini)
+
+        info = ctk.CTkLabel(mini, text=item_values[0])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[1])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[2])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[3])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[4])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[5])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[6])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[7])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[8])
+        info.pack()
+        info = ctk.CTkLabel(mini, text=item_values[9])
+        info.pack()
+
+        info.grab_set()
+
+    elif dropdown_var.get() == "Students":
+
+        if not selected_item_values:  
+            messagebox.showwarning("Warning", "Please select an item from the table first.")
+            return  
+
+        mono = tk.Toplevel(admin)
+        mono.title("Information")
+        mono.iconbitmap('old-logo.ico')
+
+        center_window(300, 300, mono)
+
+        info = ctk.CTkLabel(mono, text=selected_item_values[1])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=selected_item_values[2])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=selected_item_values[3])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=selected_item_values[4])
+        info.pack()
+
+        info.grab_set()
+
+    elif dropdown_var.get() == "Members":
+        if not select_member_value:  
+            messagebox.showwarning("Warning", "Please select an item from the table first.")
+            return  
+        
+        mono = tk.Toplevel(admin)
+        mono.title("Information")
+        mono.iconbitmap('old-logo.ico')
+
+        center_window(300, 200, mono)
+
+        info = ctk.CTkLabel(mono, text=select_member_value[1])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=select_member_value[2])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=select_member_value[3])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=select_member_value[4])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=select_member_value[5])
+        info.pack()
+
+        info.grab_set()
+
+    elif dropdown_var.get() == "Operators":
+
+        if not item_values:  
+            messagebox.showwarning("Warning", "Please select an item from the table first.")
+            return  
+        
+        mono = tk.Toplevel(admin)
+        mono.title("Information")
+        mono.iconbitmap('old-logo.ico')
+
+        center_window(300, 300, mono)
+
+        info = ctk.CTkLabel(mono, text=item_values[1])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=item_values[2])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=item_values[3])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=item_values[4])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=item_values[5])
+        info.pack()
+        info = ctk.CTkLabel(mono, text=item_values[6])
+        info.pack()
+
+        info.grab_set()
+    
+    else:
+        messagebox.showwarning("Warning", "Please select data")
+
+
+    
 # TabView for students , padx=(0, 20)
 tab_view = ctk.CTkTabview(table_frame, width=500, height=300, anchor="nw", fg_color='lightgray')
 tab_view.pack_forget()  # Initially hide the tab view
@@ -201,7 +331,7 @@ for tab_name in tab_list:
     table_student.heading("Course", text="Course")
     table_student.heading("Year&level", text="Year Level")
 
-        # Create a vertical scrollbar
+    # Create a vertical scrollbar
     scrollbar = ttk.Scrollbar(tab_view.tab(tab_name), orient="vertical", command=table_student.yview)
     table_student.configure(yscroll=scrollbar.set)
 
@@ -238,10 +368,7 @@ def clear_table(table):
     for row in table.get_children():
         table.delete(row)
 
-# scrollbarx = Scrollbar(table_frame, orient=HORIZONTAL)
-# scrollbary = Scrollbar(table_frame, orient=VERTICAL)
 #Queue table-----------------------------------------------------------------------------------------------
-
 table['columns'] = ('Queue number',
                         'Created at', 
                         'School ID',
@@ -265,16 +392,16 @@ scrollbarx.pack(side='bottom', fill='x')
 scrollbary.pack(side='right', fill='y')
 
 table.column("#0", width=0, stretch="no")  # Hide the first column
-table.column("Queue number", stretch="no", anchor="center", width=110)
-table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
-table.column("School ID", anchor="center", width=100)
-table.column("Full name", anchor="center",)
-table.column("Transaction", anchor="center")
-table.column("Affiliation", anchor="center", width=100)
-table.column("Phone", anchor="center", width=100)
-table.column("Purpose of visit", anchor="center")
-table.column("Compilation time", anchor="center")  # Ensure same column name
-table.column("Voided", anchor="center", width=100)
+table.column("Queue number", anchor="center", width=110, stretch="no")
+table.column("Created at", anchor="center", stretch="no")
+table.column("School ID", anchor="center", width=100, stretch="no")
+table.column("Full name", anchor="center", stretch="no")
+table.column("Transaction", anchor="center", stretch="no")
+table.column("Affiliation", anchor="center", width=100, stretch="no")
+table.column("Phone", anchor="center", width=100, stretch="no")
+table.column("Purpose of visit", anchor="center", stretch="no")
+table.column("Compilation time", anchor="center", stretch="no")
+table.column("Voided", anchor="center", width=100, stretch="no")
 
 table.heading("#0", text="")
 table.heading("Queue number", text="Queue Number") 
@@ -355,7 +482,14 @@ for member_name in member_list:
     table_member.heading("Role", text="Role")
     table_member.heading("Office", text="Office")
     
-    table_member.pack(fill="both", expand=True, padx=20)
+    # table_member.pack(fill="both", expand=True, padx=20)
+    # Create a vertical scrollbar
+    scrollbar = ttk.Scrollbar(tab_member.tab(member_name), orient="vertical", command=table_member.yview)
+    table_student.configure(yscroll=scrollbar.set)
+
+    # Pack the Treeview and scrollbar
+    table_member.pack(fill="both", expand=True, side="left", padx=(20, 0))
+    scrollbar.pack(fill="y", side="right")
     
     # Bind the selection event to the table , pady=(0, 20) 
     table_member.bind("<<TreeviewSelect>>", lambda event, member_name=member_name: member_selected(event, member_name))
@@ -463,6 +597,7 @@ def update_table(choice):
             cursor.close()
             connection.close()
             return rows
+    
 
         # Remove all existing rows from the TreeView table
         def clear_table(table):
@@ -482,16 +617,17 @@ def update_table(choice):
                                 'Compilation time', 
                                 'Voided')  
         table.column("#0", width=0, stretch="no")  # Hide the first column
-        table.column("Queue number", anchor="center", width=110)
-        table.column("Created at", anchor="center")  # Lowercase 'n' to match the columns definition
-        table.column("School ID", anchor="center", width=100)
-        table.column("Full name", anchor="center")
-        table.column("Transaction", anchor="center")
-        table.column("Affiliation", anchor="center", width=100)
-        table.column("Phone", anchor="center", width=100)
-        table.column("Purpose of visit", anchor="center")
-        table.column("Compilation time", anchor="center")  # Ensure same column name
-        table.column("Voided", anchor="center", width=100)
+        table.column("Queue number", anchor="center", width=110, stretch="no")
+        table.column("Created at", anchor="center", stretch="no")
+        table.column("School ID", anchor="center", width=100, stretch="no")
+        table.column("Full name", anchor="center", stretch="no")
+        table.column("Transaction", anchor="center", stretch="no")
+        table.column("Affiliation", anchor="center", width=100, stretch="no")
+        table.column("Phone", anchor="center", width=100, stretch="no")
+        table.column("Purpose of visit", anchor="center", stretch="no")
+        table.column("Compilation time", anchor="center", stretch="no")
+        table.column("Voided", anchor="center", width=100, stretch="no")
+
 
         table.heading("#0", text="")
         table.heading("Queue number", text="Queue Number") 
@@ -510,16 +646,16 @@ def update_table(choice):
         for row in data:
             table.insert("", "end", values=row)
 
-        item_values = None
+        item_values1 = None
 
         #get value wehn selected operator table
         def on_item_selected_password(event):
-            global item_values
+            global item_values1
             selected_item = table.selection()  # Get the selected items (returns a tuple)
 
             if selected_item:  # Check if any item is selected
-                item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
-                print(f"Selected values: {item_values}")  # Do something with the values
+                item_values1 = table.item(selected_item[0], 'values')  # Get the values of the selected item
+                print(f"Selected values: {item_values1}")  # Do something with the values
             else:
                 print("No item selected")  # Handle the case where no item is selected
 
@@ -530,6 +666,9 @@ def update_table(choice):
         define_password_columns()
         title_label.configure(text="Oprators table")
         close_admin_frame()
+
+        global item_values
+        item_values = None
 
         #Unhide this wedgit
         cancel_search.pack(side='right',pady=20, padx=(5,20))
@@ -851,13 +990,13 @@ def cancel_search_action():
 def define_password_columns():
     table['columns'] = ('id','School ID', 'Full name', 'Operate area', 'Phone','Username', 'Password')
     table.column("#0", width=0, stretch="no")  # Hide the first column
-    table.column("id", anchor="center", width=0,stretch="no")
-    table.column("School ID", anchor="center", width=80)
-    table.column("Full name", anchor="center", width=80)
-    table.column("Operate area", anchor="center", width=80)
-    table.column("Phone", anchor="center", width=80)
-    table.column("Username", anchor="center", width=80)
-    table.column("Password", anchor="center", width=80)
+    table.column("id", anchor="center", width=0, stretch="no")
+    table.column("School ID", anchor="center", stretch="no")
+    table.column("Full name", anchor="center", stretch="no")
+    table.column("Operate area", anchor="center", stretch="no")
+    table.column("Phone", anchor="center", stretch="no")
+    table.column("Username", anchor="center", stretch="no")
+    table.column("Password", anchor="center", stretch="no")
 
     table.heading("#0", text="", anchor="center")
     table.heading("id", text="id")
@@ -868,26 +1007,25 @@ def define_password_columns():
     table.heading("Username", text="Username")
     table.heading("Password", text="Password")
 
-
     # Fetch and display data
     data = fetch_data()
     for row in data:
         table.insert("", "end", values=row)
 
-item_values = None
+    item_values = None
 
-#get value wehn selected operator table
-def on_item_selected_password(event):
-    global item_values
-    selected_item = table.selection()  # Get the selected items (returns a tuple)
+    #get value wehn selected operator table
+    def on_item_selected_password(event):
+        global item_values
+        selected_item = table.selection()  # Get the selected items (returns a tuple)
 
-    if selected_item:  # Check if any item is selected
-        item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
-        print(f"Selected values: {item_values}")  # Do something with the values
-    else:
-        print("No item selected")  # Handle the case where no item is selected
+        if selected_item:  # Check if any item is selected
+            item_values = table.item(selected_item[0], 'values')  # Get the values of the selected item
+            print(f"Selected values: {item_values}")  # Do something with the values
+        else:
+            print("No item selected")  # Handle the case where no item is selected
 
-table.bind("<<TreeviewSelect>>", on_item_selected_password)
+    table.bind("<<TreeviewSelect>>", on_item_selected_password)
 
 #Action for close window to cancel seleted values for every tables
 def close_window_add_student(add_window):
@@ -1129,10 +1267,25 @@ def add_record():
         password_name = ctk.CTkEntry(password_frame, width=250, placeholder_text='Full name')
         password_name.pack(padx=10)  # Centering
         
-        pasword_operate_label = ctk.CTkLabel(password_frame, text='Opearate area', width=250, anchor='w')
-        pasword_operate_label.pack()        
-        pasword_operate = ctk.CTkEntry(password_frame, width=250, placeholder_text='Operate area')
-        pasword_operate.pack(padx=10)  # Centering
+        # pasword_operate_label = ctk.CTkLabel(password_frame, text='Opearate area', width=250, anchor='w')
+        # pasword_operate_label.pack()        
+        # pasword_operate = ctk.CTkEntry(password_frame, width=250, placeholder_text='Operate area')
+        # pasword_operate.pack(padx=10)  # Centering
+
+        dropdown_op = ctk.StringVar(value="Select area")
+        dropdown_op_layout = ctk.CTkOptionMenu(password_frame, variable=dropdown_op, width=250,
+                              values=[
+                                      'Cashier service',
+                                      'Scholarship coordinator', 
+                                      'Promisorry note coordinator'
+                                     ], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        dropdown_op_layout.pack(padx=10, pady=10)
 
         password_num_label = ctk.CTkLabel(password_frame, text='Phone', width=250, anchor='w')
         password_num_label.pack()  
@@ -1155,7 +1308,7 @@ def add_record():
                                    command=lambda: insert_password_data(
                                         password_id.get(),
                                         password_name.get(),
-                                        pasword_operate.get(),
+                                        dropdown_op.get(),
                                         password_num.get(),
                                         password_username.get(),
                                         password_password.get(),
@@ -1567,15 +1720,32 @@ def update_record():
 
         password_password = ctk.CTkLabel(password_operator, text='Operate area', width=250, anchor='w')
         password_password.pack() 
-        pasword_operate = ctk.CTkEntry(password_operator, width=250, placeholder_text='Operate area')
-        pasword_operate.pack(padx=10)  # Centering
-        pasword_operate.insert(0, item_values[3])
+        # pasword_operate = ctk.CTkEntry(password_operator, width=250, placeholder_text='Operate area')
+        # pasword_operate.pack(padx=10)  # Centering
+        # pasword_operate.insert(0, item_values[3])
+
+        dropdown_op = ctk.StringVar(value="Select area")
+        dropdown_op_layout = ctk.CTkOptionMenu(password_operator, variable=dropdown_op, width=250,
+                              values=[
+                                      'Cashier service',
+                                      'Scholarship coordinator', 
+                                      'Promisorry note coordinator'
+                                     ], 
+                              fg_color="#fff",
+                              text_color="#000",
+                              dropdown_fg_color="#fff",
+                              button_color="orange",
+                              dropdown_hover_color="orange",
+                              button_hover_color="#de9420")
+        dropdown_op_layout.pack(padx=10)
+        dropdown_op.set(item_values[3])
 
         password_password = ctk.CTkLabel(password_operator, text='Phone', width=250, anchor='w')
         password_password.pack() 
         password_num = ctk.CTkEntry(password_operator, width=250, placeholder_text='Phone')
         password_num.pack(padx=10)  # Centering
         password_num.insert(0, item_values[4])
+        
         password_password = ctk.CTkLabel(password_operator, text='Username', width=250, anchor='w')
         password_password.pack() 
         password_username = ctk.CTkEntry(password_operator, width=250, placeholder_text='Username')
@@ -1594,7 +1764,7 @@ def update_record():
                                                         command=lambda: update_password_data(
                                                             password_id.get(),
                                                             password_name.get(),
-                                                            pasword_operate.get(),
+                                                            dropdown_op.get(),
                                                             password_num.get(),
                                                             password_username.get(),
                                                             password_password.get(),
@@ -1720,13 +1890,13 @@ def update_password_data(school_id, fullname, operate, phone, username, password
             messagebox.showerror("Add operator record", "Error: Password must be at least 4 characters long.")
             return   
            
-        # Check if the username already exists in the database
-        cursor.execute("SELECT username FROM operator WHERE username = %s", (username,))
-        existing_user = cursor.fetchone()
+        # # Check if the username already exists in the database
+        # cursor.execute("SELECT username FROM operator WHERE username = %s", (username,))
+        # existing_user = cursor.fetchone()
         
-        if existing_user:
-            messagebox.showerror("Add operator record", "Error: Username already exists. Please choose a different username.")
-            return
+        # if existing_user:
+        #     messagebox.showerror("Add operator record", "Error: Username already exists. Please choose a different username.")
+        #     return
         
         # Hash the password before storing it
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -1769,8 +1939,7 @@ def remove_record():
         if selected_item_values is None:
            messagebox.showwarning("Warning","No item selected for remove.")
            return  # Exit if no item is selected
-           
-        
+
         global student_id
         student_id = selected_item_values[1]
 

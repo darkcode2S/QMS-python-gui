@@ -167,6 +167,8 @@ def satff_input_id(root, button_text, select_student, purpose):
             connection.commit()
             root.destroy()
             open_ticket_window(member_name)
+            from user_queue_entry_main import example
+            example()
 
         else:
             query_student = "SELECT * FROM student WHERE school_id = %s"

@@ -15,9 +15,27 @@ def pnc_window(op_name, op_area, op_id):
     ctk.set_appearance_mode("light")
     ctk.set_default_color_theme("dark-blue")
 
+    # Configure the style
+    style = ttk.Style()
+    style.configure("Treeview", 
+                    background="#f0f0f0",
+                    foreground="black",
+                    rowheight=25,
+                    fieldbackground="#f0f0f0")
+    style.configure("Treeview.Heading", 
+                    background="lightblue",  # Green background for headings
+                    foreground="#000",
+                    font=("Arial", 10, "bold"))  # Bold font for headings
+    style.map("Treeview", 
+            background=[('selected', '#0078D7')])  # Highlight selected row
+
+    # Define alternating row colors
+    style.configure("evenrow", background="white")
+    style.configure("oddrow", background="#D3D3D3")  # Light gray background for odd rows
+
     # Center the window on the screen
     window_width = 1000
-    window_height = 550
+    window_height = 630
     screen_width = promisorry.winfo_screenwidth()
     screen_height = promisorry.winfo_screenheight()
     x = (screen_width // 2) - (window_width // 2)
@@ -111,6 +129,13 @@ def pnc_window(op_name, op_area, op_id):
     tb1.heading("Queue number", text="Queue Number")
     tb1.heading("Purpose of visit", text="Purpose of Visit")
     tb1.heading("Affiliation", text="Affiliation")
+
+    # Create a vertical scrollbar
+    scrollbar = ttk.Scrollbar(tb1, orient="vertical", command=tb1.yview)
+    tb1.configure(yscroll=scrollbar.set)
+
+    # Pack the Treeview and scrollbar
+    scrollbar.pack(fill="y", side="right")
 
     data = fetch_queue_data()
     for row in data:
@@ -223,6 +248,8 @@ def pnc_window(op_name, op_area, op_id):
                     
                 else:
                     print("Canceled.")
+                    
+            popup.grab_set()
 
             # Function to handle the "Void Ticket" button
             def void_ticket():
@@ -299,6 +326,13 @@ def pnc_window(op_name, op_area, op_id):
     tb2.heading("Queue number", text="Queue Number")
     tb2.heading("Purpose of visit", text="Purpose of Visit")
     tb2.heading("Affiliation", text="Affiliation")
+
+    # Create a vertical scrollbar
+    scrollbar = ttk.Scrollbar(tb2, orient="vertical", command=tb2.yview)
+    tb2.configure(yscroll=scrollbar.set)
+
+    # Pack the Treeview and scrollbar
+    scrollbar.pack(fill="y", side="right")
 
     # Bind the TreeviewSelect event to the on_tb2_select function
     tb2.bind("<<TreeviewSelect>>", on_tb2_select)

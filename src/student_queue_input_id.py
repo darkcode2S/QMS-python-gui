@@ -1,3 +1,4 @@
+import importlib
 import customtkinter as ctk
 import tkinter as tk
 from PIL import Image
@@ -168,7 +169,13 @@ def input_id_student(root, button_text, select_student, purpose):
             # Commit the changes
             connection.commit()
             root.destroy()
+
             open_ticket_window(student_name)
+            
+            from user_queue_entry_main import example
+            example()
+            
+            
 
         else:
             # If not found in the student table, check in the member table

@@ -167,8 +167,8 @@ def confirm_logout(counter_staff):
 
         if response:
             counter_staff.destroy()
-            # import admin_operator_main
-            # importlib.reload(admin_operator_main)
+            from admin_operator_main import example
+            example()
         else:
             print("Logout canceled.")
 
@@ -222,7 +222,8 @@ def button_click_event(counter_staff, op_name, op_area, op_id):
                                     fg_color="#d68b26", 
                                     hover_color="#d68b26")
         radio3.pack(padx=30,pady=10, anchor='w')
-
+        
+        #Switch office
         def confirm_selection():
             print("Selected service:", selected_option.get())
             dialog.destroy()  # Close the dialog window
