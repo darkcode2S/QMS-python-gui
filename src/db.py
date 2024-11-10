@@ -7,7 +7,7 @@ def create_connection():
             host='localhost',
             user='root',        
             password='',
-            database='qms',
+            database='queue_system',
         )
         if conn.is_connected():
             print("Database successfully connected")

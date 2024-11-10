@@ -117,10 +117,8 @@ def satff_input_id(root, button_text, select_student, purpose):
     def cancel():
         input_id_staff.destroy()
     
-    global ticket_number
-    # Generate a random ticket number between 1 and 200
-    ticket_number = random.randint(1, 200) 
     
+
     def generate_ticket(button_text, select_student):
         entered_id = e1.get()
 
@@ -130,59 +128,88 @@ def satff_input_id(root, button_text, select_student, purpose):
 
         print(f"School ID: {entered_id}") 
 
+        # Establish database connection
         connection = create_connection()
         if connection is None:
             print("Failed to connect to the database.")
             return
 
-        cursor = connection.cursor()
+        try:
+            cursor = connection.cursor()
 
-        # First, check in the student table
-        query_student = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id = %s"
-        cursor.execute(query_student, (entered_id,))
-        result_member = cursor.fetchone()
+            # Check if entered_id exists in the member table
+            query_member = "SELECT school_id, full_name, affiliation, role, office FROM member WHERE school_id = %s"
+            cursor.execute(query_member, (entered_id,))
+            result_member = cursor.fetchone()
 
-        # Check if student exists
-        if result_member:
-            # Assuming result_member[1] is the full name
-            member_name = result_member[1]  
-            
-            # Insert into queue table
-            query_insert = """
-                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
-                VALUES (%s, %s, %s, %s, %s, %s)
-            """
-            
-            # Use actual values instead of placeholders
-            cursor.execute(query_insert, (
-                ticket_number,               
-                entered_id,
-                member_name,    
-                button_text,    
-                select_student,
-                purpose, 
-            ))
-                        
-            # Commit the changes
-            connection.commit()
-            root.destroy()
-            open_ticket_window(member_name)
-            from user_queue_entry_main import example
-            example()
+            if result_member:
+                member_name = result_member[1]  
 
-        else:
-            query_student = "SELECT * FROM student WHERE school_id = %s"
-            cursor.execute(query_student, (entered_id,))
-            result_student = cursor.fetchone()
+                # Generate ticket number only if a valid member is found
+                from ticket import generate_ticket_number
+                global ticket_number
+                ticket_number = generate_ticket_number()
 
-            if result_student:
-                print(f"School ID {entered_id} found in the member table.")
-                messagebox.showinfo("Student Access", f"The ID {entered_id} belongs to Student.")
+                # Insert record into the queue table
+                query_insert = """
+                        INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    """
+                cursor.execute(query_insert, (
+                    ticket_number,               
+                    entered_id,
+                    member_name,    
+                    button_text,    
+                    select_student,
+                    purpose,
+                ))
+                                    
+                    # Commit the transaction and close the root window
+                connection.commit()
+                root.destroy()
+
+
+                # Determine coordinator name based on button_text
+                cname = "Default"
+                if button_text == "Cashier Service":
+                    cname = "C1"
+
+                elif button_text == "Promisorry note coordinator":
+                    cname = "PNC"
+                elif button_text == "Scholarship coordinator":
+                    cname = "SC"
+
+                # Open ticket window
+                open_ticket_window(ticket_number, cname)
+
+                # Import and run example function from user_queue_entry_main
+                from user_queue_entry_main import example
+                example()
+
             else:
-                print(f"School ID {entered_id} not found in either table.")
-                messagebox.showinfo("Info", "You entered an invalid ID number. Please make sure you enter a valid ID number.")
+                # If not found in the member table, check in the student table
+                query_student = "SELECT * FROM student WHERE school_id = %s"
+                cursor.execute(query_student, (entered_id,))
+                result_student = cursor.fetchone()
 
-        connection.close()
+                if result_student:
+                    print(f"School ID {entered_id} found in the student table.")
+                    messagebox.showinfo("Student Access", f"The ID {entered_id} belongs to a Student.")
+                else:
+                    print(f"School ID {entered_id} not found in either table.")
+                    messagebox.showinfo("Info", "You entered an invalid ID number. Please make sure you enter a valid ID number.")
+
+        except Exception as e:
+            messagebox.showerror("Database Error", f"An error occurred: {e}")
+            print(f"Error during ticket generation: {e}")
+
+        finally:
+            # Close cursor and connection if they were opened
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
+
 
     input_id_staff.grab_set()
 
@@ -202,25 +229,114 @@ def print_ticket(ticket_number, member_name):
 
     print_window.mainloop()
 
-def open_ticket_window(member_name):
-    new_window = tk.Tk()  # Create a new window
-    new_window.title("Create Ticket")
-    
+def open_ticket_window( ticket_number, cname):
+    import tkinter as tk
+    from tkinter import font
+    from datetime import datetime
 
-    
-    # Create a label to display the random ticket number
-    label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))
-    label.pack(pady=10)
-    
-    # Add a button to print the ticket
-    print_button = tk.Button(new_window, text="Print Ticket", command=lambda: print_ticket(ticket_number, member_name))
-    print_button.pack(pady=5)
-    
-    # Add a button to close the window
-    close_button = tk.Button(new_window, text="Close", command=new_window.destroy)
-    close_button.pack(pady=5)
+    from center_window import center_window
 
-    new_window.mainloop()
+
+        # Initialize the main window
+    root = tk.Tk()
+    root.title("View Queue Ticket")
+    center_window(800, 600, root)
+    root.configure(bg="#D3D3D3")  # Light gray background for the window
+    root.iconbitmap("old-logo.ico")
+
+        # Custom font for larger text
+    large_font = font.Font(family="Helvetica", size=48, weight="bold")
+    title_font = font.Font(family="Helvetica", size=30, weight="bold")
+    medium_font = font.Font(family="Helvetica", size=15)
+    small_font = font.Font(family="Helvetica", size=10)
+
+    # Title Label
+    title_label = tk.Label(root, text="VIEW QUEUE TICKET", font=title_font, bg="#D3D3D3")
+    title_label.pack(pady=10)
+
+        # Frame for ticket information
+    ticket_frame = tk.Frame(root, bg="white", padx=20, pady=20)
+    ticket_frame.pack(pady=10)
+
+        # Get current date in MM-DD-YY format
+    current_date = datetime.now().strftime("%m-%d-%y")
+
+        # Ticket Number
+    queue_number_label = tk.Label(ticket_frame, text="YOUR QUEUE NUMBER:", font=small_font, fg="black", bg="white")
+    queue_number_label.pack()
+
+    queue_label = tk.Label(ticket_frame, text=ticket_number, font=large_font, fg="black", bg="white")
+    queue_label.pack()
+
+    window_label = tk.Label(ticket_frame, text="WINDOW:", font=small_font, fg="black", bg="white")
+    window_label.pack()
+
+        # Counter Information
+    counter_label = tk.Label(ticket_frame, text=cname, font=large_font, fg="black", bg="white")
+    counter_label.pack()
+
+    seated_label = tk.Label(ticket_frame, text="PLEASE BE SEATED.\n YOU WILL BE SERVED SHORTLY.", font=small_font, fg="black", bg="white")
+    seated_label.pack()
+
+    queue_label = tk.Label(ticket_frame, text=current_date, font=small_font, fg="black", bg="white")
+    queue_label.pack(pady=(20,10), anchor="e")
+
+        # Instructional Text
+    instruction_label = tk.Label(root, text=f" Click Print Ticket to generate your queue ticket.\n"
+                                                "Thank you for your submission! We appreciate your feedback. if you have any\n further inquiries or concerns, please don't hesitate to reach out to us.",
+                                    font=small_font, bg="#D3D3D3")
+    instruction_label.pack(pady=10)
+
+        # Next Ticket Button
+    next_button = tk.Button(root, text="Print Ticket", font=medium_font, command=lambda: print_receipt(ticket_number, cname, root))
+    next_button.pack(pady=10)
+
+        # Run the Tkinter event loop
+    root.mainloop()
+
+from zebra import Zebra
+
+z = Zebra()
+
+# Function to connect to the printer
+def connect_printer():
+    printers = z.getqueues()
+    if printers:
+        z.setqueue(printers[0])  # Automatically select the first printer
+        return True
+    else:
+        messagebox.showerror("Printer Error", "No printers found.")
+        return False
+
+# Function to print receipt
+def print_receipt(ticket_number, cname, root):
+    from datetime import datetime
+    
+    root.destroy() 
+
+    if connect_printer():
+        # ZPL code for formatting receipt to match the provided style
+        zpl = f"""
+
+------------------
+YOUR QUEUE NUMBER
+       {ticket_number}
+        
+      WINDOW
+       {cname}
+------------------
+PLEASE BE SEATED.\nYOU WILL BE SERVED SHORTLY.
+
+                 {datetime.now().strftime("%m-%d-%y")}
+
+
+        """
+        z.output(zpl)
+        
+        print("Receipt printed successfully!")
+    else:
+        print("Could not print receipt.")
+
 
 
 

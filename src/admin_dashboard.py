@@ -9,7 +9,6 @@ from center_window import center_window
 from db import create_connection
 from mysql.connector import Error
 
-
 # Initialize the main application window
 admin = ctk.CTk()
 admin.title("Admin")
@@ -160,10 +159,9 @@ search_bar.pack(side='right',pady=20, padx=(20,0))
 
 show_info = ctk.CTkButton(table_frame, 
                           text='Show info', 
-                          fg_color='transparent',
-                          text_color='#000',
+                          width=60,
                           command=lambda: show_data())
-show_info.pack(side='top', anchor='e')
+show_info.pack(side='top', anchor='e', pady=(10, 0), padx=10)
 
 def show_data():
     if dropdown_var.get() == "Queue":
@@ -186,26 +184,26 @@ def show_data():
 
         center_window(300, 300, mini)
 
-        info = ctk.CTkLabel(mini, text=item_values[0])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[1])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[2])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[3])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[4])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[5])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[6])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[7])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[8])
-        info.pack()
-        info = ctk.CTkLabel(mini, text=item_values[9])
-        info.pack()
+        info = ctk.CTkLabel(mini, text=f'Queue number:   {item_values[0]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Created at:   {item_values[1]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'School ID:   {item_values[2]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Full name:   {item_values[3]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Transaction:   {item_values[4]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Affiliation:   {item_values[5]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Phone:   {item_values[6]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Purpose:   {item_values[7]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Compilation time:   {item_values[8]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mini, text=f'Voided:   {item_values[9]}')
+        info.pack(padx=10, anchor='w')
 
         info.grab_set()
 
@@ -219,16 +217,16 @@ def show_data():
         mono.title("Information")
         mono.iconbitmap('old-logo.ico')
 
-        center_window(300, 300, mono)
+        center_window(300, 200, mono)
 
-        info = ctk.CTkLabel(mono, text=selected_item_values[1])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=selected_item_values[2])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=selected_item_values[3])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=selected_item_values[4])
-        info.pack()
+        info = ctk.CTkLabel(mono, text=f'School ID:   {selected_item_values[1]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Full name:   {selected_item_values[2]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Course:   {selected_item_values[3]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Year level:   {selected_item_values[4]}')
+        info.pack(padx=10, anchor='w')
 
         info.grab_set()
 
@@ -243,16 +241,16 @@ def show_data():
 
         center_window(300, 200, mono)
 
-        info = ctk.CTkLabel(mono, text=select_member_value[1])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=select_member_value[2])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=select_member_value[3])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=select_member_value[4])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=select_member_value[5])
-        info.pack()
+        info = ctk.CTkLabel(mono, text=f'School ID:   {select_member_value[1]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Full name:   {select_member_value[2]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Affiliation:   {select_member_value[3]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Role:   {select_member_value[4]}')
+        info.pack(padx=10, anchor='w')
+        info = ctk.CTkLabel(mono, text=f'Office:   {select_member_value[5]}')
+        info.pack(padx=10, anchor='w')
 
         info.grab_set()
 
@@ -266,20 +264,26 @@ def show_data():
         mono.title("Information")
         mono.iconbitmap('old-logo.ico')
 
-        center_window(300, 300, mono)
+        center_window(300, 200, mono)
 
-        info = ctk.CTkLabel(mono, text=item_values[1])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=item_values[2])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=item_values[3])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=item_values[4])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=item_values[5])
-        info.pack()
-        info = ctk.CTkLabel(mono, text=item_values[6])
-        info.pack()
+        info = ctk.CTkLabel(mono, text=f'School ID:   {item_values[1]}')
+        info.pack(padx=10, anchor='w')
+
+        info = ctk.CTkLabel(mono, text=f'Full name:   {item_values[2]}')
+        info.pack(padx=10, anchor='w')
+
+        info = ctk.CTkLabel(mono, text=f'Opearate area:   {item_values[3]}')
+        info.pack(padx=10, anchor='w')
+
+        info = ctk.CTkLabel(mono, text=f'Phone:   {item_values[4]}')
+        info.pack(padx=10, anchor='w')
+
+        info = ctk.CTkLabel(mono, text=f'Username:   {item_values[5]}')
+        info.pack(padx=10, anchor='w')
+
+        info = ctk.CTkLabel(mono, text=f'Password:   {item_values[6]}')
+        info.pack(padx=10, anchor='w')
+
 
         info.grab_set()
     
@@ -1805,6 +1809,12 @@ def save_changes_to_database(school_id, fullname, course, year,id, conn, cursor,
         elif year not in year_format:
            messagebox.showerror("Update record", "Please input valid Year level")
            return
+        
+        school_id_pattern = r'^\d{2}-\d{4}$'
+        # Validate school_id format
+        if not re.match(school_id_pattern, school_id):
+            messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            return  # Exit the function if validation fails  
                                     
 
         query = "UPDATE student SET school_id = %s, full_name = %s, course =%s, year_level =%s WHERE id = %s"
@@ -1842,7 +1852,14 @@ def save_changes_member(school_id, fullname, affiliation, role, office,memberid,
         
         elif office not in office_format:
            messagebox.showerror("Update record member", "Please input valid office")
-           return                             
+           return   
+
+        school_id_pattern = r'^\d{2}-\d{4}$'
+        # Validate school_id format
+        if not re.match(school_id_pattern, school_id):
+            messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            return  # Exit the function if validation fails  
+                                                              
 
         query = "UPDATE member SET school_id = %s, full_name = %s, affiliation =%s, role =%s, office =%s WHERE id = %s"
         cursor.execute(query, (school_id, fullname, affiliation, role, office, memberid))
@@ -1888,7 +1905,14 @@ def update_password_data(school_id, fullname, operate, phone, username, password
         
         if len(password) < 4:
             messagebox.showerror("Add operator record", "Error: Password must be at least 4 characters long.")
-            return   
+            return  
+
+        school_id_pattern = r'^\d{2}-\d{4}$'
+        # Validate school_id format
+        if not re.match(school_id_pattern, school_id):
+            messagebox.showerror("Add Record", "Error: Invalid school ID format. Please use 'XX-XXXX' format (e.g., '00-0000').")
+            return  # Exit the function if validation fails  
+                                     
            
         # # Check if the username already exists in the database
         # cursor.execute("SELECT username FROM operator WHERE username = %s", (username,))

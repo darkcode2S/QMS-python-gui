@@ -162,10 +162,18 @@ def log_in(username, password, log_in_window, root):
             # Check if user is found in operator table
             elif operator_user:
                 stored_password = operator_user[6]  # Assuming password is the sixth field
-                op_name = operator_user[1]
+                op_name = operator_user[2]
                 op_area = operator_user[3]
                 op_id = operator_user[0]
-                id = operator_user[2]
+                id = operator_user[1]
+
+                print(stored_password )
+                print( op_name)
+                print(op_area)
+                print(op_id)     
+                print(id)
+
+                print(operator_user)
 
                 if bcrypt.checkpw(password.encode('utf-8'), stored_password.encode('utf-8')):  # Compare passwords
                     role = operator_user[7]  # Assuming role is the seventh field

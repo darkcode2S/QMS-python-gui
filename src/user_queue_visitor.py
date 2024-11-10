@@ -4,44 +4,7 @@ from tkinter import messagebox
 from PIL import Image
 import re
 from db import create_connection
-import os
 
-# File to store the ticket counter
-TICKET_COUNTER_FILE = "ticket_counter.txt"
-
-# Function to read the saved ticket number from the file
-def load_ticket_counter():
-    if os.path.exists(TICKET_COUNTER_FILE):
-        with open(TICKET_COUNTER_FILE, 'r') as file:
-            return int(file.read().strip())
-    return 1  # Start from 1 if no file exists
-
-# Function to save the current ticket counter to a file
-def save_ticket_counter(ticket_counter):
-    with open(TICKET_COUNTER_FILE, 'w') as file:
-        file.write(str(ticket_counter))
-
-# Initialize the ticket counter from the file
-ticket_counter = load_ticket_counter()
-
-# Function to generate sequential ticket numbers with a limit of 300
-def generate_ticket_number():
-    global ticket_counter
-
-    # Check if the counter exceeds 300
-    if ticket_counter >= 300:
-        ticket_counter = 1  # Reset to 1 if it goes beyond 300
-
-    # Get the current ticket number
-    ticket_number = ticket_counter
-
-    # Increment the counter for the next ticket
-    ticket_counter += 1
-
-    # Save the updated ticket counter to the file
-    save_ticket_counter(ticket_counter)
-
-    return ticket_number
 
 def visitor_queue(root, button_text, select_student, purpose):
     user_visitor = tk.Toplevel(root)
@@ -118,38 +81,42 @@ def visitor_queue(root, button_text, select_student, purpose):
     def cancel():
         user_visitor.destroy()
 
+
     def create_ticket(button_text, select_student, purpose):
         connection = create_connection()
         if connection is None:
             print("Failed to connect to the database.")
             return
 
-        cursor = connection.cursor()    
-
         visitor_name = e1.get()
         visitor_phone = e2.get()
 
+        # Validate that both fields are filled in
         if not visitor_name or not visitor_phone:
             messagebox.showerror("Error", "All fields are required.")
             return
 
-        global ticket_number
-        ticket_number = generate_ticket_number()
-        
-        phone_pattern = r'^\+?\d{10,15}$' 
         # Validate phone number format
+        phone_pattern = r'^\+?\d{10,15}$' 
         if not re.match(phone_pattern, visitor_phone):
-            messagebox.showerror("Error", "Error: Invalid phone number format. Please enter a valid number with 10-15 digits.")
+            messagebox.showerror("Error", "Invalid phone number format. Please enter a valid number with 10-15 digits.")
             return
 
-        # Insert into queue table
-        query_insert = """
+        try:
+            # Generate a unique ticket number
+            global ticket_number
+            from ticket import generate_ticket_number
+            ticket_number = generate_ticket_number()
+            
+            cursor = connection.cursor()
+
+            # Insert data into the queue table
+            query_insert = """
                 INSERT INTO `queue` (`queue_number`, `full_name`, `transaction`, `affiliation`, `phone`, `purpose_of_visit`) 
                 VALUES (%s, %s, %s, %s, %s, %s)
             """
             
-        # Use actual values instead of placeholders
-        cursor.execute(query_insert, (
+            cursor.execute(query_insert, (
                 ticket_number,             
                 visitor_name,    
                 button_text,    
@@ -157,18 +124,39 @@ def visitor_queue(root, button_text, select_student, purpose):
                 visitor_phone,
                 purpose
             ))
-                        
-        # Commit the changes
-        connection.commit()
 
-        # Close the user_visitor window
-        root.destroy()
+            # Commit the transaction to save changes
+            connection.commit()
 
-        open_ticket_window(visitor_name)
-        from user_queue_entry_main import example
-        example()
+            # Close the user_visitor window
+            root.destroy()
 
-        connection.close()       
+            # Determine the coordinator name code based on the button_text
+            cname = "Default"
+            if button_text == "Cashier Service":
+                cname = "C1"
+            elif button_text == "Promisorry note coordinator":
+                cname = "PNC"
+            elif button_text == "Scholarship coordinator":
+                cname = "SC"
+
+            # Open the ticket window with generated ticket information
+            open_ticket_window(ticket_number, cname)
+
+            # Import and run example function from user_queue_entry_main
+            from user_queue_entry_main import example
+            example()
+
+        except Exception as e:
+            messagebox.showerror("Database Error", f"An error occurred: {e}")
+            print(f"Database error: {e}")
+
+        finally:
+            # Close cursor and connection if they were opened
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
     user_visitor.grab_set()
 
@@ -188,20 +176,112 @@ def print_ticket(ticket_number, visitor_name):
 
     print_window.mainloop()
 
-def open_ticket_window(visitor_name):
-    new_window = tk.Tk()  # Create a new window
-    new_window.title("Create Ticket")
-    
-    # Create a label to display the ticket number
-    label = tk.Label(new_window, text=f"Your Ticket Number: {ticket_number}", font=("Helvetica", 16))
-    label.pack(pady=10)
-    
-    # Add a button to print the ticket
-    print_button = tk.Button(new_window, text="Print Ticket", command=lambda: print_ticket(ticket_number, visitor_name))
-    print_button.pack(pady=5)
-    
-    # Add a button to close the window
-    close_button = tk.Button(new_window, text="Close", command=new_window.destroy)
-    close_button.pack(pady=5)
+def open_ticket_window( ticket_number, cname):
+    import tkinter as tk
+    from tkinter import font
+    from datetime import datetime
 
-    new_window.mainloop()
+    from center_window import center_window
+
+
+        # Initialize the main window
+    root = tk.Tk()
+    root.title("View Queue Ticket")
+    center_window(800, 600, root)
+    root.configure(bg="#D3D3D3")  # Light gray background for the window
+
+    root.iconbitmap("old-logo.ico")
+
+        # Custom font for larger text
+    large_font = font.Font(family="Helvetica", size=48, weight="bold")
+    title_font = font.Font(family="Helvetica", size=30, weight="bold")
+    medium_font = font.Font(family="Helvetica", size=15)
+    small_font = font.Font(family="Helvetica", size=10)
+
+    # Title Label
+    title_label = tk.Label(root, text="VIEW QUEUE TICKET", font=title_font, bg="#D3D3D3")
+    title_label.pack(pady=10)
+
+        # Frame for ticket information
+    ticket_frame = tk.Frame(root, bg="white", padx=20, pady=20)
+    ticket_frame.pack(pady=10)
+
+        # Get current date in MM-DD-YY format
+    current_date = datetime.now().strftime("%m-%d-%y")
+
+        # Ticket Number
+    queue_number_label = tk.Label(ticket_frame, text="YOUR QUEUE NUMBER:", font=small_font, fg="black", bg="white")
+    queue_number_label.pack()
+
+    queue_label = tk.Label(ticket_frame, text=ticket_number, font=large_font, fg="black", bg="white")
+    queue_label.pack()
+
+    window_label = tk.Label(ticket_frame, text="WINDOW:", font=small_font, fg="black", bg="white")
+    window_label.pack()
+
+        # Counter Information
+    counter_label = tk.Label(ticket_frame, text=cname, font=large_font, fg="black", bg="white")
+    counter_label.pack()
+
+    seated_label = tk.Label(ticket_frame, text="PLEASE BE SEATED.\n YOU WILL BE SERVED SHORTLY.", font=small_font, fg="black", bg="white")
+    seated_label.pack()
+
+    queue_label = tk.Label(ticket_frame, text=current_date, font=small_font, fg="black", bg="white")
+    queue_label.pack(pady=(20,10), anchor="e")
+
+        # Instructional Text
+    instruction_label = tk.Label(root, text=f" Click Print Ticket to generate your queue ticket.\n"
+                                                "Thank you for your submission! We appreciate your feedback. if you have any\n further inquiries or concerns, please don't hesitate to reach out to us.",
+                                    font=small_font, bg="#D3D3D3")
+    instruction_label.pack(pady=10)
+
+        # Next Ticket Button
+    next_button = tk.Button(root, text="Print Ticket", font=medium_font, command=lambda: print_receipt(ticket_number, cname, root))
+    next_button.pack(pady=10)
+
+        # Run the Tkinter event loop
+    root.mainloop()
+
+from zebra import Zebra
+
+z = Zebra()
+
+# Function to connect to the printer
+def connect_printer():
+    printers = z.getqueues()
+    if printers:
+        z.setqueue(printers[0])  # Automatically select the first printer
+    else:
+        print("No printers found.")
+        return False
+    return True
+
+# Function to print receipt
+def print_receipt(ticket_number, cname, root):
+    from datetime import datetime
+
+    root.destroy();
+
+    if connect_printer():
+        # ZPL code for formatting receipt to match the provided style
+        zpl = f"""
+
+------------------
+YOUR QUEUE NUMBER
+       {ticket_number}
+        
+      WINDOW
+       {cname}
+------------------
+PLEASE BE SEATED.\nYOU WILL BE SERVED SHORTLY.
+
+                 {datetime.now().strftime("%m-%d-%y")}
+
+
+        """
+        z.output(zpl)
+        
+        print("Receipt printed successfully!")
+    else:
+        print("Could not print receipt.")
+
