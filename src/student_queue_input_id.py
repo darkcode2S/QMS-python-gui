@@ -142,99 +142,154 @@ def input_id_student(root, button_text, select_student, purpose):
         if connection is None:
             print("Failed to connect to the database.")
             return
+        
+        try:
 
-        cursor = connection.cursor()
+            cursor = connection.cursor()
 
-        # First, check in the student table
-        query_student = "SELECT school_id, full_name, course, year_level FROM student WHERE school_id = %s"
-        cursor.execute(query_student, (entered_id,))
-        result_student = cursor.fetchone()
+            # First, check in the student table
+            query_student = "SELECT school_id, full_name, course, year_level FROM student WHERE school_id = %s"
+            cursor.execute(query_student, (entered_id,))
+            result_student = cursor.fetchone()
 
-        if result_student:
-            # Assuming result_student[1] is the full name
-            student_name = result_student[1]
+            if result_student:
+                # Assuming result_student[1] is the full name
+                student_name = result_student[1]
 
-            # Generate ticket number only if ID belongs to a student
-            global ticket_number
-            from ticket import generate_ticket_number
-            ticket_number = generate_ticket_number()
-
-
-            import random
-
-            cname = "Default"
-            if button_text == "Cashier Service":
-                cname = random.choice(["C1", "C2"])
-
-                if cname == "C1":
-                                # Insert into queue table
-                    query_insert = """
-                        INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """
-                    
-                    # Use actual values instead of placeholders
-                    cursor.execute(query_insert, (
-                        ticket_number,               
-                        entered_id,
-                        student_name,    
-                        button_text,    
-                        select_student, 
-                        purpose,
-                    ))
-                                
-                    # Commit the changes
-                    connection.commit()
-                    root.destroy()
-                else: 
-                                # Insert into queue table
-                    query_insert = """
-                        INSERT INTO `queue_c2` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """
-                    
-                    # Use actual values instead of placeholders
-                    cursor.execute(query_insert, (
-                        ticket_number,               
-                        entered_id,
-                        student_name,    
-                        button_text,    
-                        select_student, 
-                        purpose,
-                    ))
-                                
-                    # Commit the changes
-                    connection.commit()
-                    root.destroy()
+                # Generate ticket number only if ID belongs to a student
+                global ticket_number
+                from ticket import generate_ticket_number
+                ticket_number = generate_ticket_number()
 
 
+                import random
 
-            elif button_text == "Promisorry note coordinator":
-                cname = "PNC"
-            elif button_text == "Scholarship coordinator":
-                cname = "SC"
+                cname = "Default"
+                if button_text == "Cashier Service":
+                    cname = random.choice(["C1", "C2"])
 
-            open_ticket_window(student_name, ticket_number, cname)
+                    if cname == "C1":
+                        # Insert into queue table
+                        query_insert = """
+                            INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        """
+                        
+                        # Use actual values instead of placeholders
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            student_name,    
+                            button_text,    
+                            select_student, 
+                            purpose,
+                        ))
+                                    
+                        # Commit the changes
+                        connection.commit()
+                        root.destroy()
+                    else:
+                        #Insert into queue table
+                        query_insert = """
+                            INSERT INTO `queue_c2` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        """
+                        
+                        # Use actual values instead of placeholders
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            student_name,    
+                            button_text,    
+                            select_student, 
+                            purpose,
+                        ))
+                                    
+                        # Commit the changes
+                        connection.commit()
+                        root.destroy()
+                                    
+
+                elif button_text == "Promisorry note coordinator":
+                    cname = "PNC"
+
+                    if cname == "PNC":
+                                            # Insert into queue table
+                        query_insert = """
+                            INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        """
+                        
+                        # Use actual values instead of placeholders
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            student_name,    
+                            button_text,    
+                            select_student, 
+                            purpose,
+                        ))
+                                    
+                        # Commit the changes
+                        connection.commit()
+                        root.destroy()
             
-            from user_queue_entry_main import example
-            example()
+                elif button_text == "Scholarship coordinator":
+                    cname = "SC"
 
-        else:
-            # If not found in the student table, check in the member table
-            query_member = "SELECT * FROM member WHERE school_id = %s"
-            cursor.execute(query_member, (entered_id,))
-            result_member = cursor.fetchone()
+                    if cname == "SC":
+                    # Insert into queue table
+                        query_insert = """
+                            INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                        """
+                        
+                        # Use actual values instead of placeholders
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            student_name,    
+                            button_text,    
+                            select_student, 
+                            purpose,
+                        ))
+                                    
+                        # Commit the changes
+                        connection.commit()
+                        root.destroy()
 
-            if result_member:
-                print(f"School ID {entered_id} found in the member table.")
-                messagebox.showinfo("Staff Access", f"The ID {entered_id} belongs to school staff.")
-                return
+    
+
+                open_ticket_window(student_name, ticket_number, cname)
+                
+                from user_queue_entry_main import example
+                example()
+
             else:
-                print(f"School ID {entered_id} not found in either table.")
-                messagebox.showinfo("Info", "You entered an invalid ID number. Please make sure you enter a valid ID number.")
-                return
+                # If not found in the student table, check in the member table
+                query_member = "SELECT * FROM member WHERE school_id = %s"
+                cursor.execute(query_member, (entered_id,))
+                result_member = cursor.fetchone()
 
-        connection.close()
+                if result_member:
+                    print(f"School ID {entered_id} found in the member table.")
+                    messagebox.showinfo("Staff Access", f"The ID {entered_id} belongs to school staff.")
+                    return
+                else:
+                    print(f"School ID {entered_id} not found in either table.")
+                    messagebox.showinfo("Info", "You entered an invalid ID number. Please make sure you enter a valid ID number.")
+                    return
+
+        except Exception as e:
+            messagebox.showerror("Database Error", f"An error occurred: {e}")
+            print(f"Error during ticket generation: {e}")
+
+        finally:
+            # Close cursor and connection if they were opened
+            if cursor:
+                cursor.close()
+            if connection:
+                connection.close()
 
 
     input_id_window.grab_set()
@@ -264,12 +319,11 @@ def open_ticket_window(student_name, ticket_number, cname):
     from center_window import center_window
 
 
-        # Initialize the main window
+     # Initialize the main window
     root = tk.Tk()
     root.title("View Queue Ticket")
     center_window(800, 600, root)
     root.configure(bg="#D3D3D3")  # Light gray background for the window
-    root.iconbitmap("old-logo.ico")
 
         # Custom font for larger text
     large_font = font.Font(family="Helvetica", size=48, weight="bold")

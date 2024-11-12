@@ -5,6 +5,7 @@ from counter_staff_profile_interface import counter_staff_home
 from db import create_connection
 from mysql.connector import Error
 from tkinter import ttk, messagebox  # Added messagebox for displaying warnings
+from operator_cashier2_dashboard import cashier_window2
 
 
 def cashier_window(op_name, op_area, op_id):
@@ -457,6 +458,35 @@ def cashier_window(op_name, op_area, op_id):
 
     call_btn = ctk.CTkButton(table_btn, text='Call ticket', height=35, text_color='#fff', command=call_ticket)
     call_btn.pack(side='left', padx=10)
+
+    # Define the function that handles the dropdown selection
+    def on_dropdown_change(*args):
+        if dropdown_var.get() == "Cashier 2":
+            counter_staff.destroy()
+            cashier_window2(op_name, op_area, op_id)
+        else:
+            print("You already in C1 Window.")
+
+    # Initialize the dropdown variable and bind it to the handler
+    dropdown_var = ctk.StringVar(value="Switch window")
+    dropdown_var.trace("w", on_dropdown_change)  # Trigger `on_dropdown_change` on any write to `dropdown_var`
+
+    # Create the dropdown
+    dropdown = ctk.CTkOptionMenu(
+        table_btn, 
+        variable=dropdown_var,
+        values=["Cachier 1", "Cashier 2"],
+        fg_color="#fff",
+        text_color="#000",
+        dropdown_fg_color="#fff",
+        button_color="#d68b26",
+        dropdown_hover_color="#d68b26",
+        button_hover_color="#de9420",
+        anchor="s",
+    )
+    dropdown.pack(side="right", pady=(0, 10), padx=10)
+    
+
 
 
     counter_staff.mainloop()

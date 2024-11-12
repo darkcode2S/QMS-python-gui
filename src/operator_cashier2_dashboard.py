@@ -7,9 +7,13 @@ from mysql.connector import Error
 from tkinter import ttk, messagebox  # Added messagebox for displaying warnings
 
 
-def cashier_window(op_name, op_area, op_id):
+
+
+def cashier_window2(op_name, op_area, op_id):
+    from operator_cashier_dashboard import cashier_window
+
     counter_staff = ctk.CTk()
-    counter_staff.title("Cashier 1")
+    counter_staff.title("Cashier 2")
     counter_staff.iconbitmap("old-logo.ico")
     # Set appearance mode and color theme (Light/Dark modes)
     ctk.set_appearance_mode("light")
@@ -60,7 +64,7 @@ def cashier_window(op_name, op_area, op_id):
         counter_staff_home(op_name, op_area, op_id)
 
     title_label = ctk.CTkLabel(nav_frame,
-                                text='Cashier 1',
+                                text='Cashier 2',
                                 anchor='w',
                                 compound='left', 
                                 text_color='#fff',
@@ -110,8 +114,9 @@ def cashier_window(op_name, op_area, op_id):
     def fetch_queue_data():
         connection = create_connection()
         cursor = connection.cursor()
-        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation, school_id, full_name, transaction, phone, voided, created_at FROM queue WHERE transaction = 'Cashier Service'")
+        cursor.execute("SELECT queue_number, purpose_of_visit, affiliation, school_id, full_name, transaction, phone, voided, created_at FROM queue_c2 WHERE transaction = 'Cashier Service'")
         rows = cursor.fetchall()
+        print(rows)
         cursor.close()
         connection.close()
         return rows
@@ -233,16 +238,25 @@ def cashier_window(op_name, op_area, op_id):
                             item_values[1],  # purpose_of_visit
                             item_values[7]   # voided
                         ))
+                        print(item_values[0])
+                        print(item_values[8])
+                        print(item_values[3])
+                        print(item_values[4])
+                        print(item_values[5])
+                        print(item_values[2])
+                        print(item_values[6])
+                        print(item_values[1])
+                        print(item_values[7])
                         conn.commit()
 
 
                         q_num = item_values[0]
 
-                        query = "DELETE FROM queue_display"
+                        query = "DELETE FROM queue_c2_display"
                         cursor.execute(query)
                         conn.commit()
 
-                        query2 = "DELETE FROM queue WHERE queue_number = %s"
+                        query2 = "DELETE FROM queue_c2 WHERE queue_number = %s"
                         cursor.execute(query2, (q_num,))
                         conn.commit()
                     except Error as err:
@@ -296,11 +310,11 @@ def cashier_window(op_name, op_area, op_id):
 
                         q_num = item_values[0]
 
-                        query = "DELETE FROM queue_display"
+                        query = "DELETE FROM queue_c2_display"
                         cursor.execute(query)
                         conn.commit()
 
-                        query2 = "DELETE FROM queue WHERE queue_number = %s"
+                        query2 = "DELETE FROM queue_c2 WHERE queue_number = %s"
                         cursor.execute(query2, (q_num,))
                         conn.commit()
                     except Error as err:
@@ -405,7 +419,7 @@ def cashier_window(op_name, op_area, op_id):
 
         print(q_num)
 
-        query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+        query = "INSERT INTO queue_c2_display (c2_num) VALUES (%s)"
         cursor.execute(query, (q_num,))
         conn.commit()  # Commit the changes to the database
 
@@ -429,7 +443,7 @@ def cashier_window(op_name, op_area, op_id):
 
             cursor = conn.cursor()
 
-            query = "INSERT INTO queue_display (queue_num) VALUES (%s)"
+            query = "INSERT INTO queue_c2_display (c2_num) VALUES (%s)"
             cursor.execute(query, (s_num,))
             conn.commit()  # Commit the changes to the database
 
@@ -457,6 +471,34 @@ def cashier_window(op_name, op_area, op_id):
 
     call_btn = ctk.CTkButton(table_btn, text='Call ticket', height=35, text_color='#fff', command=call_ticket)
     call_btn.pack(side='left', padx=10)
+
+
+        # Define the function that handles the dropdown selection
+    def on_dropdown_change(*args):
+        if dropdown_var.get() == "Cashier 1":
+            counter_staff.destroy()
+            cashier_window(op_name, op_area, op_id)
+        else:
+            print("You already in C2 Window.")
+
+    # Initialize the dropdown variable and bind it to the handler
+    dropdown_var = ctk.StringVar(value="Switch window")
+    dropdown_var.trace("w", on_dropdown_change)  # Trigger `on_dropdown_change` on any write to `dropdown_var`
+
+    # Create the dropdown
+    dropdown = ctk.CTkOptionMenu(
+        table_btn, 
+        variable=dropdown_var,
+        values=["Cashier 1", "Cashier 2"],
+        fg_color="#fff",
+        text_color="#000",
+        dropdown_fg_color="#fff",
+        button_color="#d68b26",
+        dropdown_hover_color="#d68b26",
+        button_hover_color="#de9420",
+        anchor="s",
+    )
+    dropdown.pack(side="right", pady=(0, 10), padx=10)
 
 
     counter_staff.mainloop()

@@ -150,34 +150,97 @@ def satff_input_id(root, button_text, select_student, purpose):
                 global ticket_number
                 ticket_number = generate_ticket_number()
 
-                # Insert record into the queue table
-                query_insert = """
-                        INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
-                        VALUES (%s, %s, %s, %s, %s, %s)
-                    """
-                cursor.execute(query_insert, (
-                    ticket_number,               
-                    entered_id,
-                    member_name,    
-                    button_text,    
-                    select_student,
-                    purpose,
-                ))
-                                    
-                    # Commit the transaction and close the root window
-                connection.commit()
-                root.destroy()
 
+                import random
 
-                # Determine coordinator name based on button_text
                 cname = "Default"
                 if button_text == "Cashier Service":
-                    cname = "C1"
+                    cname = random.choice(["C1", "C2"]) 
+
+                    if cname == "C1":
+                        
+                        # Insert record into the queue table
+                        query_insert = """
+                                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                            """
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            member_name,    
+                            button_text,    
+                            select_student,
+                            purpose,
+                        ))
+                                            
+                            # Commit the transaction and close the root window
+                        connection.commit()
+                        root.destroy()
+                    else:
+                        
+                        # Insert record into the queue table
+                        query_insert = """
+                                INSERT INTO `queue_c2` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                            """
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            member_name,    
+                            button_text,    
+                            select_student,
+                            purpose,
+                        ))
+                                            
+                            # Commit the transaction and close the root window
+                        connection.commit()
+                        root.destroy()
 
                 elif button_text == "Promisorry note coordinator":
                     cname = "PNC"
+
+                    if cname == "PNC":
+                        
+                        # Insert record into the queue table
+                        query_insert = """
+                                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                            """
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            member_name,    
+                            button_text,    
+                            select_student,
+                            purpose,
+                        ))
+                                            
+                            # Commit the transaction and close the root window
+                        connection.commit()
+                        root.destroy()
+
                 elif button_text == "Scholarship coordinator":
                     cname = "SC"
+
+                    if cname == "SC":
+                                
+                        # Insert record into the queue table
+                        query_insert = """
+                                INSERT INTO `queue` (`queue_number`, `school_id`, `full_name`, `transaction`, `affiliation`, `purpose_of_visit`) 
+                                VALUES (%s, %s, %s, %s, %s, %s)
+                            """
+                        cursor.execute(query_insert, (
+                            ticket_number,               
+                            entered_id,
+                            member_name,    
+                            button_text,    
+                            select_student,
+                            purpose,
+                        ))
+                                            
+                            # Commit the transaction and close the root window
+                        connection.commit()
+                        root.destroy()
 
                 # Open ticket window
                 open_ticket_window(ticket_number, cname)
@@ -242,7 +305,6 @@ def open_ticket_window( ticket_number, cname):
     root.title("View Queue Ticket")
     center_window(800, 600, root)
     root.configure(bg="#D3D3D3")  # Light gray background for the window
-    root.iconbitmap("old-logo.ico")
 
         # Custom font for larger text
     large_font = font.Font(family="Helvetica", size=48, weight="bold")

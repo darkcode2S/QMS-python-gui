@@ -39,7 +39,7 @@ def example():
     # Add the image on top of the label
     image_label = ctk.CTkLabel(frame, image=photo, text="")  # Empty text to display only the image
     image_label.pack(pady=(20, 10))
-
+    
     # Create a bold heading label under the image
     heading_label = ctk.CTkLabel(frame, text="NCMC Data Queue System",
                                 font=ctk.CTkFont(size=50, weight="bold"), 

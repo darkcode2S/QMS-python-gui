@@ -60,25 +60,32 @@ serving_label.grid(row=0, column=2, sticky='nsew', padx=10, pady=10)
 
 # Sidebar labels with modern design--------------------------------------------------------------------------
 cashier_label = ttk.Label(q_display,
-                          text='CASHIER',
+                          text='CASHIER 1',
                           bootstyle="light",
                           anchor='center',
                           font=('Helvetica', 32, 'bold'))
 cashier_label.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
+
+cashier_c2 = ttk.Label(q_display,
+                          text='CASHIER 2',
+                          bootstyle="light",
+                          anchor='center',
+                          font=('Helvetica', 32, 'bold'))
+cashier_c2.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
 
 scholarship_label = ttk.Label(q_display,
                               text='SCHOLARSHIP\nCOORDINATOR',
                               bootstyle="light",
                               anchor='center',
                               font=('Helvetica', 32, 'bold'))
-scholarship_label.grid(row=2, column=0, sticky='nsew', padx=10, pady=10)
+scholarship_label.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
 
 promissory_label = ttk.Label(q_display,
                              text='PROMISSORY \nNOTE\nCOORDINATOR',
                              bootstyle="light",
                              anchor='center',
                              font=('Helvetica', 32, 'bold'))
-promissory_label.grid(row=3, column=0, sticky='nsew', padx=10, pady=10)
+promissory_label.grid(row=4, column=0, sticky='nsew', padx=10, pady=10)
 
 # Preparing queue number------------------------------------------------------------------------------------
 try:
@@ -106,12 +113,22 @@ try:
     query_sc_prep = "SELECT queue_sc FROM queue_display_sc LIMIT 1 OFFSET 1"
     cursor.execute(query_sc_prep)
     get_num_sc_prep = cursor.fetchone()
+
+    get_num_sc_prep = get_num_sc_prep[0] if get_num_sc_prep else 0
+
+    cursor.fetchall()
+
+    query_sc2_prep = "SELECT c2_num FROM queue_c2_display LIMIT 1 OFFSET 1"
+    cursor.execute(query_sc2_prep)
+    get_num_sc2_prep = cursor.fetchone()
+
+    get_num_sc2_prep = get_num_sc2_prep[0] if get_num_sc2_prep else 0
 except Error as err:
     print(f"Error: {err}")
 
 
-# Set the default value to 0 if no result is found
-get_num_sc_prep = get_num_sc_prep[0] if get_num_sc_prep else 0
+# # Set the default value to 0 if no result is found
+# get_num_sc_prep = get_num_sc_prep[0] if get_num_sc_prep else 0
 
 p_c_number = ttk.Label(q_display,
                        text=str(get_snum),
@@ -120,19 +137,26 @@ p_c_number = ttk.Label(q_display,
                        font=('Helvetica', 80, 'bold'))
 p_c_number.grid(row=1, column=1, sticky='nsew', padx=10, pady=10)
 
+p_c_number = ttk.Label(q_display,
+                       text=str(get_num_sc2_prep),
+                       bootstyle="danger",
+                       anchor='center',
+                       font=('Helvetica', 80, 'bold'))
+p_c_number.grid(row=2, column=1, sticky='nsew', padx=10, pady=10)
+
 p_sc_number = ttk.Label(q_display,
                         text=str(get_num_sc_prep),
                         bootstyle="danger",
                         anchor='center',
                         font=('Helvetica', 80, 'bold'))
-p_sc_number.grid(row=2, column=1, sticky='nsew', padx=10, pady=10)
+p_sc_number.grid(row=3, column=1, sticky='nsew', padx=10, pady=10)
 
 p_pnc_number = ttk.Label(q_display,
                          text=str(get_num_pnc_prep),
                          bootstyle="danger",
                          anchor='center',
                          font=('Helvetica', 80, 'bold'))
-p_pnc_number.grid(row=3, column=1, sticky='nsew', padx=10, pady=10)
+p_pnc_number.grid(row=4, column=1, sticky='nsew', padx=10, pady=10)
 
 # Serving queue number--------------------------------------------------------------------------------
 try:
@@ -161,6 +185,16 @@ try:
 
     # Set the default value to 0 if no result is found
     get_num_sc_serve = get_num_sc_serve[0] if get_num_sc_serve else 0
+
+    cursor.fetchall()
+
+    query_sc2_serve = "SELECT c2_num FROM queue_c2_display"
+    cursor.execute(query_sc2_serve)
+    get_num_c2_serve = cursor.fetchone()
+
+
+    get_num_c2_serve = get_num_c2_serve[0] if get_num_c2_serve else 0
+
 except Error as err:
     print(f"Error: {err}")
 
@@ -172,19 +206,26 @@ s_c_number = ttk.Label(q_display,
                        font=('Helvetica', 80, 'bold'))
 s_c_number.grid(row=1, column=2, sticky='nsew', padx=10, pady=10)
 
+s_c_number = ttk.Label(q_display,
+                       text=str(get_num_c2_serve),
+                       bootstyle="warning",
+                       anchor='center',
+                       font=('Helvetica', 80, 'bold'))
+s_c_number.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
+
 s_sc_number = ttk.Label(q_display,
                         text=str(get_num_sc_serve),
                         bootstyle="warning",
                         anchor='center',
                         font=('Helvetica', 80, 'bold'))
-s_sc_number.grid(row=2, column=2, sticky='nsew', padx=10, pady=10)
+s_sc_number.grid(row=3, column=2, sticky='nsew', padx=10, pady=10)
 
 s_pnc_number = ttk.Label(q_display,
                          text=str(get_num_pnc_serve),
                          bootstyle="warning",
                          anchor='center',
                          font=('Helvetica', 80, 'bold'))
-s_pnc_number.grid(row=3, column=2, sticky='nsew', padx=10, pady=10)
+s_pnc_number.grid(row=4, column=2, sticky='nsew', padx=10, pady=10)
 
 
 q_display.mainloop()
